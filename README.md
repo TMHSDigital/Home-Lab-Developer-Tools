@@ -269,13 +269,23 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 
 &nbsp;
 
-| Version | Theme | MCP Tools | Highlights |
-|---|---|---|---|
-| **v0.1.0** | Foundation | 15 | 10 skills, 5 rules, 15 MCP tools, SSH connectivity |
-| **v0.2.0** | Expanded monitoring | +5 | Log aggregation, alertmanager integration, dashboard provisioning |
-| **v0.3.0** | Multi-node | +5 | Ansible inventory sync, multi-Pi orchestration |
-| **v0.4.0** | Advanced networking | +5 | Tailscale ACL management, DNS analytics, certificate automation |
-| **v1.0.0** | Stable | +0 | Production release (~30 MCP tools) |
+| Version | Theme | New Tools | New Skills | New Rules | Cumulative |
+|---|---|---|---|---|---|
+| **v0.1.0** | Foundation | 15 | 10 | 5 | 15 |
+| v0.2.0 | Extended Monitoring | +5 | +2 | -- | 20 |
+| v0.3.0 | DNS and Reverse Proxy | +5 | +2 | +1 | 25 |
+| v0.4.0 | Backup and Recovery | +4 | +1 | +1 | 29 |
+| v0.5.0 | Security Hardening | +4 | +1 | +2 | 33 |
+| v0.6.0 | Logs and Notifications | +4 | +2 | -- | 37 |
+| v0.7.0 | OS and Package Management | +4 | +2 | +1 | 41 |
+| v0.8.0 | SSL/TLS Certificates | +3 | +1 | -- | 44 |
+| v0.9.0 | Multi-Node Foundation | +4 | +1 | +1 | 48 |
+| v0.10.0 | Testing Infrastructure | +2 | -- | -- | 50 |
+| v0.11.0 | Documentation Site | -- | -- | -- | 50 |
+| v0.12.0 | Polish and Hardening | +2 | -- | -- | 52 |
+| **v1.0.0** | **Stable Release** | -- | -- | -- | **52** |
+
+See [ROADMAP.md](ROADMAP.md) for detailed per-version tool, skill, and rule breakdowns.
 
 </details>
 

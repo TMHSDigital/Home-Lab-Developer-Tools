@@ -124,6 +124,32 @@ npm install -g @tmhs/homelab-mcp
 - Skills use kebab-case directory names with YAML frontmatter.
 - Rules use kebab-case filenames with `description` and `alwaysApply` frontmatter.
 
+## Release Hygiene
+
+When preparing a new release version, ALL of the following files must be updated to reflect the new version number, tool/skill/rule counts, and any new entries:
+
+| File | What to update |
+|------|----------------|
+| `mcp-server/package.json` | `version` field |
+| `mcp-server/src/index.ts` | `version` in McpServer constructor |
+| `.cursor-plugin/plugin.json` | `version` field, `description` tool/skill/rule counts |
+| `README.md` | Badge versions, stat line counts, tool/skill/rule tables, roadmap table |
+| `CLAUDE.md` | `Version` field, skill/rule/tool counts and tables |
+| `ROADMAP.md` | Move version from planned to completed, update status |
+| `CHANGELOG.md` | Add new version section with all changes |
+| `docs/index.html` | Update any version references or counts |
+
+Checklist before tagging a release:
+
+1. All new tools registered in `mcp-server/src/index.ts`
+2. All new tools have input validation tests
+3. All new skills have SKILL.md with required frontmatter and sections
+4. All new rules have .mdc with required frontmatter
+5. Structure tests pass (`pytest tests/ -v`)
+6. MCP server builds and tests pass (`npm run build && npm test`)
+7. Version numbers match across all files listed above
+8. CHANGELOG.md entry added for the new version
+
 ## Home Lab Context
 
 The target environment is a Raspberry Pi 5 running:
