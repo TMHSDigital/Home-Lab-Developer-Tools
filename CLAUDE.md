@@ -166,6 +166,7 @@ When preparing a new release version, ALL of the following files must be updated
 | `ROADMAP.md` | Move version from planned to completed, update status |
 | `CHANGELOG.md` | Add new version section with all changes |
 | `docs/index.html` | Update any version references or counts |
+| GitHub repo About | Description with skill/rule/tool counts (`gh repo edit --description "..."`) |
 
 Checklist before pushing a release:
 
@@ -178,6 +179,7 @@ Checklist before pushing a release:
 7. Version numbers match across all files listed above
 8. CHANGELOG.md entry added for the new version
 9. Regenerate `package-lock.json` (`cd mcp-server && npm install`) and commit it
+10. Update GitHub repo description: `gh repo edit --description "...N skills, N rules, and N MCP tools..."`
 
 Publishing pipeline (fully automated):
 

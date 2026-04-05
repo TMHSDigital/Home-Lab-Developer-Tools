@@ -33,15 +33,16 @@ Before finalizing any version bump, complete every item in order:
    - `CLAUDE.md` (version, tool count, tool table)
    - `ROADMAP.md` (mark new version as current, previous as Released)
 6. Add a new section to `CHANGELOG.md` with all Added/Changed/Fixed items.
-7. Update `docs/index.html` (GitHub Pages site):
+7. Update GitHub repo About description with new counts: `gh repo edit --description "...N skills, N rules, and N MCP tools..."`.
+8. Update `docs/index.html` (GitHub Pages site):
    - Meta description and og:description tool counts
    - Hero version pill
    - Stats counter data-target for MCP Tools
    - Tools table (add new tool rows)
-8. Regenerate `package-lock.json` by running `npm install` in `mcp-server/` after version bump.
-9. Re-run all tests after doc changes (some tests validate docs consistency).
-10. Commit everything (including `package-lock.json`) and push to `main`. The `auto-tag.yml` workflow creates the tag and release automatically.
-11. Verify the release appears on GitHub and npm publish succeeds.
+9. Regenerate `package-lock.json` by running `npm install` in `mcp-server/` after version bump.
+10. Re-run all tests after doc changes (some tests validate docs consistency).
+11. Commit everything (including `package-lock.json`) and push to `main`. The `auto-tag.yml` workflow creates the tag and release automatically.
+12. Verify the release appears on GitHub and npm publish succeeds.
 
 ## Publishing flow
 - Pushing a version bump in `mcp-server/package.json` to `main` triggers `auto-tag.yml`.
