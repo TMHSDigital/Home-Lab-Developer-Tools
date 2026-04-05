@@ -23,7 +23,6 @@ jobs:
           cache: npm
           cache-dependency-path: mcp-server/package-lock.json
 
-      - run: npm install -g npm@latest
       - run: npm ci
         working-directory: mcp-server
       - run: npm run build
