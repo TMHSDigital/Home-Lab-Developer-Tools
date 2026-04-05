@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-04-05
+
+### Fixed
+
+- `grafanaSnapshot` now supports authentication via `HOMELAB_GRAFANA_TOKEN` (API key) or `HOMELAB_GRAFANA_USER`/`HOMELAB_GRAFANA_PASSWORD` (basic auth)
+- All 5 v0.2.0 tools now return human-readable error messages when a service is unreachable (e.g. "Could not connect to Alertmanager on port 9093. Is it running?") instead of raw curl exit codes
+- All 5 v0.2.0 tools now support optional port overrides via env vars (`HOMELAB_PROMETHEUS_PORT`, `HOMELAB_GRAFANA_PORT`, `HOMELAB_ALERTMANAGER_PORT`, `HOMELAB_UPTIME_KUMA_PORT`, `HOMELAB_SPEEDTEST_PORT`)
+- Updated `.env.example` and `mcp-server/README.md` with new env var documentation
+
 ## [0.2.0] - 2026-04-05
 
 ### Added
@@ -45,5 +54,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.2.1]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.2.1
 [0.2.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.2.0
 [0.1.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.1.0

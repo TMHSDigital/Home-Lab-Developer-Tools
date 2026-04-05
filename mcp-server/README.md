@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi via SSH and provides 15 tools for system management, Docker Compose stacks, service monitoring, networking, and backups.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi via SSH and provides 20 tools for system management, Docker Compose stacks, service monitoring, networking, and backups.
 
 ## Tools
 
@@ -20,6 +20,11 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | Network | `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
 | Backup | `homelab_backupStatus` | Check latest restic snapshots |
 | Backup | `homelab_backupRun` | Trigger restic backup |
+| Monitoring | `homelab_prometheusQuery` | Run PromQL queries against Prometheus |
+| Monitoring | `homelab_grafanaSnapshot` | Export Grafana dashboard config by UID |
+| Monitoring | `homelab_uptimeKumaStatus` | Get Uptime Kuma monitor statuses |
+| Monitoring | `homelab_alertList` | List Alertmanager alerts by state |
+| Monitoring | `homelab_speedtestResults` | Get recent Speedtest Tracker results |
 | SSH | `homelab_sshTest` | Test SSH connectivity |
 
 ## Setup
@@ -41,6 +46,14 @@ Set environment variables:
 | `HOMELAB_PI_KEY_PATH` | (empty) | Path to SSH private key |
 | `HOMELAB_COMPOSE_DIR` | `/opt/homelab/docker` | Compose project directory on Pi |
 | `HOMELAB_BACKUP_REPO` | `/mnt/backup/restic` | Restic backup repo path on Pi |
+| `HOMELAB_GRAFANA_TOKEN` | (empty) | Grafana API token (preferred auth method) |
+| `HOMELAB_GRAFANA_USER` | `admin` | Grafana basic auth username |
+| `HOMELAB_GRAFANA_PASSWORD` | (empty) | Grafana basic auth password (falls back to admin/admin) |
+| `HOMELAB_PROMETHEUS_PORT` | `9090` | Prometheus port override |
+| `HOMELAB_GRAFANA_PORT` | `3000` | Grafana port override |
+| `HOMELAB_ALERTMANAGER_PORT` | `9093` | Alertmanager port override |
+| `HOMELAB_UPTIME_KUMA_PORT` | `3001` | Uptime Kuma port override |
+| `HOMELAB_SPEEDTEST_PORT` | `8765` | Speedtest Tracker port override |
 
 ## Usage with Cursor
 
