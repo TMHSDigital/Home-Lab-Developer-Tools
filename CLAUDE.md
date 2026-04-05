@@ -164,6 +164,7 @@ Checklist before pushing a release:
 6. MCP server builds and tests pass (`npm run build && npm test`)
 7. Version numbers match across all files listed above
 8. CHANGELOG.md entry added for the new version
+9. Regenerate `package-lock.json` (`cd mcp-server && npm install`) and commit it
 
 Publishing pipeline (fully automated):
 
