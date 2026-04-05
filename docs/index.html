@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home Lab Developer Tools</title>
-  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 18 skills, 9 rules, 37 MCP tools.">
+  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 20 skills, 10 rules, 41 MCP tools.">
   <meta property="og:title" content="Home Lab Developer Tools">
-  <meta property="og:description" content="18 skills, 9 rules, 37 MCP tools for managing a Raspberry Pi home lab via SSH.">
+  <meta property="og:description" content="20 skills, 10 rules, 41 MCP tools for managing a Raspberry Pi home lab via SSH.">
   <meta property="og:type" content="website">
   <style>
     :root {
@@ -99,22 +99,22 @@
     <div class="container">
       <h1>Home Lab Developer Tools</h1>
       <p>Home lab and Raspberry Pi workflows for Cursor, Claude Code, and any MCP-compatible editor.</p>
-      <span class="version">v0.6.0</span>
+      <span class="version">v0.7.0</span>
     </div>
   </header>
 
   <div class="container">
     <div class="stats">
       <div class="stat">
-        <div class="stat-number" data-target="18">18</div>
+        <div class="stat-number" data-target="20">20</div>
         <div class="stat-label">Skills</div>
       </div>
       <div class="stat">
-        <div class="stat-number" data-target="9">9</div>
+        <div class="stat-number" data-target="10">10</div>
         <div class="stat-label">Rules</div>
       </div>
       <div class="stat">
-        <div class="stat-number" data-target="37">37</div>
+        <div class="stat-number" data-target="41">41</div>
         <div class="stat-label">MCP Tools</div>
       </div>
     </div>
@@ -222,6 +222,17 @@
         </tbody>
       </table>
 
+      <h3>OS / Packages (4)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>homelab_aptUpgradable</code></td><td>List upgradable packages with version details</td></tr>
+          <tr><td><code>homelab_aptHistory</code></td><td>Show recent apt install/upgrade/remove history</td></tr>
+          <tr><td><code>homelab_kernelInfo</code></td><td>Kernel version, boot parameters, loaded modules</td></tr>
+          <tr><td><code>homelab_systemdServices</code></td><td>List systemd units or get status of a specific unit</td></tr>
+        </tbody>
+      </table>
+
       <h3>SSH (1)</h3>
       <table>
         <thead><tr><th>Tool</th><th>Description</th></tr></thead>
@@ -252,6 +263,8 @@
           <tr><td>secrets-management</td><td>Vaultwarden, env vars, Docker secrets, credential auditing</td></tr>
           <tr><td>log-analysis</td><td>Structured log querying, journald workflows, container log searching</td></tr>
           <tr><td>notification-workflows</td><td>Ntfy setup, alert routing, notification pipelines</td></tr>
+          <tr><td>os-update-management</td><td>Unattended-upgrades, kernel updates, reboot scheduling</td></tr>
+          <tr><td>performance-tuning</td><td>Kernel params, swap config, I/O scheduler, GPU memory split</td></tr>
           <tr><td>storage-management</td><td>Samba, Syncthing, volumes, disk monitoring</td></tr>
           <tr><td>troubleshooting</td><td>Debug crashes, network issues, hardware problems</td></tr>
         </tbody>
@@ -272,6 +285,7 @@
           <tr><td>backup-coverage</td><td>Compose files</td><td>Flag Docker volumes not covered by any backup job</td></tr>
           <tr><td>privileged-containers</td><td>Compose files</td><td>Flag containers with elevated privileges or missing security opts</td></tr>
           <tr><td>weak-credentials</td><td>Compose / .env</td><td>Flag default/weak passwords and insecure credential storage</td></tr>
+          <tr><td>resource-limits</td><td>Compose files</td><td>Flag containers without memory or CPU limits</td></tr>
         </tbody>
       </table>
     </section>

@@ -4,13 +4,13 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 18 skills, 9 rules, and a companion MCP server with 37 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 20 skills, 10 rules, and a companion MCP server with 41 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.6.0
+**Version:** 0.7.0
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
@@ -38,7 +38,7 @@ Home-Lab-Developer-Tools/
   tests/                     # Python structure tests
 ```
 
-## Skills (18)
+## Skills (20)
 
 | Skill | Description |
 |-------|-------------|
@@ -58,10 +58,12 @@ Home-Lab-Developer-Tools/
 | secrets-management | Vaultwarden, env vars, Docker secrets, credential auditing |
 | log-analysis | Structured log querying, journald workflows, container log searching |
 | notification-workflows | Ntfy setup, alert routing, notification pipelines |
+| os-update-management | Unattended-upgrades, kernel updates, reboot scheduling |
+| performance-tuning | Kernel params, swap config, I/O scheduler, GPU memory split |
 | storage-management | Samba, Syncthing, volumes, disk monitoring |
 | troubleshooting | Debug crashes, network issues, hardware problems |
 
-## Rules (9)
+## Rules (10)
 
 | Rule | Scope | Description |
 |------|-------|-------------|
@@ -74,8 +76,9 @@ Home-Lab-Developer-Tools/
 | backup-coverage | compose*.yml | Flag Docker volumes not covered by any backup job |
 | privileged-containers | compose*.yml | Flag containers with elevated privileges or missing security opts |
 | weak-credentials | compose*.yml, .env* | Flag default/weak passwords and insecure credential storage |
+| resource-limits | compose*.yml | Flag containers without memory or CPU limits |
 
-## MCP Tools (37)
+## MCP Tools (41)
 
 All tools connect to the Pi via SSH using environment variables for configuration.
 
@@ -117,6 +120,10 @@ All tools connect to the Pi via SSH using environment variables for configuratio
 | `homelab_logSearch` | Search across container logs with grep patterns |
 | `homelab_ntfySend` | Send a push notification via Ntfy |
 | `homelab_ntfyTopics` | List Ntfy topics and recent messages |
+| `homelab_aptUpgradable` | List upgradable packages with version details |
+| `homelab_aptHistory` | Show recent apt install/upgrade/remove history |
+| `homelab_kernelInfo` | Kernel version, boot parameters, loaded modules |
+| `homelab_systemdServices` | List systemd units or get status of a specific unit |
 | `homelab_sshTest` | Test SSH connectivity |
 
 ## Development

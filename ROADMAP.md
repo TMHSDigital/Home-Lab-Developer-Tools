@@ -140,19 +140,19 @@ System-level maintenance beyond apt update.
 
 **MCP tools (+4):**
 
-- [ ] `homelab_aptUpgradable` -- list upgradable packages with version details
-- [ ] `homelab_aptHistory` -- show recent apt install/upgrade history
-- [ ] `homelab_kernelInfo` -- kernel version, loaded modules, boot params
-- [ ] `homelab_systemdServices` -- list systemd units, enable/disable/status
+- [x] `homelab_aptUpgradable` -- list upgradable packages with version details
+- [x] `homelab_aptHistory` -- show recent apt install/upgrade history
+- [x] `homelab_kernelInfo` -- kernel version, loaded modules, boot params
+- [x] `homelab_systemdServices` -- list systemd units, enable/disable/status
 
 **Skills (+2):**
 
-- [ ] `os-update-management` -- unattended-upgrades config, kernel updates, reboot scheduling
-- [ ] `performance-tuning` -- kernel params, swap config, I/O scheduler, GPU memory split
+- [x] `os-update-management` -- unattended-upgrades config, kernel updates, reboot scheduling
+- [x] `performance-tuning` -- kernel params, swap config, I/O scheduler, GPU memory split
 
 **Rules (+1):**
 
-- [ ] `resource-limits` -- flag containers without memory/CPU limits set
+- [x] `resource-limits` -- flag containers without memory/CPU limits set
 
 ---
 
@@ -271,6 +271,7 @@ Production-ready, fully tested, fully documented.
 
 ## Completed
 
+- v0.7.0: OS and Package Management -- 4 new tools (aptUpgradable, aptHistory, kernelInfo, systemdServices), 2 new skills (os-update-management, performance-tuning), 1 new rule (resource-limits)
 - v0.6.0: Logs and Notifications -- 4 new tools (journalLogs, logSearch, ntfySend, ntfyTopics), 2 new skills (log-analysis, notification-workflows)
 - v0.5.0: Security Hardening -- 4 new tools (ufwStatus, fail2banStatus, openPorts, containerScan), 1 new skill (secrets-management), 2 new rules (privileged-containers, weak-credentials)
 - v0.4.0: Backup and Recovery -- 4 new tools (backupList, backupRestore, backupDiff, volumeBackup), 1 new skill (disaster-recovery), 1 new rule (backup-coverage)

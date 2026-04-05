@@ -1,8 +1,8 @@
 {
   "name": "home-lab-developer-tools",
   "displayName": "Home Lab Developer Tools",
-  "version": "0.6.0",
-  "description": "Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors - 18 skills, 9 rules, and 37 MCP tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, and system administration on a Raspberry Pi home lab via SSH.",
+  "version": "0.7.0",
+  "description": "Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors - 20 skills, 10 rules, and 41 MCP tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, and system administration on a Raspberry Pi home lab via SSH.",
   "author": {
     "name": "TMHSDigital",
     "url": "https://github.com/TMHSDigital"

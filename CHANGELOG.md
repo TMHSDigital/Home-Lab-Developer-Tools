@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-04-05
+
+### Added
+
+- 4 new MCP tools for OS and package management
+  - `homelab_aptUpgradable` -- list upgradable packages with current and candidate versions
+  - `homelab_aptHistory` -- show recent apt install, upgrade, and remove history
+  - `homelab_kernelInfo` -- kernel version, boot parameters, and loaded modules
+  - `homelab_systemdServices` -- list systemd units or get status of a specific unit
+- 2 new skills
+  - `os-update-management` -- unattended-upgrades config, kernel updates, reboot scheduling
+  - `performance-tuning` -- kernel params, swap config, I/O scheduler, GPU memory split
+- 1 new rule
+  - `resource-limits` -- flag Docker Compose services without memory or CPU limits
+- Input validation tests for all 4 new tools
+
 ## [0.6.0] - 2026-04-05
 
 ### Added
@@ -121,6 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.7.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.7.0
 [0.6.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.6.0
 [0.5.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.5.0
 [0.4.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.4.0

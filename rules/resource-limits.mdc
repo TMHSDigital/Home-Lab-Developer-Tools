@@ -1,0 +1,76 @@
+---
+description: Flag Docker Compose services without memory or CPU limits set.
+alwaysApply: false
+globs:
+  - "**/compose*.yml"
+  - "**/docker-compose*.yml"
+---
+
+# Resource Limits
+
+## Patterns to Flag
+
+### Missing Memory Limits
+- Services without `mem_limit` (Compose v2 short form)
+- Services without `deploy.resources.limits.memory` (Compose v3 deploy syntax)
+- On a Raspberry Pi with 4-8GB RAM, unbounded containers risk OOM-killing other services
+
+### Missing CPU Limits
+- Services without `cpus` (Compose v2 short form)
+- Services without `deploy.resources.limits.cpus` (Compose v3 deploy syntax)
+- On a 4-core Pi, a runaway container can starve all other services
+
+### Unreasonable Limits
+- Memory limits above 4GB on an 8GB Pi (leaves too little for the OS and other containers)
+- CPU limits above 3.0 on a 4-core Pi
+- Memory limits below 32MB (most services cannot function)
+
+## What to Do
+
+- Add resource limits to every service in Compose files:
+
+```yaml
+services:
+  grafana:
+    image: grafana/grafana:latest
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+        reservations:
+          memory: 256M
+```
+
+- Or use the v2 short form (both are valid):
+
+```yaml
+services:
+  grafana:
+    image: grafana/grafana:latest
+    mem_limit: 512m
+    cpus: 1.0
+```
+
+- Set reservations (soft limits) alongside hard limits to help Docker schedule containers
+- Size limits based on actual usage -- check with `docker stats` first
+
+## Recommended Limits for Common Home Lab Services
+
+| Service | Memory | CPUs |
+|---------|--------|------|
+| Prometheus | 512M-1G | 1.0 |
+| Grafana | 256M-512M | 0.5 |
+| AdGuard Home | 128M-256M | 0.5 |
+| Nginx Proxy Manager | 128M-256M | 0.5 |
+| Uptime Kuma | 256M | 0.5 |
+| Vaultwarden | 128M-256M | 0.25 |
+| Ntfy | 64M-128M | 0.25 |
+| Portainer | 128M-256M | 0.5 |
+| Syncthing | 256M-512M | 1.0 |
+
+## Exceptions
+
+- Services that intentionally manage their own memory (e.g. databases with `shared_buffers`)
+- Build-time services that need burst resources temporarily
+- Init containers or one-shot jobs

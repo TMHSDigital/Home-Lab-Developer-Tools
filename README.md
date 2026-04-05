@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>18 skills &nbsp;&bull;&nbsp; 9 rules &nbsp;&bull;&nbsp; 37 MCP tools</strong>
+  <strong>20 skills &nbsp;&bull;&nbsp; 10 rules &nbsp;&bull;&nbsp; 41 MCP tools</strong>
 </p>
 
 ---
@@ -41,9 +41,9 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | Component | Cursor | Claude Code (terminal) | Claude Code in Cursor | Other MCP clients |
 |---|:---:|:---:|:---:|:---:|
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
-| **18 Skills** (SKILL.md) | Yes | Yes | Yes | - |
-| **9 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **37 MCP tools** | Yes | Yes | Yes | Yes |
+| **20 Skills** (SKILL.md) | Yes | Yes | Yes | - |
+| **10 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
+| **41 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -71,7 +71,7 @@ flowchart LR
 ---
 
 <details>
-<summary><strong>18 Skills</strong> - on-demand home lab expertise</summary>
+<summary><strong>20 Skills</strong> - on-demand home lab expertise</summary>
 
 &nbsp;
 
@@ -93,13 +93,15 @@ flowchart LR
 | **Security** | `secrets-management` | Vaultwarden, env vars, Docker secrets, credential auditing |
 | **Logs** | `log-analysis` | Structured log querying, journald workflows, container log searching |
 | **Notifications** | `notification-workflows` | Ntfy setup, alert routing, notification pipelines |
+| **OS** | `os-update-management` | Unattended-upgrades, kernel updates, reboot scheduling |
+| **OS** | `performance-tuning` | Kernel params, swap config, I/O scheduler, GPU memory split |
 | **Storage** | `storage-management` | Samba, Syncthing, volumes, disk monitoring |
 | **Debug** | `troubleshooting` | Debug crashes, network issues, hardware problems |
 
 </details>
 
 <details>
-<summary><strong>9 Rules</strong> - automatic best-practice enforcement</summary>
+<summary><strong>10 Rules</strong> - automatic best-practice enforcement</summary>
 
 &nbsp;
 
@@ -114,6 +116,7 @@ flowchart LR
 | `backup-coverage` | Compose files | Flag Docker volumes not covered by any backup job |
 | `privileged-containers` | Compose files | Flag containers with elevated privileges or missing security opts |
 | `weak-credentials` | Compose / .env files | Flag default/weak passwords and insecure credential storage |
+| `resource-limits` | Compose files | Flag containers without memory or CPU limits |
 
 </details>
 
@@ -125,7 +128,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-37-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-41-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2020-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -150,7 +153,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>37 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>41 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -225,6 +228,15 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_fail2banStatus` | List fail2ban jails, banned IPs, and ban counts |
 | `homelab_openPorts` | Scan listening TCP ports and map to processes |
 | `homelab_containerScan` | Scan container images for vulnerabilities via Trivy |
+
+**OS / Packages** (4)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_aptUpgradable` | List upgradable packages with version details |
+| `homelab_aptHistory` | Show recent apt install/upgrade/remove history |
+| `homelab_kernelInfo` | Kernel version, boot parameters, loaded modules |
+| `homelab_systemdServices` | List systemd units or get status of a specific unit |
 
 **SSH** (1)
 
@@ -314,6 +326,8 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | `secrets-management` | "Audit my Pi for weak passwords and scan containers for vulnerabilities" |
 | `log-analysis` | "Search all container logs for OOM errors in the last hour" |
 | `notification-workflows` | "Send a test notification to my phone via Ntfy" |
+| `os-update-management` | "Are there any security updates pending on my Pi?" |
+| `performance-tuning` | "My Pi is sluggish with 13 containers. How can I optimize it?" |
 
 </details>
 
@@ -330,7 +344,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | **v0.4.0** | **Backup and Recovery** | **+4** | **+1** | **+1** | **29** |
 | **v0.5.0** | **Security Hardening** | **+4** | **+1** | **+2** | **33** |
 | **v0.6.0** | **Logs and Notifications** | **+4** | **+2** | **--** | **37** |
-| v0.7.0 | OS and Package Management | +4 | +2 | +1 | 41 |
+| **v0.7.0** | **OS and Package Management** | **+4** | **+2** | **+1** | **41** |
 | v0.8.0 | SSL/TLS Certificates | +3 | +1 | -- | 44 |
 | v0.9.0 | Multi-Node Foundation | +4 | +1 | +1 | 48 |
 | v0.10.0 | Testing Infrastructure | +2 | -- | -- | 50 |

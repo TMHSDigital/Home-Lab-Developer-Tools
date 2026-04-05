@@ -40,10 +40,14 @@ import { register as registerJournalLogs } from "./tools/journalLogs.js";
 import { register as registerLogSearch } from "./tools/logSearch.js";
 import { register as registerNtfySend } from "./tools/ntfySend.js";
 import { register as registerNtfyTopics } from "./tools/ntfyTopics.js";
+import { register as registerAptUpgradable } from "./tools/aptUpgradable.js";
+import { register as registerAptHistory } from "./tools/aptHistory.js";
+import { register as registerKernelInfo } from "./tools/kernelInfo.js";
+import { register as registerSystemdServices } from "./tools/systemdServices.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.6.0",
+  version: "0.7.0",
 });
 
 registerPiStatus(server);
@@ -83,6 +87,10 @@ registerJournalLogs(server);
 registerLogSearch(server);
 registerNtfySend(server);
 registerNtfyTopics(server);
+registerAptUpgradable(server);
+registerAptHistory(server);
+registerKernelInfo(server);
+registerSystemdServices(server);
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();

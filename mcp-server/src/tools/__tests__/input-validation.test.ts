@@ -619,4 +619,70 @@ describe("input validation schemas", () => {
       expect(result.since).toBe("30m");
     });
   });
+
+  describe("aptUpgradable (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("aptHistory", () => {
+    const schema = z.object({
+      lines: z.number().int().positive().optional().default(50),
+    });
+
+    it("accepts empty input with default", () => {
+      const result = schema.parse({});
+      expect(result.lines).toBe(50);
+    });
+
+    it("accepts custom line count", () => {
+      const result = schema.parse({ lines: 100 });
+      expect(result.lines).toBe(100);
+    });
+
+    it("rejects non-positive lines", () => {
+      expect(() => schema.parse({ lines: 0 })).toThrow();
+      expect(() => schema.parse({ lines: -5 })).toThrow();
+    });
+  });
+
+  describe("kernelInfo (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("systemdServices", () => {
+    const schema = z.object({
+      unit: z.string().optional(),
+      type: z.enum(["service", "timer", "socket", "mount"]).optional(),
+    });
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result.unit).toBeUndefined();
+      expect(result.type).toBeUndefined();
+    });
+
+    it("accepts specific unit", () => {
+      const result = schema.parse({ unit: "docker.service" });
+      expect(result.unit).toBe("docker.service");
+    });
+
+    it("accepts type filter", () => {
+      const result = schema.parse({ type: "timer" });
+      expect(result.type).toBe("timer");
+    });
+
+    it("rejects invalid type", () => {
+      expect(() => schema.parse({ type: "target" })).toThrow();
+    });
+  });
 });
