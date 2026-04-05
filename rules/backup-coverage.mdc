@@ -1,0 +1,45 @@
+---
+description: Flag Docker Compose services with persistent data that lack backup coverage.
+alwaysApply: false
+globs:
+  - "**/compose*.yml"
+  - "**/docker-compose*.yml"
+---
+
+# Backup Coverage
+
+## Patterns to Flag
+
+### Named Volumes Without Backup
+
+- Services with `volumes:` using named volumes (e.g. `grafana_data:/var/lib/grafana`) that are not included in any restic backup job or `homelab_volumeBackup` call
+- Named volumes holding application state (databases, config, user data) are high-priority backup targets
+
+### Bind Mounts Outside the Backup Path
+
+- Services with bind mounts to host paths outside `/opt/homelab/` (the default restic backup path)
+- Common offenders: config mapped to `/home/pi/...`, data stored in `/srv/...`, or temp paths like `/tmp/...`
+- These paths are silently missed by the standard restic backup job
+
+### No Persistent Storage Declared
+
+- Stateful services (databases, wikis, password managers) that declare no volumes at all -- data lives only in the container layer and is lost on `docker compose down`
+
+## What to Do
+
+- Add named volumes for any service that stores persistent data
+- Ensure all named volumes are covered by the restic backup path or have a dedicated `homelab_volumeBackup` schedule
+- Move bind mounts into `/opt/homelab/docker/` (or the configured backup root) so they are included in the nightly restic run
+- For services with large, replaceable data (media caches, build artifacts), document them as intentionally excluded rather than silently skipping them
+
+## Verifying Coverage
+
+- Run `homelab_backupList --tag docker-volume` to confirm volume-level snapshots exist
+- Run `homelab_backupStatus` to confirm the last successful backup timestamp is recent
+- Cross-reference the volume list from `docker volume ls` against backup snapshots
+
+## Exceptions
+
+- Volumes containing only ephemeral or regenerable data (caches, tmp files, build output)
+- Read-only bind mounts (e.g. mounting `/etc/localtime` or `/var/run/docker.sock`)
+- Services explicitly documented as stateless or disposable

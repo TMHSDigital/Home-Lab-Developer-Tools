@@ -4,13 +4,13 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 14 skills, 6 rules, and a companion MCP server with 25 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 15 skills, 7 rules, and a companion MCP server with 29 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.3.0
+**Version:** 0.4.0
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
@@ -38,7 +38,7 @@ Home-Lab-Developer-Tools/
   tests/                     # Python structure tests
 ```
 
-## Skills (14)
+## Skills (15)
 
 | Skill | Description |
 |-------|-------------|
@@ -51,13 +51,14 @@ Home-Lab-Developer-Tools/
 | dns-management | AdGuard filters, local DNS records, blocklists |
 | reverse-proxy-management | NPM routing, SSL config, access lists |
 | backup-recovery | Restic backup config, scheduling, and restore |
+| disaster-recovery | Full Pi restore, SD card imaging, Docker volume recovery, migration |
 | ssh-management | SSH keys, hardening, tunnels, troubleshooting |
 | ansible-workflows | Ansible playbooks for multi-node management |
 | security-hardening | UFW, fail2ban, SSH lockdown, container security |
 | storage-management | Samba, Syncthing, volumes, disk monitoring |
 | troubleshooting | Debug crashes, network issues, hardware problems |
 
-## Rules (6)
+## Rules (7)
 
 | Rule | Scope | Description |
 |------|-------|-------------|
@@ -67,8 +68,9 @@ Home-Lab-Developer-Tools/
 | yaml-conventions | *.yml, *.yaml | Enforce formatting conventions |
 | ansible-best-practices | ansible/**/*.yml | Flag Ansible antipatterns |
 | exposed-ports | compose*.yml | Flag services with exposed host ports that should use a proxy |
+| backup-coverage | compose*.yml | Flag Docker volumes not covered by any backup job |
 
-## MCP Tools (25)
+## MCP Tools (29)
 
 All tools connect to the Pi via SSH using environment variables for configuration.
 
@@ -98,6 +100,10 @@ All tools connect to the Pi via SSH using environment variables for configuratio
 | `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
 | `homelab_backupStatus` | Check latest restic snapshots |
 | `homelab_backupRun` | Trigger restic backup (requires confirm=true) |
+| `homelab_backupList` | List all restic snapshots with path, tag, host filtering |
+| `homelab_backupRestore` | Restore files from a snapshot (requires confirm=true) |
+| `homelab_backupDiff` | Show differences between two restic snapshots |
+| `homelab_volumeBackup` | Back up a Docker volume to restic (requires confirm=true) |
 | `homelab_sshTest` | Test SSH connectivity |
 
 ## Development

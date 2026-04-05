@@ -79,18 +79,18 @@ Go beyond "check status / trigger backup" to full disaster recovery workflows.
 
 **MCP tools (+4):**
 
-- [ ] `homelab_backupList` -- list all restic snapshots with filtering
-- [ ] `homelab_backupRestore` -- restore files from a snapshot (requires confirm=true)
-- [ ] `homelab_backupDiff` -- diff two snapshots
-- [ ] `homelab_volumeBackup` -- backup a specific Docker volume
+- [x] `homelab_backupList` -- list all restic snapshots with filtering
+- [x] `homelab_backupRestore` -- restore files from a snapshot (requires confirm=true)
+- [x] `homelab_backupDiff` -- diff two snapshots
+- [x] `homelab_volumeBackup` -- backup a specific Docker volume
 
 **Skills (+1):**
 
-- [ ] `disaster-recovery` -- full Pi restore workflow, SD card imaging, migration checklist
+- [x] `disaster-recovery` -- full Pi restore workflow, SD card imaging, migration checklist
 
 **Rules (+1):**
 
-- [ ] `backup-coverage` -- flag Docker volumes not covered by any backup job
+- [x] `backup-coverage` -- flag Docker volumes not covered by any backup job
 
 ---
 
@@ -271,6 +271,7 @@ Production-ready, fully tested, fully documented.
 
 ## Completed
 
+- v0.4.0: Backup and Recovery -- 4 new tools (backupList, backupRestore, backupDiff, volumeBackup), 1 new skill (disaster-recovery), 1 new rule (backup-coverage)
 - v0.3.0: DNS and Reverse Proxy -- 5 new tools (adguardStats, adguardFilters, adguardQueryLog, npmProxyHosts, npmCerts), 2 new skills (dns-management, reverse-proxy-management), 1 new rule (exposed-ports)
 - v0.2.0: Extended Monitoring -- 5 new tools (prometheusQuery, grafanaSnapshot, uptimeKumaStatus, alertList, speedtestResults), 2 new skills (grafana-dashboards, alerting-rules)
 - v0.1.0: Foundation release with 15 tools, 10 skills, 5 rules

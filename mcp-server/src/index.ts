@@ -28,10 +28,14 @@ import { register as registerAdguardFilters } from "./tools/adguardFilters.js";
 import { register as registerAdguardQueryLog } from "./tools/adguardQueryLog.js";
 import { register as registerNpmProxyHosts } from "./tools/npmProxyHosts.js";
 import { register as registerNpmCerts } from "./tools/npmCerts.js";
+import { register as registerBackupList } from "./tools/backupList.js";
+import { register as registerBackupRestore } from "./tools/backupRestore.js";
+import { register as registerBackupDiff } from "./tools/backupDiff.js";
+import { register as registerVolumeBackup } from "./tools/volumeBackup.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.3.0",
+  version: "0.4.0",
 });
 
 registerPiStatus(server);
@@ -59,6 +63,10 @@ registerAdguardFilters(server);
 registerAdguardQueryLog(server);
 registerNpmProxyHosts(server);
 registerNpmCerts(server);
+registerBackupList(server);
+registerBackupRestore(server);
+registerBackupDiff(server);
+registerVolumeBackup(server);
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();

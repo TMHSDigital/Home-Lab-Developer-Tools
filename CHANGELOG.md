@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-04-05
+
+### Added
+
+- 4 new MCP tools for backup and disaster recovery
+  - `homelab_backupList` -- list all restic snapshots with optional path, tag, and host filtering
+  - `homelab_backupRestore` -- restore files from a snapshot to a target path (requires confirm=true)
+  - `homelab_backupDiff` -- show differences between two restic snapshots
+  - `homelab_volumeBackup` -- back up a specific Docker volume to restic (requires confirm=true)
+- 1 new skill
+  - `disaster-recovery` -- full Pi restore workflow, SD card imaging, Docker volume recovery, migration checklist
+- 1 new rule
+  - `backup-coverage` -- flag Docker services with named volumes not covered by backup jobs
+- `HOMELAB_BACKUP_REPO` env var support in all 4 new tools (default `/mnt/backup/restic`)
+- Input validation tests for all 4 new tools
+
 ## [0.3.0] - 2026-04-05
 
 ### Added
@@ -74,6 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.4.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.4.0
 [0.3.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.3.0
 [0.2.1]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.2.1
 [0.2.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.2.0

@@ -295,4 +295,165 @@ describe("input validation schemas", () => {
       expect(result).toEqual({});
     });
   });
+
+  describe("backupList", () => {
+    const schema = z.object({
+      path: z.string().optional(),
+      tag: z.string().optional(),
+      host: z.string().optional(),
+    });
+
+    it("accepts no filters", () => {
+      const result = schema.parse({});
+      expect(result.path).toBeUndefined();
+      expect(result.tag).toBeUndefined();
+      expect(result.host).toBeUndefined();
+    });
+
+    it("accepts path filter", () => {
+      const result = schema.parse({ path: "/opt/homelab" });
+      expect(result.path).toBe("/opt/homelab");
+    });
+
+    it("accepts tag filter", () => {
+      const result = schema.parse({ tag: "docker-volume" });
+      expect(result.tag).toBe("docker-volume");
+    });
+
+    it("accepts host filter", () => {
+      const result = schema.parse({ host: "raspberrypi" });
+      expect(result.host).toBe("raspberrypi");
+    });
+
+    it("accepts all filters combined", () => {
+      const result = schema.parse({
+        path: "/opt",
+        tag: "daily",
+        host: "pi5",
+      });
+      expect(result.path).toBe("/opt");
+      expect(result.tag).toBe("daily");
+      expect(result.host).toBe("pi5");
+    });
+  });
+
+  describe("backupRestore", () => {
+    const schema = z.object({
+      snapshot: z.string().min(1),
+      target: z.string().min(1),
+      include: z.string().optional(),
+      confirm: z.boolean(),
+    });
+
+    it("rejects empty snapshot", () => {
+      expect(() =>
+        schema.parse({ snapshot: "", target: "/tmp/restore", confirm: true }),
+      ).toThrow();
+    });
+
+    it("rejects empty target", () => {
+      expect(() =>
+        schema.parse({ snapshot: "abc123", target: "", confirm: true }),
+      ).toThrow();
+    });
+
+    it("rejects missing confirm", () => {
+      expect(() =>
+        schema.parse({ snapshot: "abc123", target: "/tmp/restore" }),
+      ).toThrow();
+    });
+
+    it("rejects non-boolean confirm", () => {
+      expect(() =>
+        schema.parse({
+          snapshot: "abc123",
+          target: "/tmp/restore",
+          confirm: "yes",
+        }),
+      ).toThrow();
+    });
+
+    it("accepts valid restore request", () => {
+      const result = schema.parse({
+        snapshot: "latest",
+        target: "/tmp/restore",
+        confirm: true,
+      });
+      expect(result.snapshot).toBe("latest");
+      expect(result.target).toBe("/tmp/restore");
+      expect(result.confirm).toBe(true);
+    });
+
+    it("accepts include pattern", () => {
+      const result = schema.parse({
+        snapshot: "abc123",
+        target: "/tmp/restore",
+        include: "/opt/homelab/docker/",
+        confirm: true,
+      });
+      expect(result.include).toBe("/opt/homelab/docker/");
+    });
+  });
+
+  describe("backupDiff", () => {
+    const schema = z.object({
+      snapshotA: z.string().min(1),
+      snapshotB: z.string().min(1),
+    });
+
+    it("rejects empty snapshotA", () => {
+      expect(() =>
+        schema.parse({ snapshotA: "", snapshotB: "def456" }),
+      ).toThrow();
+    });
+
+    it("rejects empty snapshotB", () => {
+      expect(() =>
+        schema.parse({ snapshotA: "abc123", snapshotB: "" }),
+      ).toThrow();
+    });
+
+    it("accepts valid snapshot pair", () => {
+      const result = schema.parse({
+        snapshotA: "abc123",
+        snapshotB: "def456",
+      });
+      expect(result.snapshotA).toBe("abc123");
+      expect(result.snapshotB).toBe("def456");
+    });
+  });
+
+  describe("volumeBackup", () => {
+    const schema = z.object({
+      volume: z.string().min(1),
+      confirm: z.boolean(),
+    });
+
+    it("rejects empty volume name", () => {
+      expect(() =>
+        schema.parse({ volume: "", confirm: true }),
+      ).toThrow();
+    });
+
+    it("rejects missing confirm", () => {
+      expect(() => schema.parse({ volume: "grafana_data" })).toThrow();
+    });
+
+    it("rejects non-boolean confirm", () => {
+      expect(() =>
+        schema.parse({ volume: "grafana_data", confirm: "yes" }),
+      ).toThrow();
+    });
+
+    it("accepts valid volume backup request", () => {
+      const result = schema.parse({ volume: "grafana_data", confirm: true });
+      expect(result.volume).toBe("grafana_data");
+      expect(result.confirm).toBe(true);
+    });
+
+    it("accepts confirm=false", () => {
+      const result = schema.parse({ volume: "grafana_data", confirm: false });
+      expect(result.confirm).toBe(false);
+    });
+  });
 });
