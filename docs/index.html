@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home Lab Developer Tools</title>
-  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 16 skills, 9 rules, 33 MCP tools.">
+  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 18 skills, 9 rules, 37 MCP tools.">
   <meta property="og:title" content="Home Lab Developer Tools">
-  <meta property="og:description" content="16 skills, 9 rules, 33 MCP tools for managing a Raspberry Pi home lab via SSH.">
+  <meta property="og:description" content="18 skills, 9 rules, 37 MCP tools for managing a Raspberry Pi home lab via SSH.">
   <meta property="og:type" content="website">
   <style>
     :root {
@@ -99,14 +99,14 @@
     <div class="container">
       <h1>Home Lab Developer Tools</h1>
       <p>Home lab and Raspberry Pi workflows for Cursor, Claude Code, and any MCP-compatible editor.</p>
-      <span class="version">v0.5.0</span>
+      <span class="version">v0.6.0</span>
     </div>
   </header>
 
   <div class="container">
     <div class="stats">
       <div class="stat">
-        <div class="stat-number" data-target="16">16</div>
+        <div class="stat-number" data-target="18">18</div>
         <div class="stat-label">Skills</div>
       </div>
       <div class="stat">
@@ -114,7 +114,7 @@
         <div class="stat-label">Rules</div>
       </div>
       <div class="stat">
-        <div class="stat-number" data-target="33">33</div>
+        <div class="stat-number" data-target="37">37</div>
         <div class="stat-label">MCP Tools</div>
       </div>
     </div>
@@ -211,6 +211,17 @@
         </tbody>
       </table>
 
+      <h3>Logs / Notifications (4)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>homelab_journalLogs</code></td><td>Query systemd journal with unit, priority, and time filters</td></tr>
+          <tr><td><code>homelab_logSearch</code></td><td>Search across container logs with grep patterns</td></tr>
+          <tr><td><code>homelab_ntfySend</code></td><td>Send a push notification via Ntfy</td></tr>
+          <tr><td><code>homelab_ntfyTopics</code></td><td>List Ntfy topics and recent messages</td></tr>
+        </tbody>
+      </table>
+
       <h3>SSH (1)</h3>
       <table>
         <thead><tr><th>Tool</th><th>Description</th></tr></thead>
@@ -239,6 +250,8 @@
           <tr><td>ansible-workflows</td><td>Ansible playbooks for multi-node management</td></tr>
           <tr><td>security-hardening</td><td>UFW, fail2ban, SSH lockdown, container security</td></tr>
           <tr><td>secrets-management</td><td>Vaultwarden, env vars, Docker secrets, credential auditing</td></tr>
+          <tr><td>log-analysis</td><td>Structured log querying, journald workflows, container log searching</td></tr>
+          <tr><td>notification-workflows</td><td>Ntfy setup, alert routing, notification pipelines</td></tr>
           <tr><td>storage-management</td><td>Samba, Syncthing, volumes, disk monitoring</td></tr>
           <tr><td>troubleshooting</td><td>Debug crashes, network issues, hardware problems</td></tr>
         </tbody>

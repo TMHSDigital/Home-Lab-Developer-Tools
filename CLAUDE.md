@@ -4,13 +4,13 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 16 skills, 9 rules, and a companion MCP server with 33 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 18 skills, 9 rules, and a companion MCP server with 37 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.5.0
+**Version:** 0.6.0
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
@@ -38,7 +38,7 @@ Home-Lab-Developer-Tools/
   tests/                     # Python structure tests
 ```
 
-## Skills (16)
+## Skills (18)
 
 | Skill | Description |
 |-------|-------------|
@@ -56,6 +56,8 @@ Home-Lab-Developer-Tools/
 | ansible-workflows | Ansible playbooks for multi-node management |
 | security-hardening | UFW, fail2ban, SSH lockdown, container security |
 | secrets-management | Vaultwarden, env vars, Docker secrets, credential auditing |
+| log-analysis | Structured log querying, journald workflows, container log searching |
+| notification-workflows | Ntfy setup, alert routing, notification pipelines |
 | storage-management | Samba, Syncthing, volumes, disk monitoring |
 | troubleshooting | Debug crashes, network issues, hardware problems |
 
@@ -73,7 +75,7 @@ Home-Lab-Developer-Tools/
 | privileged-containers | compose*.yml | Flag containers with elevated privileges or missing security opts |
 | weak-credentials | compose*.yml, .env* | Flag default/weak passwords and insecure credential storage |
 
-## MCP Tools (33)
+## MCP Tools (37)
 
 All tools connect to the Pi via SSH using environment variables for configuration.
 
@@ -111,6 +113,10 @@ All tools connect to the Pi via SSH using environment variables for configuratio
 | `homelab_fail2banStatus` | List fail2ban jails, banned IPs, and ban counts |
 | `homelab_openPorts` | Scan listening TCP ports and map to processes |
 | `homelab_containerScan` | Scan container images for vulnerabilities via Trivy |
+| `homelab_journalLogs` | Query systemd journal with unit, priority, and time filters |
+| `homelab_logSearch` | Search across container logs with grep patterns |
+| `homelab_ntfySend` | Send a push notification via Ntfy |
+| `homelab_ntfyTopics` | List Ntfy topics and recent messages |
 | `homelab_sshTest` | Test SSH connectivity |
 
 ## Development

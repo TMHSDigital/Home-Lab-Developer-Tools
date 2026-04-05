@@ -506,4 +506,117 @@ describe("input validation schemas", () => {
       expect(result.image).toBe("grafana/grafana:latest");
     });
   });
+
+  describe("journalLogs", () => {
+    const schema = z.object({
+      unit: z.string().optional(),
+      priority: z.number().int().min(0).max(7).optional(),
+      since: z.string().optional(),
+      lines: z.number().int().positive().optional().default(50),
+    });
+
+    it("accepts empty input with defaults", () => {
+      const result = schema.parse({});
+      expect(result.lines).toBe(50);
+      expect(result.unit).toBeUndefined();
+    });
+
+    it("accepts all filters", () => {
+      const result = schema.parse({ unit: "docker.service", priority: 3, since: "1 hour ago", lines: 200 });
+      expect(result.unit).toBe("docker.service");
+      expect(result.priority).toBe(3);
+      expect(result.since).toBe("1 hour ago");
+      expect(result.lines).toBe(200);
+    });
+
+    it("rejects priority out of range", () => {
+      expect(() => schema.parse({ priority: 8 })).toThrow();
+      expect(() => schema.parse({ priority: -1 })).toThrow();
+    });
+  });
+
+  describe("logSearch", () => {
+    const schema = z.object({
+      pattern: z.string().min(1),
+      service: z.string().optional(),
+      lines: z.number().int().positive().optional().default(100),
+    });
+
+    it("requires pattern", () => {
+      expect(() => schema.parse({})).toThrow();
+    });
+
+    it("accepts pattern only", () => {
+      const result = schema.parse({ pattern: "error" });
+      expect(result.pattern).toBe("error");
+      expect(result.lines).toBe(100);
+    });
+
+    it("accepts all options", () => {
+      const result = schema.parse({ pattern: "OOM", service: "grafana", lines: 50 });
+      expect(result.service).toBe("grafana");
+      expect(result.lines).toBe(50);
+    });
+
+    it("rejects empty pattern", () => {
+      expect(() => schema.parse({ pattern: "" })).toThrow();
+    });
+  });
+
+  describe("ntfySend", () => {
+    const schema = z.object({
+      topic: z.string().min(1),
+      message: z.string().min(1),
+      title: z.string().optional(),
+      priority: z.enum(["min", "low", "default", "high", "urgent"]).optional(),
+      tags: z.string().optional(),
+    });
+
+    it("requires topic and message", () => {
+      expect(() => schema.parse({})).toThrow();
+      expect(() => schema.parse({ topic: "alerts" })).toThrow();
+    });
+
+    it("accepts minimum inputs", () => {
+      const result = schema.parse({ topic: "alerts", message: "Server rebooted" });
+      expect(result.topic).toBe("alerts");
+      expect(result.message).toBe("Server rebooted");
+    });
+
+    it("accepts all options", () => {
+      const result = schema.parse({
+        topic: "alerts",
+        message: "Disk full",
+        title: "Warning",
+        priority: "high",
+        tags: "warning,disk",
+      });
+      expect(result.title).toBe("Warning");
+      expect(result.priority).toBe("high");
+      expect(result.tags).toBe("warning,disk");
+    });
+
+    it("rejects invalid priority", () => {
+      expect(() => schema.parse({ topic: "t", message: "m", priority: "critical" })).toThrow();
+    });
+  });
+
+  describe("ntfyTopics", () => {
+    const schema = z.object({
+      topic: z.string().optional(),
+      since: z.string().optional().default("1h"),
+    });
+
+    it("accepts empty input with defaults", () => {
+      const result = schema.parse({});
+      expect(result.since).toBe("1h");
+      expect(result.topic).toBeUndefined();
+    });
+
+    it("accepts specific topic", () => {
+      const result = schema.parse({ topic: "alerts", since: "30m" });
+      expect(result.topic).toBe("alerts");
+      expect(result.since).toBe("30m");
+    });
+  });
 });

@@ -122,15 +122,15 @@ Centralized log access and alerting pipelines.
 
 **MCP tools (+4):**
 
-- [ ] `homelab_journalLogs` -- query systemd journal with filters (unit, priority, time range)
-- [ ] `homelab_logSearch` -- search across container logs with grep patterns
-- [ ] `homelab_ntfySend` -- send a notification via Ntfy
-- [ ] `homelab_ntfyTopics` -- list Ntfy topics and recent messages
+- [x] `homelab_journalLogs` -- query systemd journal with filters (unit, priority, time range)
+- [x] `homelab_logSearch` -- search across container logs with grep patterns
+- [x] `homelab_ntfySend` -- send a notification via Ntfy
+- [x] `homelab_ntfyTopics` -- list Ntfy topics and recent messages
 
 **Skills (+2):**
 
-- [ ] `log-analysis` -- structured log querying, Loki integration, journald workflows
-- [ ] `notification-workflows` -- Ntfy setup, alert routing, webhook pipelines
+- [x] `log-analysis` -- structured log querying, journald workflows, container log searching
+- [x] `notification-workflows` -- Ntfy setup, alert routing, notification pipelines
 
 ---
 
@@ -271,6 +271,7 @@ Production-ready, fully tested, fully documented.
 
 ## Completed
 
+- v0.6.0: Logs and Notifications -- 4 new tools (journalLogs, logSearch, ntfySend, ntfyTopics), 2 new skills (log-analysis, notification-workflows)
 - v0.5.0: Security Hardening -- 4 new tools (ufwStatus, fail2banStatus, openPorts, containerScan), 1 new skill (secrets-management), 2 new rules (privileged-containers, weak-credentials)
 - v0.4.0: Backup and Recovery -- 4 new tools (backupList, backupRestore, backupDiff, volumeBackup), 1 new skill (disaster-recovery), 1 new rule (backup-coverage)
 - v0.3.0: DNS and Reverse Proxy -- 5 new tools (adguardStats, adguardFilters, adguardQueryLog, npmProxyHosts, npmCerts), 2 new skills (dns-management, reverse-proxy-management), 1 new rule (exposed-ports)

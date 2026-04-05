@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi via SSH and provides 33 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, and security auditing.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi via SSH and provides 37 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, and notifications.
 
 ## Tools
 
@@ -38,6 +38,10 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | Security | `homelab_fail2banStatus` | List fail2ban jails and banned IPs |
 | Security | `homelab_openPorts` | Scan listening TCP ports and map to processes |
 | Security | `homelab_containerScan` | Scan container images for vulnerabilities via Trivy |
+| Logs | `homelab_journalLogs` | Query systemd journal with unit, priority, time filters |
+| Logs | `homelab_logSearch` | Search across container logs with grep patterns |
+| Notifications | `homelab_ntfySend` | Send a push notification via Ntfy |
+| Notifications | `homelab_ntfyTopics` | List Ntfy topics and recent messages |
 | SSH | `homelab_sshTest` | Test SSH connectivity |
 
 ## Setup
@@ -73,6 +77,7 @@ Set environment variables:
 | `HOMELAB_NPM_EMAIL` | `admin@example.com` | NPM admin email |
 | `HOMELAB_NPM_PASSWORD` | `changeme` | NPM admin password |
 | `HOMELAB_NPM_PORT` | `81` | NPM admin API port override |
+| `HOMELAB_NTFY_PORT` | `8080` | Ntfy server port override |
 
 ## Usage with Cursor
 

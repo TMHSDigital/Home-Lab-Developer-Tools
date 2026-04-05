@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-04-05
+
+### Added
+
+- 4 new MCP tools for log analysis and notifications
+  - `homelab_journalLogs` -- query systemd journal with unit, priority, and time filters
+  - `homelab_logSearch` -- search across container logs with grep patterns
+  - `homelab_ntfySend` -- send a push notification via Ntfy
+  - `homelab_ntfyTopics` -- list Ntfy topics and recent messages
+- 2 new skills
+  - `log-analysis` -- structured log querying, journald workflows, container log searching
+  - `notification-workflows` -- Ntfy setup, alert routing, notification pipelines
+- `HOMELAB_NTFY_PORT` env var for Ntfy port override (default 8080)
+- Input validation tests for all 4 new tools
+
 ## [0.5.0] - 2026-04-05
 
 ### Added
@@ -106,6 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.6.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.6.0
 [0.5.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.5.0
 [0.4.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.4.0
 [0.3.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.3.0

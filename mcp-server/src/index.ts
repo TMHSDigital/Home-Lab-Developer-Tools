@@ -36,10 +36,14 @@ import { register as registerUfwStatus } from "./tools/ufwStatus.js";
 import { register as registerFail2banStatus } from "./tools/fail2banStatus.js";
 import { register as registerOpenPorts } from "./tools/openPorts.js";
 import { register as registerContainerScan } from "./tools/containerScan.js";
+import { register as registerJournalLogs } from "./tools/journalLogs.js";
+import { register as registerLogSearch } from "./tools/logSearch.js";
+import { register as registerNtfySend } from "./tools/ntfySend.js";
+import { register as registerNtfyTopics } from "./tools/ntfyTopics.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.5.0",
+  version: "0.6.0",
 });
 
 registerPiStatus(server);
@@ -75,6 +79,10 @@ registerUfwStatus(server);
 registerFail2banStatus(server);
 registerOpenPorts(server);
 registerContainerScan(server);
+registerJournalLogs(server);
+registerLogSearch(server);
+registerNtfySend(server);
+registerNtfyTopics(server);
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();
