@@ -1,0 +1,38 @@
+---
+description: Flag Docker Compose services with exposed host ports that should use a reverse proxy instead.
+alwaysApply: false
+globs:
+  - "**/compose*.yml"
+  - "**/docker-compose*.yml"
+---
+
+# Exposed Ports
+
+## Patterns to Flag
+
+### Direct Host Binding
+- Services using `ports:` with host-side binding when the service should only be accessed through a reverse proxy
+- Services bound to `0.0.0.0` (all interfaces) when they should be internal-only
+- Port mappings like `"8080:80"` or `"0.0.0.0:3000:3000"` for web services that should sit behind NPM
+
+### Use `expose:` Instead
+- Internal-only services (databases, caches, message queues) that use `ports:` when `expose:` would suffice
+- Services that only need to be reachable by other containers on the same Docker network
+
+### Missing Proxy Config
+- Web UIs bound to host ports without a corresponding reverse proxy entry
+- Multiple services bound to high-numbered host ports instead of proxied through NPM on 80/443
+
+## What to Do
+
+- Use `expose:` for services that only need container-to-container communication
+- For web UIs, remove the host port binding and proxy through Nginx Proxy Manager
+- If a host port is required (e.g. DNS on 53, SSH on 22), bind to the Pi's LAN IP instead of `0.0.0.0`
+- Services that must bind to a host port should use `"127.0.0.1:PORT:PORT"` when only local access is needed
+
+## Exceptions
+
+- Infrastructure services that need specific host ports: DNS (53), DHCP (67), SSH (22), SMTP (25/587)
+- NPM itself needs ports 80 and 443 on the host
+- Services using non-HTTP protocols (e.g. Samba on 445, Syncthing on 22000) that cannot be reverse proxied
+- Development or debugging scenarios where direct port access is intentional

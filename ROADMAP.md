@@ -56,20 +56,20 @@ Manage the network gateway layer -- AdGuard Home and Nginx Proxy Manager.
 
 **MCP tools (+5):**
 
-- [ ] `homelab_adguardStats` -- query/filter stats, top blocked domains
-- [ ] `homelab_adguardFilters` -- list/toggle filter lists
-- [ ] `homelab_adguardQueryLog` -- search DNS query log
-- [ ] `homelab_npmProxyHosts` -- list proxy host configs from NPM
-- [ ] `homelab_npmCerts` -- list SSL certificates and expiry dates
+- [x] `homelab_adguardStats` -- query/filter stats, top blocked domains
+- [x] `homelab_adguardFilters` -- list/toggle filter lists
+- [x] `homelab_adguardQueryLog` -- search DNS query log
+- [x] `homelab_npmProxyHosts` -- list proxy host configs from NPM
+- [x] `homelab_npmCerts` -- list SSL certificates and expiry dates
 
 **Skills (+2):**
 
-- [ ] `dns-management` -- AdGuard filters, local DNS records, blocklists
-- [ ] `reverse-proxy-management` -- NPM routing, SSL config, access lists
+- [x] `dns-management` -- AdGuard filters, local DNS records, blocklists
+- [x] `reverse-proxy-management` -- NPM routing, SSL config, access lists
 
 **Rules (+1):**
 
-- [ ] `exposed-ports` -- flag services bound to 0.0.0.0 or missing proxy config
+- [x] `exposed-ports` -- flag services bound to 0.0.0.0 or missing proxy config
 
 ---
 
@@ -271,5 +271,6 @@ Production-ready, fully tested, fully documented.
 
 ## Completed
 
+- v0.3.0: DNS and Reverse Proxy -- 5 new tools (adguardStats, adguardFilters, adguardQueryLog, npmProxyHosts, npmCerts), 2 new skills (dns-management, reverse-proxy-management), 1 new rule (exposed-ports)
 - v0.2.0: Extended Monitoring -- 5 new tools (prometheusQuery, grafanaSnapshot, uptimeKumaStatus, alertList, speedtestResults), 2 new skills (grafana-dashboards, alerting-rules)
 - v0.1.0: Foundation release with 15 tools, 10 skills, 5 rules

@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>12 skills &nbsp;&bull;&nbsp; 5 rules &nbsp;&bull;&nbsp; 20 MCP tools</strong>
+  <strong>14 skills &nbsp;&bull;&nbsp; 6 rules &nbsp;&bull;&nbsp; 25 MCP tools</strong>
 </p>
 
 ---
@@ -41,9 +41,9 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | Component | Cursor | Claude Code (terminal) | Claude Code in Cursor | Other MCP clients |
 |---|:---:|:---:|:---:|:---:|
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
-| **12 Skills** (SKILL.md) | Yes | Yes | Yes | - |
-| **5 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **20 MCP tools** | Yes | Yes | Yes | Yes |
+| **14 Skills** (SKILL.md) | Yes | Yes | Yes | - |
+| **6 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
+| **25 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -71,7 +71,7 @@ flowchart LR
 ---
 
 <details>
-<summary><strong>12 Skills</strong> - on-demand home lab expertise</summary>
+<summary><strong>14 Skills</strong> - on-demand home lab expertise</summary>
 
 &nbsp;
 
@@ -83,6 +83,8 @@ flowchart LR
 | **Monitoring** | `grafana-dashboards` | Create, import, and manage Grafana dashboards |
 | **Monitoring** | `alerting-rules` | Prometheus alerting rules and Alertmanager routing |
 | **Network** | `network-configuration` | AdGuard DNS, NPM reverse proxy, Tailscale VPN |
+| **Network** | `dns-management` | AdGuard filters, local DNS records, blocklists |
+| **Network** | `reverse-proxy-management` | NPM routing, SSL config, access lists |
 | **Backup** | `backup-recovery` | Restic backup config, scheduling, and restore |
 | **SSH** | `ssh-management` | SSH keys, hardening, tunnels, troubleshooting |
 | **Automation** | `ansible-workflows` | Ansible playbooks for multi-node management |
@@ -93,7 +95,7 @@ flowchart LR
 </details>
 
 <details>
-<summary><strong>5 Rules</strong> - automatic best-practice enforcement</summary>
+<summary><strong>6 Rules</strong> - automatic best-practice enforcement</summary>
 
 &nbsp;
 
@@ -104,6 +106,7 @@ flowchart LR
 | `ssh-safety` | Global (always active) | Flag dangerous SSH commands (rm -rf, dd, mkfs) |
 | `yaml-conventions` | YAML files | Enforce 2-space indent, document start, explicit booleans |
 | `ansible-best-practices` | Ansible files | Flag non-FQCN modules, missing tags, shell misuse |
+| `exposed-ports` | Compose files | Flag services with exposed host ports that should use a reverse proxy |
 
 </details>
 
@@ -115,7 +118,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-20-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-25-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2020-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -140,7 +143,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>20 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>25 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -179,6 +182,16 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_uptimeKumaStatus` | Get the status of all Uptime Kuma monitors |
 | `homelab_alertList` | List alerts from Alertmanager by state |
 | `homelab_speedtestResults` | Get recent Speedtest Tracker results |
+
+**DNS / Proxy** (5)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_adguardStats` | AdGuard Home DNS statistics and top blocked domains |
+| `homelab_adguardFilters` | List AdGuard filter/blocklists and status |
+| `homelab_adguardQueryLog` | Search the AdGuard DNS query log |
+| `homelab_npmProxyHosts` | List NPM proxy host configurations |
+| `homelab_npmCerts` | List SSL certificates and expiry dates |
 
 **Network** (1)
 
@@ -275,6 +288,8 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | `troubleshooting` | "Grafana won't start -- help me debug the container" |
 | `grafana-dashboards` | "Export my main Pi dashboard from Grafana" |
 | `alerting-rules` | "Set up an alert for when disk usage goes above 85%" |
+| `dns-management` | "Why is example.com being blocked? Check the AdGuard query log" |
+| `reverse-proxy-management` | "What services are proxied through NPM? Any certs expiring soon?" |
 
 </details>
 
@@ -287,7 +302,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 |---|---|---|---|---|---|
 | **v0.1.0** | Foundation | 15 | 10 | 5 | 15 |
 | **v0.2.0** | **Extended Monitoring** | **+5** | **+2** | **--** | **20** |
-| v0.3.0 | DNS and Reverse Proxy | +5 | +2 | +1 | 25 |
+| **v0.3.0** | **DNS and Reverse Proxy** | **+5** | **+2** | **+1** | **25** |
 | v0.4.0 | Backup and Recovery | +4 | +1 | +1 | 29 |
 | v0.5.0 | Security Hardening | +4 | +1 | +2 | 33 |
 | v0.6.0 | Logs and Notifications | +4 | +2 | -- | 37 |

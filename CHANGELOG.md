@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-04-05
+
+### Added
+
+- 5 new MCP tools for DNS and reverse proxy management
+  - `homelab_adguardStats` -- AdGuard Home DNS statistics and top blocked domains
+  - `homelab_adguardFilters` -- list AdGuard filter/blocklists and status
+  - `homelab_adguardQueryLog` -- search the AdGuard DNS query log
+  - `homelab_npmProxyHosts` -- list Nginx Proxy Manager proxy host configurations
+  - `homelab_npmCerts` -- list SSL certificates and expiry dates
+- 2 new skills
+  - `dns-management` -- AdGuard filters, local DNS records, blocklists
+  - `reverse-proxy-management` -- NPM routing, SSL config, access lists
+- 1 new rule
+  - `exposed-ports` -- flag Compose services with exposed host ports that should use a reverse proxy
+- AdGuard authentication via `HOMELAB_ADGUARD_USER`/`HOMELAB_ADGUARD_PASSWORD`
+- NPM authentication via `HOMELAB_NPM_EMAIL`/`HOMELAB_NPM_PASSWORD`
+- Port overrides: `HOMELAB_ADGUARD_PORT`, `HOMELAB_NPM_PORT`
+- Input validation tests for all 5 new tools
+
 ## [0.2.1] - 2026-04-05
 
 ### Fixed
@@ -54,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.3.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.3.0
 [0.2.1]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.2.1
 [0.2.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.2.0
 [0.1.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.1.0

@@ -23,10 +23,15 @@ import { register as registerGrafanaSnapshot } from "./tools/grafanaSnapshot.js"
 import { register as registerUptimeKumaStatus } from "./tools/uptimeKumaStatus.js";
 import { register as registerAlertList } from "./tools/alertList.js";
 import { register as registerSpeedtestResults } from "./tools/speedtestResults.js";
+import { register as registerAdguardStats } from "./tools/adguardStats.js";
+import { register as registerAdguardFilters } from "./tools/adguardFilters.js";
+import { register as registerAdguardQueryLog } from "./tools/adguardQueryLog.js";
+import { register as registerNpmProxyHosts } from "./tools/npmProxyHosts.js";
+import { register as registerNpmCerts } from "./tools/npmCerts.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.2.1",
+  version: "0.3.0",
 });
 
 registerPiStatus(server);
@@ -49,6 +54,11 @@ registerGrafanaSnapshot(server);
 registerUptimeKumaStatus(server);
 registerAlertList(server);
 registerSpeedtestResults(server);
+registerAdguardStats(server);
+registerAdguardFilters(server);
+registerAdguardQueryLog(server);
+registerNpmProxyHosts(server);
+registerNpmCerts(server);
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();

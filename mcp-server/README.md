@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi via SSH and provides 20 tools for system management, Docker Compose stacks, service monitoring, networking, and backups.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi via SSH and provides 25 tools for system management, Docker Compose stacks, service monitoring, networking, and backups.
 
 ## Tools
 
@@ -25,6 +25,11 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | Monitoring | `homelab_uptimeKumaStatus` | Get Uptime Kuma monitor statuses |
 | Monitoring | `homelab_alertList` | List Alertmanager alerts by state |
 | Monitoring | `homelab_speedtestResults` | Get recent Speedtest Tracker results |
+| DNS/Proxy | `homelab_adguardStats` | AdGuard Home DNS statistics |
+| DNS/Proxy | `homelab_adguardFilters` | List AdGuard filter lists and status |
+| DNS/Proxy | `homelab_adguardQueryLog` | Search AdGuard DNS query log |
+| DNS/Proxy | `homelab_npmProxyHosts` | List NPM proxy host configs |
+| DNS/Proxy | `homelab_npmCerts` | List SSL certificates and expiry |
 | SSH | `homelab_sshTest` | Test SSH connectivity |
 
 ## Setup
@@ -54,6 +59,12 @@ Set environment variables:
 | `HOMELAB_ALERTMANAGER_PORT` | `9093` | Alertmanager port override |
 | `HOMELAB_UPTIME_KUMA_PORT` | `3001` | Uptime Kuma port override |
 | `HOMELAB_SPEEDTEST_PORT` | `8765` | Speedtest Tracker port override |
+| `HOMELAB_ADGUARD_USER` | `admin` | AdGuard Home username |
+| `HOMELAB_ADGUARD_PASSWORD` | `admin` | AdGuard Home password |
+| `HOMELAB_ADGUARD_PORT` | `3000` | AdGuard Home port override |
+| `HOMELAB_NPM_EMAIL` | `admin@example.com` | NPM admin email |
+| `HOMELAB_NPM_PASSWORD` | `changeme` | NPM admin password |
+| `HOMELAB_NPM_PORT` | `81` | NPM admin API port override |
 
 ## Usage with Cursor
 

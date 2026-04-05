@@ -232,4 +232,67 @@ describe("input validation schemas", () => {
       expect(() => schema.parse({ count: -3 })).toThrow();
     });
   });
+
+  describe("adguardQueryLog", () => {
+    const schema = z.object({
+      search: z.string().optional(),
+      count: z.number().int().positive().optional().default(25),
+    });
+
+    it("defaults count to 25", () => {
+      const result = schema.parse({});
+      expect(result.count).toBe(25);
+      expect(result.search).toBeUndefined();
+    });
+
+    it("accepts search filter", () => {
+      const result = schema.parse({ search: "google.com" });
+      expect(result.search).toBe("google.com");
+    });
+
+    it("accepts custom count", () => {
+      const result = schema.parse({ count: 50 });
+      expect(result.count).toBe(50);
+    });
+
+    it("rejects zero count", () => {
+      expect(() => schema.parse({ count: 0 })).toThrow();
+    });
+  });
+
+  describe("adguardStats (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("adguardFilters (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("npmProxyHosts (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("npmCerts (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
 });

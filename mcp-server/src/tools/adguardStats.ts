@@ -1,0 +1,56 @@
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { CommandFailedError } from "../utils/errors.js";
+
+const DEFAULT_PORT = 3000;
+const SERVICE_NAME = "AdGuard Home";
+
+function getPort(): number {
+  const override = process.env.HOMELAB_ADGUARD_PORT;
+  return override ? parseInt(override, 10) : DEFAULT_PORT;
+}
+
+function buildAuth(): string {
+  const user = process.env.HOMELAB_ADGUARD_USER || "admin";
+  const password = process.env.HOMELAB_ADGUARD_PASSWORD || "admin";
+  return `-u '${user}:${password}'`;
+}
+
+export function register(server: McpServer): void {
+  server.tool(
+    "homelab_adguardStats",
+    "Get AdGuard Home DNS statistics including query counts, blocked domains, and top clients",
+    {},
+    async () => {
+      const port = getPort();
+      try {
+        const auth = buildAuth();
+        const output = await execSSH(
+          `curl -sf ${auth} 'http://localhost:${port}/control/stats'`,
+        );
+
+        return { content: [{ type: "text" as const, text: output }] };
+      } catch (error) {
+        if (error instanceof CommandFailedError) {
+          if (error.exitCode === 7) {
+            return errorResponse(
+              new Error(
+                `Could not connect to ${SERVICE_NAME} on port ${port}. Is it running? ` +
+                  `Set HOMELAB_ADGUARD_PORT if using a non-default port.`,
+              ),
+            );
+          }
+          if (error.exitCode === 22) {
+            return errorResponse(
+              new Error(
+                `${SERVICE_NAME} returned an HTTP error. Check authentication -- ` +
+                  `set HOMELAB_ADGUARD_USER and HOMELAB_ADGUARD_PASSWORD.`,
+              ),
+            );
+          }
+        }
+        return errorResponse(error);
+      }
+    },
+  );
+}

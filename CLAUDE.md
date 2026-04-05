@@ -4,13 +4,13 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 12 skills, 5 rules, and a companion MCP server with 20 tools for managing Docker Compose stacks, monitoring, networking, backups, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 14 skills, 6 rules, and a companion MCP server with 25 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.2.0
+**Version:** 0.3.0
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
@@ -38,7 +38,7 @@ Home-Lab-Developer-Tools/
   tests/                     # Python structure tests
 ```
 
-## Skills (12)
+## Skills (14)
 
 | Skill | Description |
 |-------|-------------|
@@ -48,6 +48,8 @@ Home-Lab-Developer-Tools/
 | grafana-dashboards | Create, import, and manage Grafana dashboards |
 | alerting-rules | Prometheus alerting rules and Alertmanager routing |
 | network-configuration | AdGuard DNS, NPM, Tailscale VPN, port management |
+| dns-management | AdGuard filters, local DNS records, blocklists |
+| reverse-proxy-management | NPM routing, SSL config, access lists |
 | backup-recovery | Restic backup config, scheduling, and restore |
 | ssh-management | SSH keys, hardening, tunnels, troubleshooting |
 | ansible-workflows | Ansible playbooks for multi-node management |
@@ -55,7 +57,7 @@ Home-Lab-Developer-Tools/
 | storage-management | Samba, Syncthing, volumes, disk monitoring |
 | troubleshooting | Debug crashes, network issues, hardware problems |
 
-## Rules (5)
+## Rules (6)
 
 | Rule | Scope | Description |
 |------|-------|-------------|
@@ -64,8 +66,9 @@ Home-Lab-Developer-Tools/
 | ssh-safety | Global | Flag dangerous SSH commands |
 | yaml-conventions | *.yml, *.yaml | Enforce formatting conventions |
 | ansible-best-practices | ansible/**/*.yml | Flag Ansible antipatterns |
+| exposed-ports | compose*.yml | Flag services with exposed host ports that should use a proxy |
 
-## MCP Tools (20)
+## MCP Tools (25)
 
 All tools connect to the Pi via SSH using environment variables for configuration.
 
@@ -87,6 +90,11 @@ All tools connect to the Pi via SSH using environment variables for configuratio
 | `homelab_uptimeKumaStatus` | Get the status of all Uptime Kuma monitors |
 | `homelab_alertList` | List alerts from Alertmanager by state |
 | `homelab_speedtestResults` | Get recent Speedtest Tracker results |
+| `homelab_adguardStats` | AdGuard Home DNS statistics and top blocked domains |
+| `homelab_adguardFilters` | List AdGuard filter/blocklists and status |
+| `homelab_adguardQueryLog` | Search the AdGuard DNS query log |
+| `homelab_npmProxyHosts` | List NPM proxy host configurations |
+| `homelab_npmCerts` | List SSL certificates and expiry dates |
 | `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
 | `homelab_backupStatus` | Check latest restic snapshots |
 | `homelab_backupRun` | Trigger restic backup (requires confirm=true) |
