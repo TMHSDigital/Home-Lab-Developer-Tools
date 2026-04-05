@@ -146,7 +146,7 @@ When preparing a new release version, ALL of the following files must be updated
 | `CHANGELOG.md` | Add new version section with all changes |
 | `docs/index.html` | Update any version references or counts |
 
-Checklist before tagging a release:
+Checklist before pushing a release:
 
 1. All new tools registered in `mcp-server/src/index.ts`
 2. All new tools have input validation tests
@@ -156,6 +156,13 @@ Checklist before tagging a release:
 6. MCP server builds and tests pass (`npm run build && npm test`)
 7. Version numbers match across all files listed above
 8. CHANGELOG.md entry added for the new version
+
+Publishing pipeline (fully automated):
+
+1. Push version bump in `mcp-server/package.json` to `main`
+2. `auto-tag.yml` detects the change, creates git tag `vX.Y.Z` and GitHub Release
+3. GitHub Release triggers `publish.yml` which publishes to npm with provenance
+4. Never create tags, releases, or npm publishes manually
 
 ## Home Lab Context
 

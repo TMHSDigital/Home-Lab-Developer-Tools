@@ -39,14 +39,16 @@ Before finalizing any version bump, complete every item in order:
    - Stats counter data-target for MCP Tools
    - Tools table (add new tool rows)
 8. Re-run all tests after doc changes (some tests validate docs consistency).
-9. Commit, push, tag (`vX.Y.Z`), and `gh release create` with release notes.
-10. Update repo description: `gh repo edit --description "..."` with new tool count.
+9. Commit and push to `main`. The `auto-tag.yml` workflow creates the tag and release automatically.
+10. Verify the release appears on GitHub and npm publish succeeds.
 
 ## Publishing flow
-- Tagging a commit with `vX.Y.Z` and creating a GitHub Release triggers `publish.yml`.
-- `publish.yml` builds, tests, and publishes `@tmhs/homelab-mcp` to npm with provenance.
+- Pushing a version bump in `mcp-server/package.json` to `main` triggers `auto-tag.yml`.
+- `auto-tag.yml` detects the version change, creates a git tag (`vX.Y.Z`), and creates a GitHub Release with auto-generated notes.
+- The GitHub Release triggers `publish.yml`, which builds, tests, and publishes `@tmhs/homelab-mcp` to npm with provenance.
 - Release Drafter auto-drafts release notes from merged PRs (labels control categories).
 - Never publish to npm manually -- always go through the GitHub Release workflow.
+- Never create tags or releases manually -- `auto-tag.yml` handles this automatically on version bumps.
 
 ## Home lab conventions
 - Target platform is Raspberry Pi 5 running Raspberry Pi OS Lite 64-bit (arm64).
