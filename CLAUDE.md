@@ -4,13 +4,13 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 20 skills, 10 rules, and a companion MCP server with 41 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 21 skills, 10 rules, and a companion MCP server with 44 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.7.0
+**Version:** 0.8.0
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
@@ -38,7 +38,7 @@ Home-Lab-Developer-Tools/
   tests/                     # Python structure tests
 ```
 
-## Skills (20)
+## Skills (21)
 
 | Skill | Description |
 |-------|-------------|
@@ -60,6 +60,7 @@ Home-Lab-Developer-Tools/
 | notification-workflows | Ntfy setup, alert routing, notification pipelines |
 | os-update-management | Unattended-upgrades, kernel updates, reboot scheduling |
 | performance-tuning | Kernel params, swap config, I/O scheduler, GPU memory split |
+| certificate-management | Let's Encrypt, self-signed certs, renewal automation, NPM cert integration |
 | storage-management | Samba, Syncthing, volumes, disk monitoring |
 | troubleshooting | Debug crashes, network issues, hardware problems |
 
@@ -78,7 +79,7 @@ Home-Lab-Developer-Tools/
 | weak-credentials | compose*.yml, .env* | Flag default/weak passwords and insecure credential storage |
 | resource-limits | compose*.yml | Flag containers without memory or CPU limits |
 
-## MCP Tools (41)
+## MCP Tools (44)
 
 All tools connect to the Pi via SSH using environment variables for configuration.
 
@@ -124,6 +125,9 @@ All tools connect to the Pi via SSH using environment variables for configuratio
 | `homelab_aptHistory` | Show recent apt install/upgrade/remove history |
 | `homelab_kernelInfo` | Kernel version, boot parameters, loaded modules |
 | `homelab_systemdServices` | List systemd units or get status of a specific unit |
+| `homelab_certCheck` | Check SSL certificate expiry, issuer, and fingerprint |
+| `homelab_certRenew` | Trigger Let's Encrypt certificate renewal |
+| `homelab_certList` | List all managed certificates from certbot and NPM |
 | `homelab_sshTest` | Test SSH connectivity |
 
 ## Development

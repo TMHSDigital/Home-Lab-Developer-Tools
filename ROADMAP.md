@@ -162,13 +162,13 @@ Certificate lifecycle management.
 
 **MCP tools (+3):**
 
-- [ ] `homelab_certCheck` -- check SSL cert expiry for a domain/host
-- [ ] `homelab_certRenew` -- trigger Let's Encrypt renewal (requires confirm=true)
-- [ ] `homelab_certList` -- list all managed certificates and their status
+- [x] `homelab_certCheck` -- check SSL cert expiry for a domain/host
+- [x] `homelab_certRenew` -- trigger Let's Encrypt renewal (requires confirm=true)
+- [x] `homelab_certList` -- list all managed certificates and their status
 
 **Skills (+1):**
 
-- [ ] `certificate-management` -- Let's Encrypt, self-signed certs, renewal automation, NPM cert integration
+- [x] `certificate-management` -- Let's Encrypt, self-signed certs, renewal automation, NPM cert integration
 
 ---
 
@@ -271,6 +271,7 @@ Production-ready, fully tested, fully documented.
 
 ## Completed
 
+- v0.8.0: SSL/TLS Certificates -- 3 new tools (certCheck, certRenew, certList), 1 new skill (certificate-management)
 - v0.7.0: OS and Package Management -- 4 new tools (aptUpgradable, aptHistory, kernelInfo, systemdServices), 2 new skills (os-update-management, performance-tuning), 1 new rule (resource-limits)
 - v0.6.0: Logs and Notifications -- 4 new tools (journalLogs, logSearch, ntfySend, ntfyTopics), 2 new skills (log-analysis, notification-workflows)
 - v0.5.0: Security Hardening -- 4 new tools (ufwStatus, fail2banStatus, openPorts, containerScan), 1 new skill (secrets-management), 2 new rules (privileged-containers, weak-credentials)

@@ -44,10 +44,13 @@ import { register as registerAptUpgradable } from "./tools/aptUpgradable.js";
 import { register as registerAptHistory } from "./tools/aptHistory.js";
 import { register as registerKernelInfo } from "./tools/kernelInfo.js";
 import { register as registerSystemdServices } from "./tools/systemdServices.js";
+import { register as registerCertCheck } from "./tools/certCheck.js";
+import { register as registerCertRenew } from "./tools/certRenew.js";
+import { register as registerCertList } from "./tools/certList.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.7.0",
+  version: "0.8.0",
 });
 
 registerPiStatus(server);
@@ -91,6 +94,9 @@ registerAptUpgradable(server);
 registerAptHistory(server);
 registerKernelInfo(server);
 registerSystemdServices(server);
+registerCertCheck(server);
+registerCertRenew(server);
+registerCertList(server);
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();

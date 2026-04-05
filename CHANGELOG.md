@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-04-05
+
+### Added
+
+- 3 new MCP tools for SSL/TLS certificate management
+  - `homelab_certCheck` -- check SSL certificate expiry, issuer, and fingerprint for a domain
+  - `homelab_certRenew` -- trigger Let's Encrypt certificate renewal via certbot (requires confirm=true)
+  - `homelab_certList` -- list all managed certificates from certbot and Nginx Proxy Manager
+- 1 new skill
+  - `certificate-management` -- Let's Encrypt, self-signed certs, renewal automation, NPM cert integration
+- Input validation tests for all 3 new tools
+
 ## [0.7.0] - 2026-04-05
 
 ### Added
@@ -137,6 +149,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.8.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.8.0
 [0.7.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.7.0
 [0.6.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.6.0
 [0.5.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.5.0

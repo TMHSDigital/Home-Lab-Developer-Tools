@@ -685,4 +685,65 @@ describe("input validation schemas", () => {
       expect(() => schema.parse({ type: "target" })).toThrow();
     });
   });
+
+  describe("certCheck", () => {
+    const schema = z.object({
+      domain: z.string().min(1),
+    });
+
+    it("requires domain", () => {
+      expect(() => schema.parse({})).toThrow();
+    });
+
+    it("accepts a domain", () => {
+      const result = schema.parse({ domain: "example.com" });
+      expect(result.domain).toBe("example.com");
+    });
+
+    it("accepts host:port format", () => {
+      const result = schema.parse({ domain: "example.com:8443" });
+      expect(result.domain).toBe("example.com:8443");
+    });
+
+    it("rejects empty domain", () => {
+      expect(() => schema.parse({ domain: "" })).toThrow();
+    });
+  });
+
+  describe("certRenew", () => {
+    const schema = z.object({
+      domain: z.string().optional(),
+      confirm: z.boolean(),
+    });
+
+    it("requires confirm", () => {
+      expect(() => schema.parse({})).toThrow();
+    });
+
+    it("accepts confirm only (renew all)", () => {
+      const result = schema.parse({ confirm: true });
+      expect(result.confirm).toBe(true);
+      expect(result.domain).toBeUndefined();
+    });
+
+    it("accepts domain and confirm", () => {
+      const result = schema.parse({ domain: "example.com", confirm: true });
+      expect(result.domain).toBe("example.com");
+      expect(result.confirm).toBe(true);
+    });
+
+    it("accepts confirm=false", () => {
+      const result = schema.parse({ confirm: false });
+      expect(result.confirm).toBe(false);
+    });
+  });
+
+  describe("certList (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
 });

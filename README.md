@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>20 skills &nbsp;&bull;&nbsp; 10 rules &nbsp;&bull;&nbsp; 41 MCP tools</strong>
+  <strong>21 skills &nbsp;&bull;&nbsp; 10 rules &nbsp;&bull;&nbsp; 44 MCP tools</strong>
 </p>
 
 ---
@@ -41,9 +41,9 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | Component | Cursor | Claude Code (terminal) | Claude Code in Cursor | Other MCP clients |
 |---|:---:|:---:|:---:|:---:|
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
-| **20 Skills** (SKILL.md) | Yes | Yes | Yes | - |
+| **21 Skills** (SKILL.md) | Yes | Yes | Yes | - |
 | **10 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **41 MCP tools** | Yes | Yes | Yes | Yes |
+| **44 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -71,7 +71,7 @@ flowchart LR
 ---
 
 <details>
-<summary><strong>20 Skills</strong> - on-demand home lab expertise</summary>
+<summary><strong>21 Skills</strong> - on-demand home lab expertise</summary>
 
 &nbsp;
 
@@ -95,6 +95,7 @@ flowchart LR
 | **Notifications** | `notification-workflows` | Ntfy setup, alert routing, notification pipelines |
 | **OS** | `os-update-management` | Unattended-upgrades, kernel updates, reboot scheduling |
 | **OS** | `performance-tuning` | Kernel params, swap config, I/O scheduler, GPU memory split |
+| **Certificates** | `certificate-management` | Let's Encrypt, self-signed certs, renewal automation, NPM cert integration |
 | **Storage** | `storage-management` | Samba, Syncthing, volumes, disk monitoring |
 | **Debug** | `troubleshooting` | Debug crashes, network issues, hardware problems |
 
@@ -128,7 +129,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-41-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-44-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2020-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -153,7 +154,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>41 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>44 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -328,6 +329,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | `notification-workflows` | "Send a test notification to my phone via Ntfy" |
 | `os-update-management` | "Are there any security updates pending on my Pi?" |
 | `performance-tuning` | "My Pi is sluggish with 13 containers. How can I optimize it?" |
+| `certificate-management` | "Are any of my SSL certificates expiring soon? Renew them" |
 
 </details>
 
@@ -345,7 +347,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | **v0.5.0** | **Security Hardening** | **+4** | **+1** | **+2** | **33** |
 | **v0.6.0** | **Logs and Notifications** | **+4** | **+2** | **--** | **37** |
 | **v0.7.0** | **OS and Package Management** | **+4** | **+2** | **+1** | **41** |
-| v0.8.0 | SSL/TLS Certificates | +3 | +1 | -- | 44 |
+| **v0.8.0** | **SSL/TLS Certificates** | **+3** | **+1** | **--** | **44** |
 | v0.9.0 | Multi-Node Foundation | +4 | +1 | +1 | 48 |
 | v0.10.0 | Testing Infrastructure | +2 | -- | -- | 50 |
 | v0.11.0 | Documentation Site | -- | -- | -- | 50 |
