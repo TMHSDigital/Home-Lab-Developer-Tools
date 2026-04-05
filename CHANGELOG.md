@@ -28,5 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Vitest input validation tests for MCP tools
 - CI/CD workflows (ci.yml, validate.yml)
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
+- Project logo (assets/logo.png)
 
 [0.1.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.1.0
