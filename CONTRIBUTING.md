@@ -108,7 +108,7 @@ Describe which `homelab_*` MCP tools this skill uses.
 
 ## See Also
 
-- [Related Skill](../skill-name/SKILL.md)
+- [Related Skill](../pi-system-management/SKILL.md)
 ```
 
 ### Skill requirements
