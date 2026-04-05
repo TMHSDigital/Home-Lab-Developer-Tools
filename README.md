@@ -1,27 +1,57 @@
-# Home Lab Developer Tools
+<p align="center">
+  <img src="assets/logo.png" alt="Home Lab Developer Tools" width="120">
+</p>
 
-**Home lab and Raspberry Pi workflows for Cursor, Claude Code, and any MCP-compatible editor.**
+<h1 align="center">Home Lab Developer Tools</h1>
 
-Version 0.1.0 | CC-BY-NC-ND-4.0 License | npm: @tmhs/homelab-mcp
+<p align="center">
+  Home lab and Raspberry Pi workflows for Cursor, Claude Code, and any MCP-compatible editor.
+</p>
 
-**10 skills** -- **5 rules** -- **15 MCP tools**
+<p align="center">
+  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases"><img src="https://img.shields.io/github/v/release/TMHSDigital/Home-Lab-Developer-Tools?label=version" alt="version"></a>
+  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases"><img src="https://img.shields.io/github/v/release/TMHSDigital/Home-Lab-Developer-Tools?label=release&color=blue" alt="release"></a>
+  <a href="https://www.npmjs.com/package/@tmhs/homelab-mcp"><img src="https://img.shields.io/npm/v/@tmhs/homelab-mcp" alt="npm"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-CC--BY--NC--ND--4.0-green" alt="license"></a>
+  <a href="https://tmhsdigital.github.io/Home-Lab-Developer-Tools/"><img src="https://img.shields.io/badge/docs-website-blue" alt="docs"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/actions"><img src="https://img.shields.io/github/actions/workflow/status/TMHSDigital/Home-Lab-Developer-Tools/validate.yml?label=validate" alt="validate"></a>
+  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/actions"><img src="https://img.shields.io/github/actions/workflow/status/TMHSDigital/Home-Lab-Developer-Tools/codeql.yml?label=CodeQL" alt="CodeQL"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/TMHSDigital/Home-Lab-Developer-Tools?style=flat" alt="stars">
+  <img src="https://img.shields.io/github/issues/TMHSDigital/Home-Lab-Developer-Tools" alt="issues">
+  <img src="https://img.shields.io/github/issues-pr/TMHSDigital/Home-Lab-Developer-Tools" alt="PRs">
+  <img src="https://img.shields.io/npm/dm/@tmhs/homelab-mcp" alt="downloads">
+</p>
+
+<p align="center">
+  <strong>10 skills &nbsp;&bull;&nbsp; 5 rules &nbsp;&bull;&nbsp; 15 MCP tools</strong>
+</p>
 
 ---
 
 ## Compatibility
 
+This project works with any AI coding tool that supports skills, rules, or MCP:
+
 | Component | Cursor | Claude Code (terminal) | Claude Code in Cursor | Other MCP clients |
-|-----------|--------|------------------------|-----------------------|-------------------|
+|---|:---:|:---:|:---:|:---:|
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
 | **10 Skills** (SKILL.md) | Yes | Yes | Yes | - |
 | **5 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
 | **15 MCP tools** | Yes | Yes | Yes | Yes |
 
+> **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
+
 ## Quick Start
 
 Install the plugin, then ask anything about your home lab:
 
-```
+```text
 "What's the CPU temperature on my Pi?"
 "Restart the Grafana container"
 "Show me which services are unhealthy"
@@ -30,40 +60,63 @@ Install the plugin, then ask anything about your home lab:
 
 ## How It Works
 
-The MCP server connects to your Raspberry Pi via SSH. Skills teach AI assistants how to manage home lab infrastructure. Rules enforce best practices automatically.
+```mermaid
+flowchart LR
+    A[User asks home lab question] --> B[AI loads a Skill]
+    B --> C[Skill guides the response]
+    C --> D[MCP tools run commands via SSH]
+    D --> E[User gets expert help]
+```
 
 ---
 
-**10 Skills** - on-demand home lab expertise
+<details>
+<summary><strong>10 Skills</strong> - on-demand home lab expertise</summary>
+
+&nbsp;
 
 | Category | Skill | Description |
-|----------|-------|-------------|
-| **System** | pi-system-management | Monitor Pi hardware -- temp, throttling, memory, reboots |
-| **Containers** | docker-compose-stacks | Manage multi-file Docker Compose deployments |
-| **Monitoring** | service-monitoring | Prometheus, Grafana, Uptime Kuma, alert rules |
-| **Network** | network-configuration | AdGuard DNS, NPM reverse proxy, Tailscale VPN |
-| **Backup** | backup-recovery | Restic backup config, scheduling, and restore |
-| **SSH** | ssh-management | SSH keys, hardening, tunnels, troubleshooting |
-| **Automation** | ansible-workflows | Ansible playbooks for multi-node management |
-| **Security** | security-hardening | UFW, fail2ban, SSH lockdown, container security |
-| **Storage** | storage-management | Samba, Syncthing, volumes, disk monitoring |
-| **Debug** | troubleshooting | Debug crashes, network issues, hardware problems |
+|---|---|---|
+| **System** | `pi-system-management` | Monitor Pi hardware -- temp, throttling, memory, reboots |
+| **Containers** | `docker-compose-stacks` | Manage multi-file Docker Compose deployments |
+| **Monitoring** | `service-monitoring` | Prometheus, Grafana, Uptime Kuma, alert rules |
+| **Network** | `network-configuration` | AdGuard DNS, NPM reverse proxy, Tailscale VPN |
+| **Backup** | `backup-recovery` | Restic backup config, scheduling, and restore |
+| **SSH** | `ssh-management` | SSH keys, hardening, tunnels, troubleshooting |
+| **Automation** | `ansible-workflows` | Ansible playbooks for multi-node management |
+| **Security** | `security-hardening` | UFW, fail2ban, SSH lockdown, container security |
+| **Storage** | `storage-management` | Samba, Syncthing, volumes, disk monitoring |
+| **Debug** | `troubleshooting` | Debug crashes, network issues, hardware problems |
 
-**5 Rules** - automatic best-practice enforcement
+</details>
+
+<details>
+<summary><strong>5 Rules</strong> - automatic best-practice enforcement</summary>
+
+&nbsp;
 
 | Rule | Scope | What It Does |
-|------|-------|--------------|
-| homelab-secrets | Global (always active) | Flag hardcoded passwords, IPs, and SSH keys |
-| compose-arm64 | Compose files | Flag images without arm64 support, missing healthchecks |
-| ssh-safety | Global (always active) | Flag dangerous SSH commands (rm -rf, dd, mkfs) |
-| yaml-conventions | YAML files | Enforce 2-space indent, document start, explicit booleans |
-| ansible-best-practices | Ansible files | Flag non-FQCN modules, missing tags, shell misuse |
+|---|---|---|
+| `homelab-secrets` | Global (always active) | Flag hardcoded passwords, IPs, and SSH keys |
+| `compose-arm64` | Compose files | Flag images without arm64 support, missing healthchecks |
+| `ssh-safety` | Global (always active) | Flag dangerous SSH commands (rm -rf, dd, mkfs) |
+| `yaml-conventions` | YAML files | Enforce 2-space indent, document start, explicit booleans |
+| `ansible-best-practices` | Ansible files | Flag non-FQCN modules, missing tags, shell misuse |
+
+</details>
 
 ---
 
 ## Companion: Home Lab MCP Server
 
 The MCP server gives your AI assistant live access to your Raspberry Pi via SSH. Works with Cursor, Claude Code, and any MCP-compatible client.
+
+<p align="center">
+  <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
+  <img src="https://img.shields.io/badge/tools-15-green" alt="tools">
+  <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2020-yellow" alt="runtime">
+  <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
+</p>
 
 Add to your Cursor MCP config (`.cursor/mcp.json`):
 
@@ -84,29 +137,64 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 }
 ```
 
-**15 MCP Tools**
+<details>
+<summary><strong>15 MCP Tools</strong> - full tool reference</summary>
 
-| Category | Tool | Description |
-|----------|------|-------------|
-| System | `homelab_piStatus` | CPU temp, memory, disk, uptime, throttle state |
-| System | `homelab_piReboot` | Safe reboot with pre-checks |
-| System | `homelab_diskUsage` | Disk usage breakdown by directory |
-| System | `homelab_aptUpdate` | Run apt update, list upgradable packages |
-| Containers | `homelab_serviceHealth` | Docker container health status |
-| Containers | `homelab_serviceLogs` | Tail container logs |
-| Containers | `homelab_serviceRestart` | Restart a container |
-| Compose | `homelab_composeUp` | Start compose stacks |
-| Compose | `homelab_composeDown` | Stop compose stacks |
-| Compose | `homelab_composePull` | Pull latest images |
-| Compose | `homelab_composePs` | List running containers |
-| Network | `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
-| Backup | `homelab_backupStatus` | Check latest restic snapshots |
-| Backup | `homelab_backupRun` | Trigger restic backup |
-| SSH | `homelab_sshTest` | Test SSH connectivity |
+&nbsp;
+
+**System** (4)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_piStatus` | CPU temp, memory, disk, uptime, throttle state |
+| `homelab_piReboot` | Safe reboot with pre-checks (requires confirm=true) |
+| `homelab_diskUsage` | Disk usage breakdown by directory |
+| `homelab_aptUpdate` | Run apt update, list upgradable packages |
+
+**Containers** (3)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_serviceHealth` | Docker container health status |
+| `homelab_serviceLogs` | Tail container logs |
+| `homelab_serviceRestart` | Restart a container |
+
+**Compose** (4)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_composeUp` | Start compose stacks (all or specific) |
+| `homelab_composeDown` | Stop compose stacks |
+| `homelab_composePull` | Pull latest images |
+| `homelab_composePs` | List running compose containers |
+
+**Network** (1)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
+
+**Backup** (2)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_backupStatus` | Check latest restic snapshots |
+| `homelab_backupRun` | Trigger restic backup (requires confirm=true) |
+
+**SSH** (1)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_sshTest` | Test SSH connectivity |
+
+</details>
 
 ---
 
-## Installation
+<details>
+<summary><h2>Installation</h2></summary>
+
+&nbsp;
 
 ### Cursor (plugin + MCP)
 
@@ -132,7 +220,7 @@ npm install
 npm run build
 ```
 
-Then add the JSON config from the MCP Server section to `.cursor/mcp.json`.
+Then add the JSON config from the [MCP Server section](#companion-home-lab-mcp-server) to `.cursor/mcp.json`.
 
 ### Claude Code (terminal or in Cursor)
 
@@ -154,22 +242,42 @@ claude mcp add homelab -- npx @tmhs/homelab-mcp
 
 Any client supporting MCP stdio transport can use the Home Lab MCP server. Point it at `node ./mcp-server/dist/index.js` or the global `npx @tmhs/homelab-mcp`.
 
----
+</details>
 
-## Example Prompts
+<details>
+<summary><h2>Example Prompts</h2> - one per skill</summary>
+
+&nbsp;
 
 | Skill | Try This |
-|-------|----------|
-| pi-system-management | "Is my Pi overheating? Check the CPU temp and throttle status" |
-| docker-compose-stacks | "Pull latest images and redeploy the monitoring stack" |
-| service-monitoring | "Set up a Prometheus alert for when disk usage exceeds 85%" |
-| network-configuration | "Configure AdGuard to block ads for all devices on my network" |
-| backup-recovery | "When was the last backup? Show me the recent snapshots" |
-| ssh-management | "Harden my SSH config -- disable password auth, change the port" |
-| ansible-workflows | "Write an Ansible playbook to deploy all compose stacks" |
-| security-hardening | "Audit my Pi's firewall rules and suggest improvements" |
-| storage-management | "Which directories are using the most disk space?" |
-| troubleshooting | "Grafana won't start -- help me debug the container" |
+|---|---|
+| `pi-system-management` | "Is my Pi overheating? Check the CPU temp and throttle status" |
+| `docker-compose-stacks` | "Pull latest images and redeploy the monitoring stack" |
+| `service-monitoring` | "Set up a Prometheus alert for when disk usage exceeds 85%" |
+| `network-configuration` | "Configure AdGuard to block ads for all devices on my network" |
+| `backup-recovery` | "When was the last backup? Show me the recent snapshots" |
+| `ssh-management` | "Harden my SSH config -- disable password auth, change the port" |
+| `ansible-workflows` | "Write an Ansible playbook to deploy all compose stacks" |
+| `security-hardening` | "Audit my Pi's firewall rules and suggest improvements" |
+| `storage-management` | "Which directories are using the most disk space?" |
+| `troubleshooting` | "Grafana won't start -- help me debug the container" |
+
+</details>
+
+<details>
+<summary><h2>Roadmap</h2></summary>
+
+&nbsp;
+
+| Version | Theme | MCP Tools | Highlights |
+|---|---|---|---|
+| **v0.1.0** | Foundation | 15 | 10 skills, 5 rules, 15 MCP tools, SSH connectivity |
+| **v0.2.0** | Expanded monitoring | +5 | Log aggregation, alertmanager integration, dashboard provisioning |
+| **v0.3.0** | Multi-node | +5 | Ansible inventory sync, multi-Pi orchestration |
+| **v0.4.0** | Advanced networking | +5 | Tailscale ACL management, DNS analytics, certificate automation |
+| **v1.0.0** | Stable | +0 | Production release (~30 MCP tools) |
+
+</details>
 
 ---
 
@@ -181,10 +289,12 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 
 ## Contributing
 
-Contributions welcome - see [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions welcome - see [CONTRIBUTING.md](CONTRIBUTING.md). Found a bug? [Open an issue](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/issues).
 
 ## License
 
 **CC-BY-NC-ND-4.0** - Copyright 2026 TM Hospitality Strategies. See [LICENSE](LICENSE).
 
-Built by [TMHSDigital](https://github.com/TMHSDigital)
+<p align="center">
+  <a href="https://github.com/TMHSDigital">Built by TMHSDigital</a>
+</p>
