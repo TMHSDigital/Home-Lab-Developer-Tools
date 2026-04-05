@@ -17,10 +17,15 @@ def _find_markdown_files():
     return md_files
 
 
+def _strip_code_fences(text):
+    """Remove fenced code blocks so links inside them are not checked."""
+    return re.sub(r"```[\s\S]*?```", "", text)
+
+
 @pytest.mark.parametrize("md_file", _find_markdown_files())
 def test_relative_links_resolve(md_file):
     with open(md_file, "r", encoding="utf-8") as f:
-        text = f.read()
+        text = _strip_code_fences(f.read())
 
     links = re.findall(r"\]\((\.\./[^)]+|\.\/[^)]+)\)", text)
     file_dir = os.path.dirname(md_file)
