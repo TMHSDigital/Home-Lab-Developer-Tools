@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-04-05
+
+### Added
+
+- 4 new MCP tools for security hardening and auditing
+  - `homelab_ufwStatus` -- list UFW firewall rules and status
+  - `homelab_fail2banStatus` -- list fail2ban jails, banned IPs, and ban counts
+  - `homelab_openPorts` -- scan for listening TCP ports and map to processes
+  - `homelab_containerScan` -- scan container images for HIGH/CRITICAL vulnerabilities via Trivy
+- 1 new skill
+  - `secrets-management` -- managing credentials with Vaultwarden, env vars, Docker secrets, and security auditing
+- 2 new rules
+  - `privileged-containers` -- flag containers running with elevated privileges or missing security restrictions
+  - `weak-credentials` -- flag default/weak passwords and insecure credential storage in compose files
+- Input validation tests for all 4 new tools
+
 ## [0.4.0] - 2026-04-05
 
 ### Added
@@ -90,6 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.5.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.5.0
 [0.4.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.4.0
 [0.3.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.3.0
 [0.2.1]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.2.1

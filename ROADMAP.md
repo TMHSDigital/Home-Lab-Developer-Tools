@@ -100,19 +100,19 @@ Deeper security tooling and automated auditing.
 
 **MCP tools (+4):**
 
-- [ ] `homelab_ufwStatus` -- list UFW rules and status
-- [ ] `homelab_fail2banStatus` -- list jails, banned IPs, recent bans
-- [ ] `homelab_openPorts` -- scan for listening ports and map to services
-- [ ] `homelab_containerScan` -- check running containers for known vulnerabilities (via Trivy or similar)
+- [x] `homelab_ufwStatus` -- list UFW rules and status
+- [x] `homelab_fail2banStatus` -- list jails, banned IPs, recent bans
+- [x] `homelab_openPorts` -- scan for listening ports and map to services
+- [x] `homelab_containerScan` -- check running containers for known vulnerabilities (via Trivy or similar)
 
 **Skills (+1):**
 
-- [ ] `secrets-management` -- managing credentials with Vaultwarden, env vars, Docker secrets
+- [x] `secrets-management` -- managing credentials with Vaultwarden, env vars, Docker secrets
 
 **Rules (+2):**
 
-- [ ] `privileged-containers` -- flag containers running as root or with privileged mode
-- [ ] `weak-credentials` -- flag default/weak passwords in compose env vars
+- [x] `privileged-containers` -- flag containers running as root or with privileged mode
+- [x] `weak-credentials` -- flag default/weak passwords in compose env vars
 
 ---
 
@@ -271,6 +271,7 @@ Production-ready, fully tested, fully documented.
 
 ## Completed
 
+- v0.5.0: Security Hardening -- 4 new tools (ufwStatus, fail2banStatus, openPorts, containerScan), 1 new skill (secrets-management), 2 new rules (privileged-containers, weak-credentials)
 - v0.4.0: Backup and Recovery -- 4 new tools (backupList, backupRestore, backupDiff, volumeBackup), 1 new skill (disaster-recovery), 1 new rule (backup-coverage)
 - v0.3.0: DNS and Reverse Proxy -- 5 new tools (adguardStats, adguardFilters, adguardQueryLog, npmProxyHosts, npmCerts), 2 new skills (dns-management, reverse-proxy-management), 1 new rule (exposed-ports)
 - v0.2.0: Extended Monitoring -- 5 new tools (prometheusQuery, grafanaSnapshot, uptimeKumaStatus, alertList, speedtestResults), 2 new skills (grafana-dashboards, alerting-rules)

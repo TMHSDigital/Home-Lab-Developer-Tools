@@ -32,10 +32,14 @@ import { register as registerBackupList } from "./tools/backupList.js";
 import { register as registerBackupRestore } from "./tools/backupRestore.js";
 import { register as registerBackupDiff } from "./tools/backupDiff.js";
 import { register as registerVolumeBackup } from "./tools/volumeBackup.js";
+import { register as registerUfwStatus } from "./tools/ufwStatus.js";
+import { register as registerFail2banStatus } from "./tools/fail2banStatus.js";
+import { register as registerOpenPorts } from "./tools/openPorts.js";
+import { register as registerContainerScan } from "./tools/containerScan.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.4.0",
+  version: "0.5.0",
 });
 
 registerPiStatus(server);
@@ -67,6 +71,10 @@ registerBackupList(server);
 registerBackupRestore(server);
 registerBackupDiff(server);
 registerVolumeBackup(server);
+registerUfwStatus(server);
+registerFail2banStatus(server);
+registerOpenPorts(server);
+registerContainerScan(server);
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();

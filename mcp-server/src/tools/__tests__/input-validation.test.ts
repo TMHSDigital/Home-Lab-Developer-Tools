@@ -456,4 +456,54 @@ describe("input validation schemas", () => {
       expect(result.confirm).toBe(false);
     });
   });
+
+  describe("ufwStatus (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("fail2banStatus", () => {
+    const schema = z.object({
+      jail: z.string().optional(),
+    });
+
+    it("accepts no jail filter", () => {
+      const result = schema.parse({});
+      expect(result.jail).toBeUndefined();
+    });
+
+    it("accepts specific jail", () => {
+      const result = schema.parse({ jail: "sshd" });
+      expect(result.jail).toBe("sshd");
+    });
+  });
+
+  describe("openPorts (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("containerScan", () => {
+    const schema = z.object({
+      image: z.string().optional(),
+    });
+
+    it("accepts no image (scan all)", () => {
+      const result = schema.parse({});
+      expect(result.image).toBeUndefined();
+    });
+
+    it("accepts specific image", () => {
+      const result = schema.parse({ image: "grafana/grafana:latest" });
+      expect(result.image).toBe("grafana/grafana:latest");
+    });
+  });
 });

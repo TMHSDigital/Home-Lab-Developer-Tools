@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi via SSH and provides 29 tools for system management, Docker Compose stacks, service monitoring, networking, backups, and disaster recovery.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi via SSH and provides 33 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, and security auditing.
 
 ## Tools
 
@@ -34,6 +34,10 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | DNS/Proxy | `homelab_adguardQueryLog` | Search AdGuard DNS query log |
 | DNS/Proxy | `homelab_npmProxyHosts` | List NPM proxy host configs |
 | DNS/Proxy | `homelab_npmCerts` | List SSL certificates and expiry |
+| Security | `homelab_ufwStatus` | List UFW firewall rules and status |
+| Security | `homelab_fail2banStatus` | List fail2ban jails and banned IPs |
+| Security | `homelab_openPorts` | Scan listening TCP ports and map to processes |
+| Security | `homelab_containerScan` | Scan container images for vulnerabilities via Trivy |
 | SSH | `homelab_sshTest` | Test SSH connectivity |
 
 ## Setup

@@ -1,0 +1,51 @@
+---
+description: Flag Docker Compose services running with elevated privileges or missing security restrictions.
+alwaysApply: false
+globs:
+  - "**/compose*.yml"
+  - "**/docker-compose*.yml"
+---
+
+# Privileged Containers
+
+## Patterns to Flag
+
+### Privileged Mode
+- Services with `privileged: true` -- grants full host access, almost never necessary
+- Services with `cap_add: [SYS_ADMIN]` or other broad capabilities
+- Services with `cap_add: [ALL]`
+
+### Running as Root
+- Services with `user: root` or `user: "0"` when the image supports non-root
+- Services without a `user:` directive when the image defaults to root and supports non-root alternatives
+
+### Missing Security Options
+- Services without `security_opt: [no-new-privileges:true]` -- allows privilege escalation via setuid binaries
+- Services without `read_only: true` when the service does not need to write to the container filesystem (use tmpfs or volumes for writable paths)
+
+### Excessive Capabilities
+- Services adding capabilities beyond what they need (e.g. `NET_ADMIN` for a web app)
+- Services not dropping all capabilities and adding back only what is required
+
+## What to Do
+
+- Remove `privileged: true` and add only the specific capabilities needed
+- Set `user: 1000:1000` (or the image's recommended non-root user)
+- Add `security_opt: [no-new-privileges:true]` to every service
+- Drop all capabilities and add back only what is required:
+
+```yaml
+cap_drop:
+  - ALL
+cap_add:
+  - NET_BIND_SERVICE  # only if needed
+```
+
+- Use `read_only: true` with explicit tmpfs/volume mounts for writable paths
+
+## Exceptions
+
+- Portainer agent requires `privileged: true` or specific capabilities to manage Docker
+- Tailscale container needs `NET_ADMIN` and `SYS_MODULE` capabilities
+- Services that manage host networking (AdGuard in DHCP mode, WireGuard)
+- Docker socket mounts (`/var/run/docker.sock`) are a separate concern but worth noting
