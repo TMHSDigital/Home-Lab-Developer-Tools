@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi via SSH and provides 44 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, and certificate lifecycle.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 48 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, and multi-node management. All tools accept an optional `node` parameter to target specific nodes.
 
 ## Tools
 
@@ -49,6 +49,10 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | Certificates | `homelab_certCheck` | Check SSL certificate expiry, issuer, and fingerprint |
 | Certificates | `homelab_certRenew` | Trigger Let's Encrypt certificate renewal |
 | Certificates | `homelab_certList` | List all managed certificates from certbot and NPM |
+| Multi-Node | `homelab_nodeList` | List all managed nodes and connection status |
+| Multi-Node | `homelab_nodeExec` | Execute a command on a specific node |
+| Multi-Node | `homelab_nodeStatus` | Get system status for a specific node |
+| Multi-Node | `homelab_inventorySync` | Discover nodes from Ansible inventory or Tailscale |
 | SSH | `homelab_sshTest` | Test SSH connectivity |
 
 ## Setup
@@ -85,6 +89,8 @@ Set environment variables:
 | `HOMELAB_NPM_PASSWORD` | `changeme` | NPM admin password |
 | `HOMELAB_NPM_PORT` | `81` | NPM admin API port override |
 | `HOMELAB_NTFY_PORT` | `8080` | Ntfy server port override |
+| `HOMELAB_NODES` | (empty) | JSON object mapping node names to SSH config for multi-node support |
+| `HOMELAB_ANSIBLE_INVENTORY` | `/etc/ansible/hosts` | Ansible inventory file path for node discovery |
 
 ## Usage with Cursor
 

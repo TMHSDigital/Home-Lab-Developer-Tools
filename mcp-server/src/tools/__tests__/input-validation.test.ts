@@ -746,4 +746,95 @@ describe("input validation schemas", () => {
       expect(result).toEqual({});
     });
   });
+
+  describe("nodeList (no params)", () => {
+    const schema = z.object({});
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result).toEqual({});
+    });
+  });
+
+  describe("nodeExec", () => {
+    const schema = z.object({
+      node: z.string().min(1),
+      command: z.string().min(1),
+      confirm: z.boolean(),
+    });
+
+    it("requires all three fields", () => {
+      expect(() => schema.parse({})).toThrow();
+    });
+
+    it("requires node", () => {
+      expect(() => schema.parse({ command: "ls", confirm: true })).toThrow();
+    });
+
+    it("requires command", () => {
+      expect(() => schema.parse({ node: "pi5", confirm: true })).toThrow();
+    });
+
+    it("requires confirm", () => {
+      expect(() => schema.parse({ node: "pi5", command: "ls" })).toThrow();
+    });
+
+    it("accepts valid input", () => {
+      const result = schema.parse({ node: "pi5", command: "uptime", confirm: true });
+      expect(result.node).toBe("pi5");
+      expect(result.command).toBe("uptime");
+      expect(result.confirm).toBe(true);
+    });
+
+    it("rejects empty node", () => {
+      expect(() => schema.parse({ node: "", command: "ls", confirm: true })).toThrow();
+    });
+
+    it("rejects empty command", () => {
+      expect(() => schema.parse({ node: "pi5", command: "", confirm: true })).toThrow();
+    });
+  });
+
+  describe("nodeStatus", () => {
+    const schema = z.object({
+      node: z.string().min(1),
+    });
+
+    it("requires node", () => {
+      expect(() => schema.parse({})).toThrow();
+    });
+
+    it("accepts a node name", () => {
+      const result = schema.parse({ node: "nas" });
+      expect(result.node).toBe("nas");
+    });
+
+    it("rejects empty node", () => {
+      expect(() => schema.parse({ node: "" })).toThrow();
+    });
+  });
+
+  describe("inventorySync", () => {
+    const schema = z.object({
+      source: z.enum(["ansible", "tailscale"]),
+    });
+
+    it("requires source", () => {
+      expect(() => schema.parse({})).toThrow();
+    });
+
+    it("accepts ansible", () => {
+      const result = schema.parse({ source: "ansible" });
+      expect(result.source).toBe("ansible");
+    });
+
+    it("accepts tailscale", () => {
+      const result = schema.parse({ source: "tailscale" });
+      expect(result.source).toBe("tailscale");
+    });
+
+    it("rejects invalid source", () => {
+      expect(() => schema.parse({ source: "kubernetes" })).toThrow();
+    });
+  });
 });

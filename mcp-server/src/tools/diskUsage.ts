@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   path: z
     .string()
     .optional()
@@ -33,7 +35,7 @@ export function register(server: McpServer): void {
           'echo ""',
           'echo "=== Docker Disk Usage ==="',
           "docker system df 2>/dev/null || echo 'Docker not available'",
-        ].join(" && "));
+        ].join(" && "), args.node);
 
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {

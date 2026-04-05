@@ -11,16 +11,71 @@ import {
 const CONNECT_TIMEOUT_MS = 10_000;
 const EXEC_TIMEOUT_MS = 30_000;
 
-function getConfig() {
-  const host = process.env.HOMELAB_PI_HOST || "raspi5.local";
-  const username = process.env.HOMELAB_PI_USER || "tmhs";
-  const keyPath = process.env.HOMELAB_PI_KEY_PATH || "";
-
-  return { host, username, keyPath };
+interface NodeConfig {
+  host: string;
+  username: string;
+  keyPath: string;
 }
 
-export async function execSSH(command: string): Promise<string> {
-  const { host, username, keyPath } = getConfig();
+function getDefaultConfig(): NodeConfig {
+  return {
+    host: process.env.HOMELAB_PI_HOST || "raspi5.local",
+    username: process.env.HOMELAB_PI_USER || "tmhs",
+    keyPath: process.env.HOMELAB_PI_KEY_PATH || "",
+  };
+}
+
+function getNodesRegistry(): Record<string, NodeConfig> {
+  const raw = process.env.HOMELAB_NODES;
+  if (!raw) return {};
+
+  try {
+    const parsed = JSON.parse(raw);
+    const registry: Record<string, NodeConfig> = {};
+    for (const [name, cfg] of Object.entries(parsed)) {
+      const c = cfg as Record<string, string>;
+      registry[name] = {
+        host: c.host || "",
+        username: c.user || c.username || "pi",
+        keyPath: c.keyPath || "",
+      };
+    }
+    return registry;
+  } catch {
+    return {};
+  }
+}
+
+export function getNodeConfig(node?: string): NodeConfig {
+  if (!node) return getDefaultConfig();
+
+  const registry = getNodesRegistry();
+  if (registry[node]) return registry[node];
+
+  if (node === "default") return getDefaultConfig();
+
+  throw new SSHError(`Unknown node "${node}". Available nodes: ${listNodes().map((n) => n.name).join(", ") || "(none -- set HOMELAB_NODES)"}`);
+}
+
+export function listNodes(): { name: string; host: string }[] {
+  const defaultCfg = getDefaultConfig();
+  const nodes: { name: string; host: string }[] = [
+    { name: "default", host: defaultCfg.host },
+  ];
+
+  const registry = getNodesRegistry();
+  for (const [name, cfg] of Object.entries(registry)) {
+    nodes.push({ name, host: cfg.host });
+  }
+
+  return nodes;
+}
+
+export async function execSSH(
+  command: string,
+  node?: string,
+): Promise<string> {
+  const { host, username, keyPath } = getNodeConfig(node);
 
   return new Promise((resolve, reject) => {
     const conn = new Client();

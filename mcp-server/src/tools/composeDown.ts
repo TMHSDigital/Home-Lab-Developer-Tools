@@ -1,10 +1,12 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const COMPOSE_DIR = process.env.HOMELAB_COMPOSE_DIR || "/opt/homelab/docker";
 
 const inputSchema = {
+  ...nodeParam,
   stacks: z
     .array(z.string())
     .optional()
@@ -33,6 +35,7 @@ export function register(server: McpServer): void {
         const volFlag = args.removeVolumes ? " -v" : "";
         const output = await execSSH(
           `cd ${COMPOSE_DIR} && docker compose ${files} down${volFlag} 2>&1`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

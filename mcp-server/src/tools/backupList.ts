@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   path: z.string().optional().describe("Filter snapshots containing this path"),
   tag: z.string().optional().describe("Filter snapshots by tag"),
   host: z.string().optional().describe("Filter snapshots by hostname"),
@@ -23,6 +25,7 @@ export function register(server: McpServer): void {
         const extra = flags.length > 0 ? " " + flags.join(" ") : "";
         const output = await execSSH(
           `sudo restic -r ${repo} snapshots${extra} --json 2>/dev/null || echo "No backup repo found at ${repo} or restic not configured"`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

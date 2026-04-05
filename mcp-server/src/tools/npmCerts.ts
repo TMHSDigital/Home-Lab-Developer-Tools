@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const DEFAULT_PORT = 81;
 const SERVICE_NAME = "Nginx Proxy Manager";
@@ -17,12 +18,13 @@ function getCredentials(): { email: string; password: string } {
   };
 }
 
-async function getNpmToken(port: number): Promise<string> {
+async function getNpmToken(port: number, node?: string): Promise<string> {
   const { email, password } = getCredentials();
   const payload = JSON.stringify({ identity: email, secret: password });
   const output = await execSSH(
     `curl -sf -X POST -H 'Content-Type: application/json' ` +
       `-d '${payload}' 'http://localhost:${port}/api/tokens'`,
+    node,
   );
   const parsed = JSON.parse(output);
   return parsed.token;
@@ -32,14 +34,15 @@ export function register(server: McpServer): void {
   server.tool(
     "homelab_npmCerts",
     "List SSL certificates managed by Nginx Proxy Manager with expiry dates",
-    {},
-    async () => {
+    { ...nodeParam },
+    async (args) => {
       const port = getPort();
       try {
-        const token = await getNpmToken(port);
+        const token = await getNpmToken(port, args.node);
         const output = await execSSH(
           `curl -sf -H 'Authorization: Bearer ${token}' ` +
             `'http://localhost:${port}/api/nginx/certificates'`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

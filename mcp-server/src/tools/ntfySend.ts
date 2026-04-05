@@ -2,11 +2,13 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const DEFAULT_PORT = 8080;
 const SERVICE_NAME = "Ntfy";
 
 const inputSchema = {
+  ...nodeParam,
   topic: z
     .string()
     .min(1)
@@ -48,7 +50,7 @@ export function register(server: McpServer): void {
         if (args.tags) headers.push(`-H 'Tags: ${args.tags}'`);
         const escaped = args.message.replace(/'/g, "'\\''");
         const cmd = `curl -sf -d '${escaped}' ${headers.join(" ")} 'http://localhost:${port}/${args.topic}'`;
-        const output = await execSSH(cmd);
+        const output = await execSSH(cmd, args.node);
         return { content: [{ type: "text" as const, text: output || `Notification sent to topic '${args.topic}'.` }] };
       } catch (error) {
         if (error instanceof CommandFailedError) {

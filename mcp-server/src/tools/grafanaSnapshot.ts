@@ -2,11 +2,13 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const DEFAULT_PORT = 3000;
 const SERVICE_NAME = "Grafana";
 
 const inputSchema = {
+  ...nodeParam,
   dashboard: z.string().min(1).describe("Dashboard UID to export"),
 };
 
@@ -39,6 +41,7 @@ export function register(server: McpServer): void {
         const auth = buildAuthHeader();
         const output = await execSSH(
           `curl -sf ${auth} 'http://localhost:${port}/api/dashboards/uid/${args.dashboard}'`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

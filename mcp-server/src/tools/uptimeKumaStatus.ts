@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const DEFAULT_PORT = 3001;
 const SERVICE_NAME = "Uptime Kuma";
@@ -14,12 +15,13 @@ export function register(server: McpServer): void {
   server.tool(
     "homelab_uptimeKumaStatus",
     "Get the status of all Uptime Kuma monitors",
-    {},
-    async () => {
+    { ...nodeParam },
+    async (args) => {
       const port = getPort();
       try {
         const output = await execSSH(
           `curl -sf 'http://localhost:${port}/api/status-page/heartbeat/default'`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

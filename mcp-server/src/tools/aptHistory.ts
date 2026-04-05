@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   lines: z
     .number()
     .int()
@@ -23,7 +25,7 @@ export function register(server: McpServer): void {
           `(grep -E '(Install|Upgrade|Remove|Commandline)' /var/log/apt/history.log 2>/dev/null; ` +
           `zgrep -E '(Install|Upgrade|Remove|Commandline)' /var/log/apt/history.log.*.gz 2>/dev/null) ` +
           `| tail -${args.lines}`;
-        const output = await execSSH(cmd);
+        const output = await execSSH(cmd, args.node);
         return {
           content: [{
             type: "text" as const,

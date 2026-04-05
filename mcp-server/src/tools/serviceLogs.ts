@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   service: z.string().min(1).describe("Container name to get logs from"),
   lines: z
     .number()
@@ -22,6 +24,7 @@ export function register(server: McpServer): void {
       try {
         const output = await execSSH(
           `docker logs --tail ${args.lines} ${args.service} 2>&1`,
+          args.node,
         );
 
         return {

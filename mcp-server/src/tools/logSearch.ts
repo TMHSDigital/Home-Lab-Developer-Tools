@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   pattern: z
     .string()
     .min(1)
@@ -31,7 +33,7 @@ export function register(server: McpServer): void {
         const cmd = args.service
           ? `docker logs '${args.service}' 2>&1 | grep -i '${escaped}' | tail -${args.lines}`
           : `docker ps --format '{{.Names}}' | while read name; do matches=$(docker logs "$name" 2>&1 | grep -i '${escaped}' | tail -${args.lines}); if [ -n "$matches" ]; then echo "=== $name ==="; echo "$matches"; echo; fi; done`;
-        const output = await execSSH(cmd);
+        const output = await execSSH(cmd, args.node);
         return { content: [{ type: "text" as const, text: output || `No matches found for pattern '${args.pattern}'.` }] };
       } catch (error) {
         return errorResponse(error);

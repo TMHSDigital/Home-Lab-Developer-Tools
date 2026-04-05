@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>21 skills &nbsp;&bull;&nbsp; 10 rules &nbsp;&bull;&nbsp; 44 MCP tools</strong>
+  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 48 MCP tools</strong>
 </p>
 
 ---
@@ -41,9 +41,9 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | Component | Cursor | Claude Code (terminal) | Claude Code in Cursor | Other MCP clients |
 |---|:---:|:---:|:---:|:---:|
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
-| **21 Skills** (SKILL.md) | Yes | Yes | Yes | - |
-| **10 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **44 MCP tools** | Yes | Yes | Yes | Yes |
+| **22 Skills** (SKILL.md) | Yes | Yes | Yes | - |
+| **11 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
+| **48 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -71,7 +71,7 @@ flowchart LR
 ---
 
 <details>
-<summary><strong>21 Skills</strong> - on-demand home lab expertise</summary>
+<summary><strong>22 Skills</strong> - on-demand home lab expertise</summary>
 
 &nbsp;
 
@@ -96,13 +96,14 @@ flowchart LR
 | **OS** | `os-update-management` | Unattended-upgrades, kernel updates, reboot scheduling |
 | **OS** | `performance-tuning` | Kernel params, swap config, I/O scheduler, GPU memory split |
 | **Certificates** | `certificate-management` | Let's Encrypt, self-signed certs, renewal automation, NPM cert integration |
+| **Multi-Node** | `multi-node-management` | Managing fleets, node inventory, parallel operations, cross-node monitoring |
 | **Storage** | `storage-management` | Samba, Syncthing, volumes, disk monitoring |
 | **Debug** | `troubleshooting` | Debug crashes, network issues, hardware problems |
 
 </details>
 
 <details>
-<summary><strong>10 Rules</strong> - automatic best-practice enforcement</summary>
+<summary><strong>11 Rules</strong> - automatic best-practice enforcement</summary>
 
 &nbsp;
 
@@ -118,6 +119,7 @@ flowchart LR
 | `privileged-containers` | Compose files | Flag containers with elevated privileges or missing security opts |
 | `weak-credentials` | Compose / .env files | Flag default/weak passwords and insecure credential storage |
 | `resource-limits` | Compose files | Flag containers without memory or CPU limits |
+| `inventory-consistency` | Inventory / .env files | Flag nodes in config missing from HOMELAB_NODES registry |
 
 </details>
 
@@ -129,7 +131,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-44-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-48-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2020-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -154,7 +156,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>44 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>48 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -238,6 +240,15 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_aptHistory` | Show recent apt install/upgrade/remove history |
 | `homelab_kernelInfo` | Kernel version, boot parameters, loaded modules |
 | `homelab_systemdServices` | List systemd units or get status of a specific unit |
+
+**Multi-Node** (4)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_nodeList` | List all managed nodes and connection status |
+| `homelab_nodeExec` | Execute a command on a specific node |
+| `homelab_nodeStatus` | Get system status for a specific node |
+| `homelab_inventorySync` | Discover nodes from Ansible inventory or Tailscale |
 
 **SSH** (1)
 
@@ -330,6 +341,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | `os-update-management` | "Are there any security updates pending on my Pi?" |
 | `performance-tuning` | "My Pi is sluggish with 13 containers. How can I optimize it?" |
 | `certificate-management` | "Are any of my SSL certificates expiring soon? Renew them" |
+| `multi-node-management` | "List all my nodes and show which ones are online" |
 
 </details>
 
@@ -348,7 +360,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | **v0.6.0** | **Logs and Notifications** | **+4** | **+2** | **--** | **37** |
 | **v0.7.0** | **OS and Package Management** | **+4** | **+2** | **+1** | **41** |
 | **v0.8.0** | **SSL/TLS Certificates** | **+3** | **+1** | **--** | **44** |
-| v0.9.0 | Multi-Node Foundation | +4 | +1 | +1 | 48 |
+| **v0.9.0** | **Multi-Node Foundation** | **+4** | **+1** | **+1** | **48** |
 | v0.10.0 | Testing Infrastructure | +2 | -- | -- | 50 |
 | v0.11.0 | Documentation Site | -- | -- | -- | 50 |
 | v0.12.0 | Polish and Hardening | +2 | -- | -- | 52 |

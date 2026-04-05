@@ -2,11 +2,13 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const DEFAULT_PORT = 9090;
 const SERVICE_NAME = "Prometheus";
 
 const inputSchema = {
+  ...nodeParam,
   query: z.string().min(1).describe("PromQL expression to evaluate"),
   time: z
     .string()
@@ -31,6 +33,7 @@ export function register(server: McpServer): void {
         const timeParam = args.time ? `&time=${encodeURIComponent(args.time)}` : "";
         const output = await execSSH(
           `curl -sf 'http://localhost:${port}/api/v1/query?query=${encoded}${timeParam}'`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

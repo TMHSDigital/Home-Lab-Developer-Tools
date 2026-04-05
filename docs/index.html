@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home Lab Developer Tools</title>
-  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 21 skills, 10 rules, 44 MCP tools.">
+  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 22 skills, 11 rules, 48 MCP tools.">
   <meta property="og:title" content="Home Lab Developer Tools">
-  <meta property="og:description" content="21 skills, 10 rules, 44 MCP tools for managing a Raspberry Pi home lab via SSH.">
+  <meta property="og:description" content="22 skills, 11 rules, 48 MCP tools for managing a Raspberry Pi home lab via SSH.">
   <meta property="og:type" content="website">
   <style>
     :root {
@@ -99,22 +99,22 @@
     <div class="container">
       <h1>Home Lab Developer Tools</h1>
       <p>Home lab and Raspberry Pi workflows for Cursor, Claude Code, and any MCP-compatible editor.</p>
-      <span class="version">v0.8.0</span>
+      <span class="version">v0.9.0</span>
     </div>
   </header>
 
   <div class="container">
     <div class="stats">
       <div class="stat">
-        <div class="stat-number" data-target="21">21</div>
+        <div class="stat-number" data-target="22">22</div>
         <div class="stat-label">Skills</div>
       </div>
       <div class="stat">
-        <div class="stat-number" data-target="10">10</div>
+        <div class="stat-number" data-target="11">11</div>
         <div class="stat-label">Rules</div>
       </div>
       <div class="stat">
-        <div class="stat-number" data-target="44">44</div>
+        <div class="stat-number" data-target="48">48</div>
         <div class="stat-label">MCP Tools</div>
       </div>
     </div>
@@ -243,6 +243,17 @@
         </tbody>
       </table>
 
+      <h3>Multi-Node (4)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>homelab_nodeList</code></td><td>List all managed nodes and connection status</td></tr>
+          <tr><td><code>homelab_nodeExec</code></td><td>Execute a command on a specific node</td></tr>
+          <tr><td><code>homelab_nodeStatus</code></td><td>Get system status for a specific node</td></tr>
+          <tr><td><code>homelab_inventorySync</code></td><td>Discover nodes from Ansible inventory or Tailscale</td></tr>
+        </tbody>
+      </table>
+
       <h3>SSH (1)</h3>
       <table>
         <thead><tr><th>Tool</th><th>Description</th></tr></thead>
@@ -276,6 +287,7 @@
           <tr><td>os-update-management</td><td>Unattended-upgrades, kernel updates, reboot scheduling</td></tr>
           <tr><td>performance-tuning</td><td>Kernel params, swap config, I/O scheduler, GPU memory split</td></tr>
           <tr><td>certificate-management</td><td>Let's Encrypt, self-signed certs, renewal automation, NPM cert integration</td></tr>
+          <tr><td>multi-node-management</td><td>Managing fleets, node inventory, parallel operations, cross-node monitoring</td></tr>
           <tr><td>storage-management</td><td>Samba, Syncthing, volumes, disk monitoring</td></tr>
           <tr><td>troubleshooting</td><td>Debug crashes, network issues, hardware problems</td></tr>
         </tbody>
@@ -297,6 +309,7 @@
           <tr><td>privileged-containers</td><td>Compose files</td><td>Flag containers with elevated privileges or missing security opts</td></tr>
           <tr><td>weak-credentials</td><td>Compose / .env</td><td>Flag default/weak passwords and insecure credential storage</td></tr>
           <tr><td>resource-limits</td><td>Compose files</td><td>Flag containers without memory or CPU limits</td></tr>
+          <tr><td>inventory-consistency</td><td>Inventory / .env</td><td>Flag nodes in config missing from HOMELAB_NODES registry</td></tr>
         </tbody>
       </table>
     </section>

@@ -2,11 +2,13 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const DEFAULT_PORT = 3000;
 const SERVICE_NAME = "AdGuard Home";
 
 const inputSchema = {
+  ...nodeParam,
   search: z
     .string()
     .optional()
@@ -47,6 +49,7 @@ export function register(server: McpServer): void {
         const query = params.join("&");
         const output = await execSSH(
           `curl -sf ${auth} 'http://localhost:${port}/control/querylog?${query}'`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

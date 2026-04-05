@@ -178,23 +178,23 @@ Support managing multiple SSH targets. Core infrastructure change.
 
 **MCP tools (+4):**
 
-- [ ] `homelab_nodeList` -- list all managed nodes and their connection status
-- [ ] `homelab_nodeExec` -- execute a command on a specific node by name
-- [ ] `homelab_nodeStatus` -- get system status for a specific node (like piStatus but for any node)
-- [ ] `homelab_inventorySync` -- sync/discover nodes from Ansible inventory or Tailscale
+- [x] `homelab_nodeList` -- list all managed nodes and their connection status
+- [x] `homelab_nodeExec` -- execute a command on a specific node by name
+- [x] `homelab_nodeStatus` -- get system status for a specific node (like piStatus but for any node)
+- [x] `homelab_inventorySync` -- sync/discover nodes from Ansible inventory or Tailscale
 
 **Infrastructure changes:**
 
-- [ ] `ssh-api.ts` refactored to support a node registry (env var or config file for multiple hosts)
-- [ ] All existing tools gain optional `node` parameter (defaults to primary Pi)
+- [x] `ssh-api.ts` refactored to support a node registry (env var or config file for multiple hosts)
+- [x] All existing tools gain optional `node` parameter (defaults to primary Pi)
 
 **Skills (+1):**
 
-- [ ] `multi-node-management` -- managing fleets, inventory, parallel operations
+- [x] `multi-node-management` -- managing fleets, inventory, parallel operations
 
 **Rules (+1):**
 
-- [ ] `inventory-consistency` -- flag nodes in inventory but unreachable, or missing from inventory
+- [x] `inventory-consistency` -- flag nodes in inventory but unreachable, or missing from inventory
 
 ---
 
@@ -271,6 +271,7 @@ Production-ready, fully tested, fully documented.
 
 ## Completed
 
+- v0.9.0: Multi-Node Foundation -- 4 new tools (nodeList, nodeExec, nodeStatus, inventorySync), ssh-api.ts refactored for multi-node, all 44 existing tools gain optional node parameter, 1 new skill (multi-node-management), 1 new rule (inventory-consistency)
 - v0.8.0: SSL/TLS Certificates -- 3 new tools (certCheck, certRenew, certList), 1 new skill (certificate-management)
 - v0.7.0: OS and Package Management -- 4 new tools (aptUpgradable, aptHistory, kernelInfo, systemdServices), 2 new skills (os-update-management, performance-tuning), 1 new rule (resource-limits)
 - v0.6.0: Logs and Notifications -- 4 new tools (journalLogs, logSearch, ntfySend, ntfyTopics), 2 new skills (log-analysis, notification-workflows)

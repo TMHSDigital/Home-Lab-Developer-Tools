@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   volume: z.string().min(1).describe("Docker volume name to back up"),
   confirm: z
     .boolean()
@@ -29,6 +31,7 @@ export function register(server: McpServer): void {
         const volumePath = `/var/lib/docker/volumes/${args.volume}/_data`;
         const output = await execSSH(
           `sudo restic -r ${repo} backup '${volumePath}' --tag docker-volume --tag '${args.volume}' 2>&1`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

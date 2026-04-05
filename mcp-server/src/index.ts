@@ -47,10 +47,14 @@ import { register as registerSystemdServices } from "./tools/systemdServices.js"
 import { register as registerCertCheck } from "./tools/certCheck.js";
 import { register as registerCertRenew } from "./tools/certRenew.js";
 import { register as registerCertList } from "./tools/certList.js";
+import { register as registerNodeList } from "./tools/nodeList.js";
+import { register as registerNodeExec } from "./tools/nodeExec.js";
+import { register as registerNodeStatus } from "./tools/nodeStatus.js";
+import { register as registerInventorySync } from "./tools/inventorySync.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.8.0",
+  version: "0.9.0",
 });
 
 registerPiStatus(server);
@@ -97,6 +101,10 @@ registerSystemdServices(server);
 registerCertCheck(server);
 registerCertRenew(server);
 registerCertList(server);
+registerNodeList(server);
+registerNodeExec(server);
+registerNodeStatus(server);
+registerInventorySync(server);
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();

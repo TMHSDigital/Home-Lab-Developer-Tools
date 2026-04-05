@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   snapshot: z
     .string()
     .min(1)
@@ -40,6 +42,7 @@ export function register(server: McpServer): void {
         const includeFlag = args.include ? ` --include '${args.include}'` : "";
         const output = await execSSH(
           `sudo restic -r ${repo} restore '${args.snapshot}' --target '${args.target}'${includeFlag} 2>&1`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

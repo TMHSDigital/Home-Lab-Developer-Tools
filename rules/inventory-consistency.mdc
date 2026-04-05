@@ -1,0 +1,58 @@
+---
+description: Flag inconsistencies between node registry and inventory or configuration files.
+alwaysApply: false
+globs:
+  - "**/hosts"
+  - "**/inventory*"
+  - "**/.env*"
+---
+
+# Inventory Consistency
+
+## Patterns to Flag
+
+### Nodes in Config but Missing from Registry
+- Hosts referenced in Ansible inventory, `.env` files, or SSH configs that are not in `HOMELAB_NODES`
+- Compose files referencing remote hosts not in the node registry
+- Scripts with hardcoded SSH targets instead of using the node registry
+
+### Invalid Registry Entries
+- `HOMELAB_NODES` entries with placeholder hosts (e.g. `example.com`, `changeme`, `localhost`)
+- Entries with empty or missing `host` field
+- Entries with default credentials that should be customized
+
+### Stale or Unreachable Nodes
+- Nodes in `HOMELAB_NODES` that have been offline for extended periods
+- Duplicate node names with different configs
+- Nodes with IPs that don't match DNS records
+
+## What to Do
+
+- Keep `HOMELAB_NODES` in sync with your actual infrastructure
+- Use `homelab_nodeList` to verify all registered nodes are reachable
+- Use `homelab_inventorySync` to discover nodes from Ansible or Tailscale
+- Remove nodes from the registry when decommissioned
+- Use descriptive node names that indicate purpose (e.g. `nas`, `pi-monitor`, `pi-dns`)
+
+## Example Valid Configuration
+
+```json
+{
+  "pi5": {
+    "host": "raspi5.local",
+    "user": "tmhs",
+    "keyPath": "~/.ssh/id_ed25519_pi"
+  },
+  "nas": {
+    "host": "192.168.1.50",
+    "user": "admin",
+    "keyPath": "~/.ssh/id_ed25519_nas"
+  }
+}
+```
+
+## Exceptions
+
+- Development or testing environments with intentionally placeholder values
+- Dynamically provisioned nodes that come and go (e.g. CI runners)
+- Tailscale-only nodes accessed via magic DNS rather than static IPs

@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   unit: z
     .string()
     .optional()
@@ -38,7 +40,7 @@ export function register(server: McpServer): void {
         if (args.unit) parts.push(`--unit '${args.unit}'`);
         if (args.priority !== undefined) parts.push(`--priority ${args.priority}`);
         if (args.since) parts.push(`--since '${args.since}'`);
-        const output = await execSSH(parts.join(" "));
+        const output = await execSSH(parts.join(" "), args.node);
         return { content: [{ type: "text" as const, text: output || "No journal entries matched the filters." }] };
       } catch (error) {
         return errorResponse(error);

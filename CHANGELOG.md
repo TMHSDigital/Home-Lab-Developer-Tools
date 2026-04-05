@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-04-05
+
+### Added
+
+- 4 new MCP tools for multi-node management
+  - `homelab_nodeList` -- list all managed nodes and their connection status
+  - `homelab_nodeExec` -- execute a command on a specific node by name (requires confirm=true)
+  - `homelab_nodeStatus` -- get system status for a specific node (uptime, CPU, memory, disk)
+  - `homelab_inventorySync` -- discover nodes from Ansible inventory or Tailscale
+- 1 new skill
+  - `multi-node-management` -- managing fleets, node inventory, parallel operations, cross-node monitoring
+- 1 new rule
+  - `inventory-consistency` -- flag nodes in config missing from HOMELAB_NODES registry
+- `HOMELAB_NODES` env var for multi-node SSH configuration (JSON object)
+- `HOMELAB_ANSIBLE_INVENTORY` env var for Ansible inventory path
+- Input validation tests for all 4 new tools
+
+### Changed
+
+- **Infrastructure refactor:** `ssh-api.ts` now supports a node registry via `HOMELAB_NODES` env var
+- `execSSH()` accepts an optional `node` parameter to target specific nodes
+- All 44 existing tools now accept an optional `node` parameter (defaults to primary Pi)
+- New `node-param.ts` utility provides shared zod schema fragment for the node parameter
+
 ## [0.8.0] - 2026-04-05
 
 ### Added
@@ -149,6 +173,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.9.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.9.0
 [0.8.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.8.0
 [0.7.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.7.0
 [0.6.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.6.0

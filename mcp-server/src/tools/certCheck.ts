@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   domain: z
     .string()
     .min(1)
@@ -21,7 +23,7 @@ export function register(server: McpServer): void {
         const cmd =
           `echo | openssl s_client -servername '${serverName}' -connect '${target}' 2>/dev/null ` +
           `| openssl x509 -noout -subject -issuer -dates -fingerprint 2>&1`;
-        const output = await execSSH(cmd);
+        const output = await execSSH(cmd, args.node);
         return {
           content: [{
             type: "text" as const,

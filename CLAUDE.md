@@ -4,13 +4,13 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 21 skills, 10 rules, and a companion MCP server with 44 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 48 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.8.0
+**Version:** 0.9.0
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
@@ -38,7 +38,7 @@ Home-Lab-Developer-Tools/
   tests/                     # Python structure tests
 ```
 
-## Skills (21)
+## Skills (22)
 
 | Skill | Description |
 |-------|-------------|
@@ -61,10 +61,11 @@ Home-Lab-Developer-Tools/
 | os-update-management | Unattended-upgrades, kernel updates, reboot scheduling |
 | performance-tuning | Kernel params, swap config, I/O scheduler, GPU memory split |
 | certificate-management | Let's Encrypt, self-signed certs, renewal automation, NPM cert integration |
+| multi-node-management | Managing fleets, node inventory, parallel operations, cross-node monitoring |
 | storage-management | Samba, Syncthing, volumes, disk monitoring |
 | troubleshooting | Debug crashes, network issues, hardware problems |
 
-## Rules (10)
+## Rules (11)
 
 | Rule | Scope | Description |
 |------|-------|-------------|
@@ -78,10 +79,11 @@ Home-Lab-Developer-Tools/
 | privileged-containers | compose*.yml | Flag containers with elevated privileges or missing security opts |
 | weak-credentials | compose*.yml, .env* | Flag default/weak passwords and insecure credential storage |
 | resource-limits | compose*.yml | Flag containers without memory or CPU limits |
+| inventory-consistency | hosts, inventory*, .env* | Flag nodes in config missing from HOMELAB_NODES registry |
 
-## MCP Tools (44)
+## MCP Tools (48)
 
-All tools connect to the Pi via SSH using environment variables for configuration.
+All tools connect to the Pi (or any registered node) via SSH. All tools accept an optional `node` parameter to target a specific node from the `HOMELAB_NODES` registry.
 
 | Tool | Description |
 |------|-------------|
@@ -128,6 +130,10 @@ All tools connect to the Pi via SSH using environment variables for configuratio
 | `homelab_certCheck` | Check SSL certificate expiry, issuer, and fingerprint |
 | `homelab_certRenew` | Trigger Let's Encrypt certificate renewal |
 | `homelab_certList` | List all managed certificates from certbot and NPM |
+| `homelab_nodeList` | List all managed nodes and connection status |
+| `homelab_nodeExec` | Execute a command on a specific node (requires confirm=true) |
+| `homelab_nodeStatus` | Get system status for a specific node |
+| `homelab_inventorySync` | Discover nodes from Ansible inventory or Tailscale |
 | `homelab_sshTest` | Test SSH connectivity |
 
 ## Development

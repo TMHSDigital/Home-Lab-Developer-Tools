@@ -2,11 +2,13 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const DEFAULT_PORT = 9093;
 const SERVICE_NAME = "Alertmanager";
 
 const inputSchema = {
+  ...nodeParam,
   state: z
     .enum(["active", "suppressed", "unprocessed"])
     .optional()
@@ -29,6 +31,7 @@ export function register(server: McpServer): void {
         const stateParam = args.state ? `?state=${args.state}` : "";
         const output = await execSSH(
           `curl -sf 'http://localhost:${port}/api/v2/alerts${stateParam}'`,
+          args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };

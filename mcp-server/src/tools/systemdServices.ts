@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   unit: z
     .string()
     .optional()
@@ -23,7 +25,7 @@ export function register(server: McpServer): void {
         const cmd = args.unit
           ? `systemctl status '${args.unit}' --no-pager 2>&1`
           : `systemctl list-units --type=${args.type || "service"} --no-pager 2>&1`;
-        const output = await execSSH(cmd);
+        const output = await execSSH(cmd, args.node);
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
         return errorResponse(error);
