@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 48 MCP tools</strong>
+  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 50 MCP tools</strong>
 </p>
 
 ---
@@ -43,7 +43,7 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
 | **22 Skills** (SKILL.md) | Yes | Yes | Yes | - |
 | **11 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **48 MCP tools** | Yes | Yes | Yes | Yes |
+| **50 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -131,7 +131,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-48-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-50-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2020-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -156,7 +156,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>48 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>50 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -249,6 +249,13 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_nodeExec` | Execute a command on a specific node |
 | `homelab_nodeStatus` | Get system status for a specific node |
 | `homelab_inventorySync` | Discover nodes from Ansible inventory or Tailscale |
+
+**Diagnostics** (2)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_healthCheck` | Comprehensive self-test (SSH, Docker, curl, restic, certbot, systemd) |
+| `homelab_diagnostics` | Collect debug info bundle (OS, kernel, Docker, memory, disk, network) |
 
 **SSH** (1)
 
@@ -361,7 +368,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | **v0.7.0** | **OS and Package Management** | **+4** | **+2** | **+1** | **41** |
 | **v0.8.0** | **SSL/TLS Certificates** | **+3** | **+1** | **--** | **44** |
 | **v0.9.0** | **Multi-Node Foundation** | **+4** | **+1** | **+1** | **48** |
-| v0.10.0 | Testing Infrastructure | +2 | -- | -- | 50 |
+| **v0.10.0** | **Testing Infrastructure** | **+2** | **--** | **--** | **50** |
 | v0.11.0 | Documentation Site | -- | -- | -- | 50 |
 | v0.12.0 | Polish and Hardening | +2 | -- | -- | 52 |
 | **v1.0.0** | **Stable Release** | -- | -- | -- | **52** |

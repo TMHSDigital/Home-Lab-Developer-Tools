@@ -1,0 +1,49 @@
+---
+name: E2E Tests (Live Pi)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 0" # Weekly, Sunday 6am UTC
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    if: github.repository == 'TMHSDigital/Home-Lab-Developer-Tools'
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mcp-server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: mcp-server
+
+      - name: Build
+        run: npm run build
+        working-directory: mcp-server
+
+      - name: Write SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PI_KEY }}" | base64 -d > ~/.ssh/pi_key
+          chmod 600 ~/.ssh/pi_key
+          ssh-keyscan -H ${{ secrets.PI_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Run E2E tests
+        run: npm test
+        working-directory: mcp-server
+        env:
+          HOMELAB_TEST_PI: "true"
+          HOMELAB_PI_HOST: ${{ secrets.PI_HOST }}
+          HOMELAB_PI_USER: ${{ secrets.PI_USER }}
+          HOMELAB_PI_KEY_PATH: ~/.ssh/pi_key
+
+      - name: Clean up
+        if: always()
+        run: rm -f ~/.ssh/pi_key

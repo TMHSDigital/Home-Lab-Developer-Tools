@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home Lab Developer Tools</title>
-  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 22 skills, 11 rules, 48 MCP tools.">
+  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 22 skills, 11 rules, 50 MCP tools.">
   <meta property="og:title" content="Home Lab Developer Tools">
-  <meta property="og:description" content="22 skills, 11 rules, 48 MCP tools for managing a Raspberry Pi home lab via SSH.">
+  <meta property="og:description" content="22 skills, 11 rules, 50 MCP tools for managing a Raspberry Pi home lab via SSH.">
   <meta property="og:type" content="website">
   <style>
     :root {
@@ -99,7 +99,7 @@
     <div class="container">
       <h1>Home Lab Developer Tools</h1>
       <p>Home lab and Raspberry Pi workflows for Cursor, Claude Code, and any MCP-compatible editor.</p>
-      <span class="version">v0.9.0</span>
+      <span class="version">v0.10.0</span>
     </div>
   </header>
 
@@ -114,7 +114,7 @@
         <div class="stat-label">Rules</div>
       </div>
       <div class="stat">
-        <div class="stat-number" data-target="48">48</div>
+        <div class="stat-number" data-target="50">50</div>
         <div class="stat-label">MCP Tools</div>
       </div>
     </div>
@@ -251,6 +251,15 @@
           <tr><td><code>homelab_nodeExec</code></td><td>Execute a command on a specific node</td></tr>
           <tr><td><code>homelab_nodeStatus</code></td><td>Get system status for a specific node</td></tr>
           <tr><td><code>homelab_inventorySync</code></td><td>Discover nodes from Ansible inventory or Tailscale</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Diagnostics (2)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>homelab_healthCheck</code></td><td>Comprehensive self-test (SSH, Docker, curl, restic, certbot, systemd)</td></tr>
+          <tr><td><code>homelab_diagnostics</code></td><td>Collect debug info bundle (OS, kernel, Docker, memory, disk, network)</td></tr>
         </tbody>
       </table>
 

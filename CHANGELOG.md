@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-04-05
+
+### Added
+
+- 2 new MCP tools for testing and diagnostics
+  - `homelab_healthCheck` -- comprehensive self-test (SSH, Docker, curl, restic, certbot, systemd)
+  - `homelab_diagnostics` -- collect debug info bundle (OS, kernel, Docker, memory, disk, network)
+- Integration tests with mocked SSH -- first tests covering actual tool handler logic
+- E2E test suite gated behind `HOMELAB_TEST_PI=true` env var for live Pi testing
+- `.github/workflows/e2e.yml` CI workflow for manual/scheduled E2E runs against a real Pi
+- Input validation tests for both new tools
+
 ## [0.9.0] - 2026-04-05
 
 ### Added

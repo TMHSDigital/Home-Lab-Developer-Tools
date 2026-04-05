@@ -4,13 +4,13 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 48 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 50 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.9.0
+**Version:** 0.10.0
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
@@ -81,7 +81,7 @@ Home-Lab-Developer-Tools/
 | resource-limits | compose*.yml | Flag containers without memory or CPU limits |
 | inventory-consistency | hosts, inventory*, .env* | Flag nodes in config missing from HOMELAB_NODES registry |
 
-## MCP Tools (48)
+## MCP Tools (50)
 
 All tools connect to the Pi (or any registered node) via SSH. All tools accept an optional `node` parameter to target a specific node from the `HOMELAB_NODES` registry.
 
@@ -134,6 +134,8 @@ All tools connect to the Pi (or any registered node) via SSH. All tools accept a
 | `homelab_nodeExec` | Execute a command on a specific node (requires confirm=true) |
 | `homelab_nodeStatus` | Get system status for a specific node |
 | `homelab_inventorySync` | Discover nodes from Ansible inventory or Tailscale |
+| `homelab_healthCheck` | Comprehensive self-test (SSH, Docker, curl, restic, certbot, systemd) |
+| `homelab_diagnostics` | Collect debug info bundle (OS, kernel, Docker, memory, disk, network) |
 | `homelab_sshTest` | Test SSH connectivity |
 
 ## Development

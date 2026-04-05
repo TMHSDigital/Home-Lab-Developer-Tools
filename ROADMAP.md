@@ -204,14 +204,14 @@ Real test coverage before v1.0.
 
 **MCP tools (+2):**
 
-- [ ] `homelab_healthCheck` -- comprehensive self-test (SSH connectivity, Docker availability, required tools present)
-- [ ] `homelab_diagnostics` -- collect debug info bundle (versions, connectivity, config)
+- [x] `homelab_healthCheck` -- comprehensive self-test (SSH connectivity, Docker availability, required tools present)
+- [x] `homelab_diagnostics` -- collect debug info bundle (versions, connectivity, config)
 
 **Testing layers:**
 
-- [ ] Integration tests with mocked SSH (ssh2-mock or similar)
-- [ ] E2E test suite that runs against a real Pi (gated behind `HOMELAB_TEST_PI=true` env var)
-- [ ] CI workflow that connects to a Pi via Tailscale for e2e (self-hosted runner or SSH tunnel)
+- [x] Integration tests with mocked SSH (vi.mock execSSH)
+- [x] E2E test suite that runs against a real Pi (gated behind `HOMELAB_TEST_PI=true` env var)
+- [x] CI workflow for manual/scheduled E2E runs (.github/workflows/e2e.yml)
 
 ---
 
@@ -271,6 +271,7 @@ Production-ready, fully tested, fully documented.
 
 ## Completed
 
+- v0.10.0: Testing Infrastructure -- 2 new tools (healthCheck, diagnostics), integration tests with mocked SSH, E2E test suite gated behind HOMELAB_TEST_PI, CI workflow for e2e
 - v0.9.0: Multi-Node Foundation -- 4 new tools (nodeList, nodeExec, nodeStatus, inventorySync), ssh-api.ts refactored for multi-node, all 44 existing tools gain optional node parameter, 1 new skill (multi-node-management), 1 new rule (inventory-consistency)
 - v0.8.0: SSL/TLS Certificates -- 3 new tools (certCheck, certRenew, certList), 1 new skill (certificate-management)
 - v0.7.0: OS and Package Management -- 4 new tools (aptUpgradable, aptHistory, kernelInfo, systemdServices), 2 new skills (os-update-management, performance-tuning), 1 new rule (resource-limits)

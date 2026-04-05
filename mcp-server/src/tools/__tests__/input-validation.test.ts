@@ -837,4 +837,36 @@ describe("input validation schemas", () => {
       expect(() => schema.parse({ source: "kubernetes" })).toThrow();
     });
   });
+
+  describe("healthCheck", () => {
+    const schema = z.object({
+      node: z.string().optional(),
+    });
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result.node).toBeUndefined();
+    });
+
+    it("accepts optional node", () => {
+      const result = schema.parse({ node: "pi5" });
+      expect(result.node).toBe("pi5");
+    });
+  });
+
+  describe("diagnostics", () => {
+    const schema = z.object({
+      node: z.string().optional(),
+    });
+
+    it("accepts empty input", () => {
+      const result = schema.parse({});
+      expect(result.node).toBeUndefined();
+    });
+
+    it("accepts optional node", () => {
+      const result = schema.parse({ node: "nas" });
+      expect(result.node).toBe("nas");
+    });
+  });
 });
