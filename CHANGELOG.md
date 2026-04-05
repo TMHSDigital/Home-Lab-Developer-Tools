@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-04-05
+
+### Added
+
+- 5 new MCP tools for monitoring stack integration
+  - `homelab_prometheusQuery` -- run PromQL queries against Prometheus
+  - `homelab_grafanaSnapshot` -- export Grafana dashboard configs by UID
+  - `homelab_uptimeKumaStatus` -- get all Uptime Kuma monitor statuses
+  - `homelab_alertList` -- list Alertmanager alerts with optional state filter
+  - `homelab_speedtestResults` -- get recent Speedtest Tracker results
+- 2 new skills
+  - `grafana-dashboards` -- creating, importing, and managing Grafana dashboards
+  - `alerting-rules` -- writing Prometheus alerting rules and Alertmanager routing
+- Input validation tests for all 5 new tools
+
 ## [0.1.0] - 2026-04-05
 
 ### Added
@@ -30,4 +45,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.2.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.2.0
 [0.1.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.1.0

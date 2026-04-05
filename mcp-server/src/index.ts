@@ -18,10 +18,15 @@ import { register as registerBackupStatus } from "./tools/backupStatus.js";
 import { register as registerBackupRun } from "./tools/backupRun.js";
 import { register as registerAptUpdate } from "./tools/aptUpdate.js";
 import { register as registerSshTest } from "./tools/sshTest.js";
+import { register as registerPrometheusQuery } from "./tools/prometheusQuery.js";
+import { register as registerGrafanaSnapshot } from "./tools/grafanaSnapshot.js";
+import { register as registerUptimeKumaStatus } from "./tools/uptimeKumaStatus.js";
+import { register as registerAlertList } from "./tools/alertList.js";
+import { register as registerSpeedtestResults } from "./tools/speedtestResults.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.1.0",
+  version: "0.2.0",
 });
 
 registerPiStatus(server);
@@ -39,6 +44,11 @@ registerBackupStatus(server);
 registerBackupRun(server);
 registerAptUpdate(server);
 registerSshTest(server);
+registerPrometheusQuery(server);
+registerGrafanaSnapshot(server);
+registerUptimeKumaStatus(server);
+registerAlertList(server);
+registerSpeedtestResults(server);
 
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();

@@ -4,13 +4,13 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 10 skills, 5 rules, and a companion MCP server with 15 tools for managing Docker Compose stacks, monitoring, networking, backups, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 12 skills, 5 rules, and a companion MCP server with 20 tools for managing Docker Compose stacks, monitoring, networking, backups, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.1.0
+**Version:** 0.2.0
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
@@ -38,13 +38,15 @@ Home-Lab-Developer-Tools/
   tests/                     # Python structure tests
 ```
 
-## Skills (10)
+## Skills (12)
 
 | Skill | Description |
 |-------|-------------|
 | pi-system-management | Monitor Pi hardware -- temp, throttling, memory, reboots |
 | docker-compose-stacks | Manage multi-file Docker Compose deployments |
 | service-monitoring | Prometheus, Grafana, Uptime Kuma, alert rules |
+| grafana-dashboards | Create, import, and manage Grafana dashboards |
+| alerting-rules | Prometheus alerting rules and Alertmanager routing |
 | network-configuration | AdGuard DNS, NPM, Tailscale VPN, port management |
 | backup-recovery | Restic backup config, scheduling, and restore |
 | ssh-management | SSH keys, hardening, tunnels, troubleshooting |
@@ -63,7 +65,7 @@ Home-Lab-Developer-Tools/
 | yaml-conventions | *.yml, *.yaml | Enforce formatting conventions |
 | ansible-best-practices | ansible/**/*.yml | Flag Ansible antipatterns |
 
-## MCP Tools (15)
+## MCP Tools (20)
 
 All tools connect to the Pi via SSH using environment variables for configuration.
 
@@ -80,6 +82,11 @@ All tools connect to the Pi via SSH using environment variables for configuratio
 | `homelab_composeDown` | Stop compose stacks |
 | `homelab_composePull` | Pull latest images |
 | `homelab_composePs` | List running compose containers |
+| `homelab_prometheusQuery` | Run a PromQL query against Prometheus |
+| `homelab_grafanaSnapshot` | Export a Grafana dashboard configuration by UID |
+| `homelab_uptimeKumaStatus` | Get the status of all Uptime Kuma monitors |
+| `homelab_alertList` | List alerts from Alertmanager by state |
+| `homelab_speedtestResults` | Get recent Speedtest Tracker results |
 | `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
 | `homelab_backupStatus` | Check latest restic snapshots |
 | `homelab_backupRun` | Trigger restic backup (requires confirm=true) |

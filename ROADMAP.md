@@ -37,16 +37,16 @@ Deep integration with the monitoring stack already running on the Pi.
 
 **MCP tools (+5):**
 
-- [ ] `homelab_prometheusQuery` -- run PromQL queries against Prometheus
-- [ ] `homelab_grafanaSnapshot` -- export Grafana dashboard snapshots
-- [ ] `homelab_uptimeKumaStatus` -- get Uptime Kuma monitor statuses
-- [ ] `homelab_alertList` -- list active Alertmanager alerts
-- [ ] `homelab_speedtestResults` -- get recent Speedtest Tracker results
+- [x] `homelab_prometheusQuery` -- run PromQL queries against Prometheus
+- [x] `homelab_grafanaSnapshot` -- export Grafana dashboard snapshots
+- [x] `homelab_uptimeKumaStatus` -- get Uptime Kuma monitor statuses
+- [x] `homelab_alertList` -- list active Alertmanager alerts
+- [x] `homelab_speedtestResults` -- get recent Speedtest Tracker results
 
 **Skills (+2):**
 
-- [ ] `grafana-dashboards` -- creating and managing dashboards
-- [ ] `alerting-rules` -- writing Prometheus alert rules
+- [x] `grafana-dashboards` -- creating and managing dashboards
+- [x] `alerting-rules` -- writing Prometheus alert rules
 
 ---
 
@@ -271,4 +271,5 @@ Production-ready, fully tested, fully documented.
 
 ## Completed
 
+- v0.2.0: Extended Monitoring -- 5 new tools (prometheusQuery, grafanaSnapshot, uptimeKumaStatus, alertList, speedtestResults), 2 new skills (grafana-dashboards, alerting-rules)
 - v0.1.0: Foundation release with 15 tools, 10 skills, 5 rules

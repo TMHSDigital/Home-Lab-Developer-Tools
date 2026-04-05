@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>10 skills &nbsp;&bull;&nbsp; 5 rules &nbsp;&bull;&nbsp; 15 MCP tools</strong>
+  <strong>12 skills &nbsp;&bull;&nbsp; 5 rules &nbsp;&bull;&nbsp; 20 MCP tools</strong>
 </p>
 
 ---
@@ -41,9 +41,9 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | Component | Cursor | Claude Code (terminal) | Claude Code in Cursor | Other MCP clients |
 |---|:---:|:---:|:---:|:---:|
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
-| **10 Skills** (SKILL.md) | Yes | Yes | Yes | - |
+| **12 Skills** (SKILL.md) | Yes | Yes | Yes | - |
 | **5 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **15 MCP tools** | Yes | Yes | Yes | Yes |
+| **20 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -71,7 +71,7 @@ flowchart LR
 ---
 
 <details>
-<summary><strong>10 Skills</strong> - on-demand home lab expertise</summary>
+<summary><strong>12 Skills</strong> - on-demand home lab expertise</summary>
 
 &nbsp;
 
@@ -80,6 +80,8 @@ flowchart LR
 | **System** | `pi-system-management` | Monitor Pi hardware -- temp, throttling, memory, reboots |
 | **Containers** | `docker-compose-stacks` | Manage multi-file Docker Compose deployments |
 | **Monitoring** | `service-monitoring` | Prometheus, Grafana, Uptime Kuma, alert rules |
+| **Monitoring** | `grafana-dashboards` | Create, import, and manage Grafana dashboards |
+| **Monitoring** | `alerting-rules` | Prometheus alerting rules and Alertmanager routing |
 | **Network** | `network-configuration` | AdGuard DNS, NPM reverse proxy, Tailscale VPN |
 | **Backup** | `backup-recovery` | Restic backup config, scheduling, and restore |
 | **SSH** | `ssh-management` | SSH keys, hardening, tunnels, troubleshooting |
@@ -113,7 +115,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-15-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-20-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2020-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -138,7 +140,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>15 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>20 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -167,6 +169,16 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_composeDown` | Stop compose stacks |
 | `homelab_composePull` | Pull latest images |
 | `homelab_composePs` | List running compose containers |
+
+**Monitoring** (5)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_prometheusQuery` | Run a PromQL query against Prometheus |
+| `homelab_grafanaSnapshot` | Export a Grafana dashboard configuration by UID |
+| `homelab_uptimeKumaStatus` | Get the status of all Uptime Kuma monitors |
+| `homelab_alertList` | List alerts from Alertmanager by state |
+| `homelab_speedtestResults` | Get recent Speedtest Tracker results |
 
 **Network** (1)
 
@@ -261,6 +273,8 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | `security-hardening` | "Audit my Pi's firewall rules and suggest improvements" |
 | `storage-management` | "Which directories are using the most disk space?" |
 | `troubleshooting` | "Grafana won't start -- help me debug the container" |
+| `grafana-dashboards` | "Export my main Pi dashboard from Grafana" |
+| `alerting-rules` | "Set up an alert for when disk usage goes above 85%" |
 
 </details>
 
@@ -272,7 +286,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | Version | Theme | New Tools | New Skills | New Rules | Cumulative |
 |---|---|---|---|---|---|
 | **v0.1.0** | Foundation | 15 | 10 | 5 | 15 |
-| v0.2.0 | Extended Monitoring | +5 | +2 | -- | 20 |
+| **v0.2.0** | **Extended Monitoring** | **+5** | **+2** | **--** | **20** |
 | v0.3.0 | DNS and Reverse Proxy | +5 | +2 | +1 | 25 |
 | v0.4.0 | Backup and Recovery | +4 | +1 | +1 | 29 |
 | v0.5.0 | Security Hardening | +4 | +1 | +2 | 33 |

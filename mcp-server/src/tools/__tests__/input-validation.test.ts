@@ -151,4 +151,85 @@ describe("input validation schemas", () => {
       expect(result.stacks).toEqual(["compose.monitoring.yml"]);
     });
   });
+
+  describe("prometheusQuery", () => {
+    const schema = z.object({
+      query: z.string().min(1),
+      time: z.string().optional(),
+    });
+
+    it("rejects empty query", () => {
+      expect(() => schema.parse({ query: "" })).toThrow();
+    });
+
+    it("accepts valid PromQL", () => {
+      const result = schema.parse({ query: "up{job='node'}" });
+      expect(result.query).toBe("up{job='node'}");
+      expect(result.time).toBeUndefined();
+    });
+
+    it("accepts query with time", () => {
+      const result = schema.parse({ query: "up", time: "2026-01-01T00:00:00Z" });
+      expect(result.time).toBe("2026-01-01T00:00:00Z");
+    });
+  });
+
+  describe("grafanaSnapshot", () => {
+    const schema = z.object({
+      dashboard: z.string().min(1),
+    });
+
+    it("rejects empty dashboard UID", () => {
+      expect(() => schema.parse({ dashboard: "" })).toThrow();
+    });
+
+    it("accepts valid dashboard UID", () => {
+      const result = schema.parse({ dashboard: "abc123" });
+      expect(result.dashboard).toBe("abc123");
+    });
+  });
+
+  describe("alertList", () => {
+    const schema = z.object({
+      state: z.enum(["active", "suppressed", "unprocessed"]).optional(),
+    });
+
+    it("accepts no state filter", () => {
+      const result = schema.parse({});
+      expect(result.state).toBeUndefined();
+    });
+
+    it("accepts valid state", () => {
+      const result = schema.parse({ state: "active" });
+      expect(result.state).toBe("active");
+    });
+
+    it("rejects invalid state", () => {
+      expect(() => schema.parse({ state: "firing" })).toThrow();
+    });
+  });
+
+  describe("speedtestResults", () => {
+    const schema = z.object({
+      count: z.number().int().positive().optional().default(5),
+    });
+
+    it("defaults count to 5", () => {
+      const result = schema.parse({});
+      expect(result.count).toBe(5);
+    });
+
+    it("accepts custom count", () => {
+      const result = schema.parse({ count: 10 });
+      expect(result.count).toBe(10);
+    });
+
+    it("rejects zero count", () => {
+      expect(() => schema.parse({ count: 0 })).toThrow();
+    });
+
+    it("rejects negative count", () => {
+      expect(() => schema.parse({ count: -3 })).toThrow();
+    });
+  });
 });
