@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home Lab Developer Tools</title>
-  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 10 skills, 5 rules, 15 MCP tools.">
+  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 16 skills, 9 rules, 33 MCP tools.">
   <meta property="og:title" content="Home Lab Developer Tools">
-  <meta property="og:description" content="10 skills, 5 rules, 15 MCP tools for managing a Raspberry Pi home lab via SSH.">
+  <meta property="og:description" content="16 skills, 9 rules, 33 MCP tools for managing a Raspberry Pi home lab via SSH.">
   <meta property="og:type" content="website">
   <style>
     :root {
@@ -60,6 +60,7 @@
     section { padding: 48px 0; border-bottom: 1px solid var(--border); }
     section:last-child { border-bottom: none; }
     h2 { font-size: 1.5rem; margin-bottom: 24px; }
+    h3 { font-size: 1.1rem; margin: 24px 0 12px; color: var(--text-muted); }
 
     table { width: 100%; border-collapse: collapse; margin-top: 16px; }
     th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
@@ -98,22 +99,22 @@
     <div class="container">
       <h1>Home Lab Developer Tools</h1>
       <p>Home lab and Raspberry Pi workflows for Cursor, Claude Code, and any MCP-compatible editor.</p>
-      <span class="version">v0.1.0</span>
+      <span class="version">v0.5.0</span>
     </div>
   </header>
 
   <div class="container">
     <div class="stats">
       <div class="stat">
-        <div class="stat-number" data-target="10">10</div>
+        <div class="stat-number" data-target="16">16</div>
         <div class="stat-label">Skills</div>
       </div>
       <div class="stat">
-        <div class="stat-number" data-target="5">5</div>
+        <div class="stat-number" data-target="9">9</div>
         <div class="stat-label">Rules</div>
       </div>
       <div class="stat">
-        <div class="stat-number" data-target="15">15</div>
+        <div class="stat-number" data-target="33">33</div>
         <div class="stat-label">MCP Tools</div>
       </div>
     </div>
@@ -121,25 +122,99 @@
     <section>
       <h2>MCP Tools</h2>
       <p>All tools connect to your Raspberry Pi via SSH for live system management.</p>
+
+      <h3>System (4)</h3>
       <table>
-        <thead>
-          <tr><th>Tool</th><th>Description</th></tr>
-        </thead>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
         <tbody>
           <tr><td><code>homelab_piStatus</code></td><td>CPU temp, memory, disk, uptime, throttle state</td></tr>
           <tr><td><code>homelab_piReboot</code></td><td>Safe reboot with pre-checks</td></tr>
           <tr><td><code>homelab_diskUsage</code></td><td>Disk usage breakdown by directory</td></tr>
           <tr><td><code>homelab_aptUpdate</code></td><td>Run apt update, list upgradable packages</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Containers (3)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
           <tr><td><code>homelab_serviceHealth</code></td><td>Docker container health status</td></tr>
           <tr><td><code>homelab_serviceLogs</code></td><td>Tail container logs</td></tr>
           <tr><td><code>homelab_serviceRestart</code></td><td>Restart a container</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Compose (4)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
           <tr><td><code>homelab_composeUp</code></td><td>Start compose stacks</td></tr>
           <tr><td><code>homelab_composeDown</code></td><td>Stop compose stacks</td></tr>
           <tr><td><code>homelab_composePull</code></td><td>Pull latest images</td></tr>
           <tr><td><code>homelab_composePs</code></td><td>List running compose containers</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Monitoring (5)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>homelab_prometheusQuery</code></td><td>Run a PromQL query against Prometheus</td></tr>
+          <tr><td><code>homelab_grafanaSnapshot</code></td><td>Export a Grafana dashboard configuration by UID</td></tr>
+          <tr><td><code>homelab_uptimeKumaStatus</code></td><td>Get the status of all Uptime Kuma monitors</td></tr>
+          <tr><td><code>homelab_alertList</code></td><td>List alerts from Alertmanager by state</td></tr>
+          <tr><td><code>homelab_speedtestResults</code></td><td>Get recent Speedtest Tracker results</td></tr>
+        </tbody>
+      </table>
+
+      <h3>DNS / Proxy (5)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>homelab_adguardStats</code></td><td>AdGuard Home DNS statistics and top blocked domains</td></tr>
+          <tr><td><code>homelab_adguardFilters</code></td><td>List AdGuard filter/blocklists and status</td></tr>
+          <tr><td><code>homelab_adguardQueryLog</code></td><td>Search the AdGuard DNS query log</td></tr>
+          <tr><td><code>homelab_npmProxyHosts</code></td><td>List NPM proxy host configurations</td></tr>
+          <tr><td><code>homelab_npmCerts</code></td><td>List SSL certificates and expiry dates</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Network (1)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
           <tr><td><code>homelab_networkInfo</code></td><td>IP addresses, DNS, Tailscale status</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Backup (6)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
           <tr><td><code>homelab_backupStatus</code></td><td>Check latest restic snapshots</td></tr>
           <tr><td><code>homelab_backupRun</code></td><td>Trigger restic backup</td></tr>
+          <tr><td><code>homelab_backupList</code></td><td>List all restic snapshots with filtering</td></tr>
+          <tr><td><code>homelab_backupRestore</code></td><td>Restore files from a snapshot</td></tr>
+          <tr><td><code>homelab_backupDiff</code></td><td>Show differences between two snapshots</td></tr>
+          <tr><td><code>homelab_volumeBackup</code></td><td>Back up a Docker volume to restic</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Security (4)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>homelab_ufwStatus</code></td><td>List UFW firewall rules and status</td></tr>
+          <tr><td><code>homelab_fail2banStatus</code></td><td>List fail2ban jails, banned IPs, and ban counts</td></tr>
+          <tr><td><code>homelab_openPorts</code></td><td>Scan listening TCP ports and map to processes</td></tr>
+          <tr><td><code>homelab_containerScan</code></td><td>Scan container images for vulnerabilities via Trivy</td></tr>
+        </tbody>
+      </table>
+
+      <h3>SSH (1)</h3>
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
           <tr><td><code>homelab_sshTest</code></td><td>Test SSH connectivity</td></tr>
         </tbody>
       </table>
@@ -148,20 +223,42 @@
     <section>
       <h2>Skills</h2>
       <table>
-        <thead>
-          <tr><th>Skill</th><th>Description</th></tr>
-        </thead>
+        <thead><tr><th>Skill</th><th>Description</th></tr></thead>
         <tbody>
           <tr><td>pi-system-management</td><td>Monitor Pi hardware -- temp, throttling, memory, reboots</td></tr>
           <tr><td>docker-compose-stacks</td><td>Manage multi-file Docker Compose deployments</td></tr>
           <tr><td>service-monitoring</td><td>Prometheus, Grafana, Uptime Kuma, alert rules</td></tr>
+          <tr><td>grafana-dashboards</td><td>Create, import, and manage Grafana dashboards</td></tr>
+          <tr><td>alerting-rules</td><td>Prometheus alerting rules and Alertmanager routing</td></tr>
           <tr><td>network-configuration</td><td>AdGuard DNS, NPM, Tailscale VPN, port management</td></tr>
+          <tr><td>dns-management</td><td>AdGuard filters, local DNS records, blocklists</td></tr>
+          <tr><td>reverse-proxy-management</td><td>NPM routing, SSL config, access lists</td></tr>
           <tr><td>backup-recovery</td><td>Restic backup config, scheduling, and restore</td></tr>
+          <tr><td>disaster-recovery</td><td>Full Pi restore, SD card imaging, migration checklist</td></tr>
           <tr><td>ssh-management</td><td>SSH keys, hardening, tunnels, troubleshooting</td></tr>
           <tr><td>ansible-workflows</td><td>Ansible playbooks for multi-node management</td></tr>
           <tr><td>security-hardening</td><td>UFW, fail2ban, SSH lockdown, container security</td></tr>
+          <tr><td>secrets-management</td><td>Vaultwarden, env vars, Docker secrets, credential auditing</td></tr>
           <tr><td>storage-management</td><td>Samba, Syncthing, volumes, disk monitoring</td></tr>
           <tr><td>troubleshooting</td><td>Debug crashes, network issues, hardware problems</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Rules</h2>
+      <table>
+        <thead><tr><th>Rule</th><th>Scope</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>homelab-secrets</td><td>Global</td><td>Flag hardcoded passwords, IPs, and SSH keys</td></tr>
+          <tr><td>compose-arm64</td><td>Compose files</td><td>Flag images without arm64 support, missing healthchecks</td></tr>
+          <tr><td>ssh-safety</td><td>Global</td><td>Flag dangerous SSH commands</td></tr>
+          <tr><td>yaml-conventions</td><td>YAML files</td><td>Enforce 2-space indent, document start, explicit booleans</td></tr>
+          <tr><td>ansible-best-practices</td><td>Ansible files</td><td>Flag non-FQCN modules, missing tags, shell misuse</td></tr>
+          <tr><td>exposed-ports</td><td>Compose files</td><td>Flag services with exposed host ports that should use a proxy</td></tr>
+          <tr><td>backup-coverage</td><td>Compose files</td><td>Flag Docker volumes not covered by any backup job</td></tr>
+          <tr><td>privileged-containers</td><td>Compose files</td><td>Flag containers with elevated privileges or missing security opts</td></tr>
+          <tr><td>weak-credentials</td><td>Compose / .env</td><td>Flag default/weak passwords and insecure credential storage</td></tr>
         </tbody>
       </table>
     </section>
@@ -178,11 +275,15 @@
         <pre><code>cd mcp-server && npm install && npm run build
 claude mcp add homelab node ./mcp-server/dist/index.js</code></pre>
       </div>
+      <div class="install-block" style="margin-top: 16px;">
+        <strong>npm (global)</strong>
+        <pre><code>npm install -g @tmhs/homelab-mcp</code></pre>
+      </div>
     </section>
   </div>
 
   <footer>
-    <p>Built by <a href="https://github.com/TMHSDigital">TMHSDigital</a> | <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools">GitHub</a></p>
+    <p>Built by <a href="https://github.com/TMHSDigital">TMHSDigital</a> | <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools">GitHub</a> | <a href="https://www.npmjs.com/package/@tmhs/homelab-mcp">npm</a></p>
   </footer>
 </body>
 </html>

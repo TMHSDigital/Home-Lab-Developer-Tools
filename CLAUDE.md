@@ -165,7 +165,7 @@ When preparing a new release version, ALL of the following files must be updated
 | `CLAUDE.md` | `Version` field, skill/rule/tool counts and tables |
 | `ROADMAP.md` | Move version from planned to completed, update status |
 | `CHANGELOG.md` | Add new version section with all changes |
-| `docs/index.html` | Update any version references or counts |
+| `docs/index.html` | Version pill, stat counters, tools/skills/rules tables, meta descriptions |
 | GitHub repo About | Description with skill/rule/tool counts (`gh repo edit --description "..."`) |
 
 Checklist before pushing a release:
