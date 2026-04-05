@@ -44,10 +44,10 @@ Before finalizing any version bump, complete every item in order:
 
 ## Publishing flow
 - Pushing a version bump in `mcp-server/package.json` to `main` triggers `auto-tag.yml`.
-- `auto-tag.yml` detects the version change, creates a git tag (`vX.Y.Z`), and creates a GitHub Release with auto-generated notes.
-- The GitHub Release triggers `publish.yml`, which builds, tests, and publishes `@tmhs/homelab-mcp` to npm with provenance.
+- `auto-tag.yml` detects the version change, creates a git tag (`vX.Y.Z`), creates a GitHub Release, then builds, tests, and publishes to npm -- all in one workflow.
+- `publish.yml` exists as a manual fallback only (workflow_dispatch or manual GitHub Release).
 - Release Drafter auto-drafts release notes from merged PRs (labels control categories).
-- Never publish to npm manually -- always go through the GitHub Release workflow.
+- Never publish to npm manually -- always go through the automated workflow.
 - Never create tags or releases manually -- `auto-tag.yml` handles this automatically on version bumps.
 
 ## Home lab conventions

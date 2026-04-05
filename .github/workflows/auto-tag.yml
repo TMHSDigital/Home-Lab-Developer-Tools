@@ -1,5 +1,5 @@
 ---
-name: Auto-tag and release on version bump
+name: Auto-tag, release, and publish on version bump
 
 on:
   push:
@@ -9,9 +9,10 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
-  tag-and-release:
+  tag-release-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -55,3 +56,27 @@ jobs:
             --title "$TAG" \
             --generate-notes \
             --latest
+
+      - name: Setup Node.js
+        if: steps.version.outputs.changed == 'true' && steps.check-tag.outputs.exists == 'false'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+          cache-dependency-path: mcp-server/package-lock.json
+
+      - name: Install, build, test
+        if: steps.version.outputs.changed == 'true' && steps.check-tag.outputs.exists == 'false'
+        working-directory: mcp-server
+        run: |
+          npm ci
+          npm run build
+          npm test
+
+      - name: Publish to npm
+        if: steps.version.outputs.changed == 'true' && steps.check-tag.outputs.exists == 'false'
+        working-directory: mcp-server
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
