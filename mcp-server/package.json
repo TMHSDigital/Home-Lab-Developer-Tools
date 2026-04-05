@@ -1,0 +1,49 @@
+{
+  "name": "@tmhs/homelab-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for home lab operations via SSH - 15 tools for system status, Docker Compose management, service health, networking, backups, and administration on a Raspberry Pi.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "homelab-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">= 20.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "ssh2": "^1.16.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ssh2": "^1.15.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "license": "CC-BY-NC-ND-4.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TMHSDigital/Home-Lab-Developer-Tools.git",
+    "directory": "mcp-server"
+  },
+  "homepage": "https://github.com/TMHSDigital/Home-Lab-Developer-Tools",
+  "bugs": {
+    "url": "https://github.com/TMHSDigital/Home-Lab-Developer-Tools/issues"
+  },
+  "author": "TMHSDigital"
+}

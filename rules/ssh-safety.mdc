@@ -1,0 +1,39 @@
+---
+description: Flag dangerous SSH commands that could cause data loss or system damage on the Raspberry Pi.
+alwaysApply: true
+---
+
+# SSH Command Safety
+
+## Patterns to Flag
+
+### Destructive Commands
+- `rm -rf /` or `rm -rf /*` -- catastrophic data loss
+- `dd if=` writing to system disks without explicit confirmation
+- `mkfs` on any partition without confirmation context
+- `shutdown -h now` or `poweroff` without a reboot plan (Pi may need physical access to restart)
+
+### Risky Operations
+- `chmod -R 777` -- overly permissive, security risk
+- `chown -R` on system directories outside `/opt`, `/srv`, or `/home`
+- Piping curl output directly to `sh` or `bash` (`curl | sh`)
+- Running `apt-get remove` on critical packages (docker, openssh-server, systemd)
+
+### Network Risks
+- Disabling the firewall (`ufw disable`) without re-enabling
+- Changing SSH port or disabling password auth without confirming key auth works first
+- Modifying `/etc/network/interfaces` or `netplan` without a rollback plan
+
+## What to Do
+
+- Always use `homelab_piReboot` (which has safety checks) instead of raw reboot commands
+- Suggest dry-run flags where available (`--dry-run`, `--simulate`, `-n`)
+- For destructive operations, recommend a backup first (`homelab_backupRun`)
+- Use `homelab_sshTest` to verify connectivity after network changes
+- Wrap dangerous commands with confirmation prompts in scripts
+
+## Exceptions
+
+- Commands in Ansible playbooks with proper `when` conditions and idempotency
+- Commands in documented runbooks with explicit prerequisite steps
+- Test environments where data loss is acceptable

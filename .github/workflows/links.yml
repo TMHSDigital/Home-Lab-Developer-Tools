@@ -1,0 +1,33 @@
+---
+name: Check Links
+
+on:
+  schedule:
+    - cron: "0 0 1 * *"
+  push:
+    branches: [main]
+    paths:
+      - "**.md"
+      - "**.mdc"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  linkcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          fail: false
+          args: >
+            --exclude "localhost"
+            --exclude "127.0.0.1"
+            --exclude "example.com"
+            --exclude "raspi5.local"
+            "**/*.md"
+            "**/*.mdc"

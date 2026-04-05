@@ -1,0 +1,55 @@
+# Home-Lab Developer Tools - Cursor Rules
+
+## Formatting
+- Never use em dashes. Use a regular dash (-) or double dash (--) or rewrite the sentence.
+- Never use emojis in any file.
+- Never hardcode SSH credentials, IP addresses, or private keys. Always use environment variables.
+
+## Plugin conventions
+- Skills live in `skills/<skill-name>/SKILL.md` (one per directory, kebab-case).
+- Rules live in `rules/<rule-name>.mdc`.
+- Every skill SKILL.md must have YAML frontmatter with `name` (matching directory) and `description`.
+- Every rule .mdc must have YAML frontmatter with `description` and `alwaysApply`.
+- Skill sections in order: Trigger, Required Inputs, Workflow, Key References, Example Interaction, MCP Usage, Common Pitfalls, See Also.
+
+## MCP server conventions
+- Tool names follow `homelab_camelCase` pattern (e.g. `homelab_piStatus`, `homelab_serviceHealth`).
+- Each tool file exports a `register(server)` function.
+- All Pi interaction goes through SSH via `execSSH()` from `utils/ssh-api.ts`.
+- Always check SSH connectivity before executing commands.
+- Handle connection failures gracefully with typed errors.
+
+## Release checklist
+Before finalizing any version bump, complete every item in order:
+1. Implement all MCP tools, skills, and rules listed for the milestone in ROADMAP.md.
+2. Add input validation tests for every new MCP tool in `input-validation.test.ts`.
+3. Build the MCP server (`npm run build`) and confirm zero compiler errors.
+4. Run all tests: `cd mcp-server && npm test` (Vitest) and `pytest tests/ -v --tb=short` (structure).
+5. Bump version in ALL of these files (must be consistent):
+   - `.cursor-plugin/plugin.json` (version + description tool count)
+   - `mcp-server/package.json` (version + description)
+   - `mcp-server/src/index.ts` (McpServer version string)
+   - `README.md` (version badge, tool count in tagline, tools table)
+   - `CLAUDE.md` (version, tool count, tool table)
+   - `ROADMAP.md` (mark new version as current, previous as Released)
+6. Add a new section to `CHANGELOG.md` with all Added/Changed/Fixed items.
+7. Update `docs/index.html` (GitHub Pages site):
+   - Meta description and og:description tool counts
+   - Hero version pill
+   - Stats counter data-target for MCP Tools
+   - Tools table (add new tool rows)
+8. Re-run all tests after doc changes (some tests validate docs consistency).
+9. Commit, push, tag (`vX.Y.Z`), and `gh release create` with release notes.
+10. Update repo description: `gh repo edit --description "..."` with new tool count.
+
+## Publishing flow
+- Tagging a commit with `vX.Y.Z` and creating a GitHub Release triggers `publish.yml`.
+- `publish.yml` builds, tests, and publishes `@tmhs/homelab-mcp` to npm with provenance.
+- Release Drafter auto-drafts release notes from merged PRs (labels control categories).
+- Never publish to npm manually -- always go through the GitHub Release workflow.
+
+## Home lab conventions
+- Target platform is Raspberry Pi 5 running Raspberry Pi OS Lite 64-bit (arm64).
+- Docker Compose stacks live in `/opt/homelab/docker/` on the Pi.
+- Compose files are split by function: base, monitoring, network, apps, security, storage, tools.
+- Native services (Cockpit, Samba, node_exporter) are managed via systemd, not Docker.

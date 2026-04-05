@@ -1,0 +1,78 @@
+---
+name: Validate Plugin Structure
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Validate plugin.json
+        run: python3 -c "import json; json.load(open('.cursor-plugin/plugin.json'))"
+
+      - name: Check directories exist
+        run: |
+          test -d skills
+          test -d rules
+
+      - name: Validate skill frontmatter
+        run: |
+          for dir in skills/*/; do
+            skill_name=$(basename "$dir")
+            skill_file="$dir/SKILL.md"
+            if [ ! -f "$skill_file" ]; then
+              echo "FAIL: Missing SKILL.md in $dir"
+              exit 1
+            fi
+            if ! head -1 "$skill_file" | grep -q "^---"; then
+              echo "FAIL: $skill_file missing YAML frontmatter"
+              exit 1
+            fi
+            echo "OK: $skill_file"
+          done
+
+      - name: Validate rule frontmatter
+        run: |
+          for rule_file in rules/*.mdc; do
+            if ! head -1 "$rule_file" | grep -q "^---"; then
+              echo "FAIL: $rule_file missing YAML frontmatter"
+              exit 1
+            fi
+            echo "OK: $rule_file"
+          done
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        run: pip install -r requirements-test.txt
+
+      - name: Run structure tests
+        run: pytest tests/ -v --tb=short
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mcp-server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: mcp-server
+
+      - name: Type check
+        run: npx tsc --noEmit
+        working-directory: mcp-server

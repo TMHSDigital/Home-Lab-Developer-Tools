@@ -1,0 +1,39 @@
+---
+description: Flag Docker Compose issues specific to arm64 Raspberry Pi deployments including incompatible images and missing healthchecks.
+alwaysApply: false
+globs:
+  - "**/compose*.yml"
+  - "**/docker-compose*.yml"
+---
+
+# Compose ARM64 Compatibility
+
+## Patterns to Flag
+
+### Image Compatibility
+- Images without known arm64/aarch64 support (check Docker Hub for multi-arch manifests)
+- Using `amd64`-only images without explicitly noting the platform limitation
+- Missing `platform: linux/arm64` when an image requires explicit platform specification
+
+### Missing Best Practices
+- Services without `restart: unless-stopped` or `restart: always`
+- Services without a `healthcheck` block
+- Using `:latest` tags in production -- suggest pinning to specific versions
+- Missing `container_name` making it harder to reference containers in scripts
+
+### Resource Concerns
+- No memory limits on a resource-constrained Pi (4GB or 8GB RAM shared across all containers)
+- CPU-intensive services without resource constraints
+
+## What to Do
+
+- Verify arm64 support on Docker Hub or the image's GitHub repo before adding a service
+- Add `healthcheck` with appropriate test command, interval, timeout, and retries
+- Pin image versions after initial testing (e.g. `grafana/grafana-oss:11.4.0` not `:latest`)
+- Add `deploy.resources.limits` for memory on resource-heavy services
+- Set `restart: unless-stopped` on all services
+
+## Exceptions
+
+- Development or testing compose files may use `:latest` for convenience
+- Init containers or one-shot jobs do not need healthchecks

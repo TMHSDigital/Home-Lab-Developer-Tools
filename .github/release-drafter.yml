@@ -1,0 +1,71 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+categories:
+  - title: "New MCP Tools"
+    labels:
+      - "new-tool"
+      - "mcp"
+  - title: "Skills & Rules"
+    labels:
+      - "skill"
+      - "rule"
+  - title: "Bug Fixes"
+    labels:
+      - "bug"
+      - "fix"
+  - title: "Documentation"
+    labels:
+      - "documentation"
+      - "docs"
+  - title: "CI / Infrastructure"
+    labels:
+      - "ci"
+      - "infrastructure"
+      - "dependencies"
+  - title: "Other Changes"
+    labels:
+      - "*"
+change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
+change-title-escapes: '\<*_&'
+version-resolver:
+  major:
+    labels:
+      - "major"
+      - "breaking"
+  minor:
+    labels:
+      - "minor"
+      - "feature"
+      - "new-tool"
+  patch:
+    labels:
+      - "patch"
+      - "bug"
+      - "fix"
+      - "docs"
+  default: patch
+exclude-labels:
+  - "skip-changelog"
+autolabeler:
+  - label: "documentation"
+    files:
+      - "*.md"
+      - "docs/**"
+  - label: "ci"
+    files:
+      - ".github/**"
+  - label: "mcp"
+    files:
+      - "mcp-server/**"
+  - label: "skill"
+    files:
+      - "skills/**"
+  - label: "rule"
+    files:
+      - "rules/**"

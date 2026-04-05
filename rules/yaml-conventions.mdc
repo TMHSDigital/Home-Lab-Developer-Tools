@@ -1,0 +1,43 @@
+---
+description: Enforce YAML formatting conventions for consistency across compose files, Ansible playbooks, and monitoring configs.
+alwaysApply: false
+globs:
+  - "**/*.yml"
+  - "**/*.yaml"
+---
+
+# YAML Conventions
+
+## Patterns to Flag
+
+### Indentation
+- Using tabs instead of spaces
+- Inconsistent indentation (mixing 2-space and 4-space within the same file)
+- Not using 2-space indentation (the project standard)
+
+### Document Structure
+- Missing `---` document start marker at the top of the file
+- Using `yes`/`no` instead of `true`/`false` for boolean values
+- Trailing whitespace on lines
+
+### Quoting
+- Using smart/curly quotes instead of straight quotes
+- Inconsistent quoting style within the same file (mixing single and double without reason)
+- Unquoted values that YAML might misinterpret (e.g. `on`, `off`, `null`, version strings like `3.8`)
+
+### Comments
+- No space after `#` in comments
+- Commented-out blocks of code without explanation of why they are disabled
+
+## What to Do
+
+- Use 2-space indentation consistently
+- Start every YAML file with `---`
+- Use `true`/`false` for booleans, not `yes`/`no`
+- Quote version strings and values that could be misinterpreted
+- Add a space after `#` in comments
+
+## Exceptions
+
+- Generated YAML files (e.g. Grafana dashboard exports) may have different formatting
+- Lock files and dependency manifests follow their own conventions

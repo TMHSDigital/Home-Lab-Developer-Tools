@@ -1,0 +1,44 @@
+---
+description: Flag Ansible antipatterns including non-FQCN modules, missing tags, and shell commands when modules exist.
+alwaysApply: false
+globs:
+  - "**/ansible/**/*.yml"
+---
+
+# Ansible Best Practices
+
+## Patterns to Flag
+
+### Module Usage
+- Using short module names (`apt`, `copy`, `file`) instead of FQCN (`ansible.builtin.apt`, `ansible.builtin.copy`)
+- Using `command` or `shell` modules when a purpose-built module exists (e.g. `shell: apt-get install` instead of `ansible.builtin.apt`)
+- Using `shell` when `command` would suffice (shell is needed only for pipes, redirects, or env vars)
+
+### Task Structure
+- Tasks without `tags` -- prevents selective execution
+- Tasks without `name` -- makes output unreadable
+- Using `notify` without a corresponding handler
+- Hardcoded paths that should use variables
+
+### Variables and Secrets
+- Passwords or tokens in plain text in playbooks or group_vars
+- Variables without defaults in role `defaults/main.yml`
+- Undefined variables used without `| default()` filter
+
+### Idempotency
+- Using `changed_when: true` without actual change detection
+- Commands that are not idempotent without `creates` or `removes` guards
+- Missing `state: present` or `state: absent` on package/service tasks
+
+## What to Do
+
+- Use FQCN for all modules: `ansible.builtin.apt`, `ansible.builtin.template`, etc.
+- Add tags to every task for selective runs (e.g. `tags: [common, packages]`)
+- Define all role variables in `defaults/main.yml` with descriptive comments
+- Use `ansible.builtin.template` for config files, not `copy` with inline content
+- Use `ansible-vault` or environment variables for sensitive data
+
+## Exceptions
+
+- One-off debug playbooks may skip tags for brevity
+- Imported roles from Galaxy may use short module names (flag but do not block)
