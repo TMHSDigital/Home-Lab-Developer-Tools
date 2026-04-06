@@ -1,6 +1,10 @@
 ---
 name: ansible-workflows
 description: Write and run Ansible playbooks for multi-node home lab provisioning and configuration management.
+tools:
+  - homelab_inventorySync
+  - homelab_nodeList
+  - homelab_nodeExec
 ---
 
 # Ansible Workflows

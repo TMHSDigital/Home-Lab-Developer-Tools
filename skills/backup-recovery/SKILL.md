@@ -1,6 +1,11 @@
 ---
 name: backup-recovery
 description: Configure and manage restic backups including scheduling, verification, and disaster recovery.
+tools:
+  - homelab_backupStatus
+  - homelab_backupRun
+  - homelab_backupList
+  - homelab_backupDiff
 ---
 
 # Backup and Recovery

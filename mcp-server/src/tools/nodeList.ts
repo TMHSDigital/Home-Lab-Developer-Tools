@@ -1,5 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse, listNodes } from "../utils/ssh-api.js";
+import { execSSH, listNodes } from "../utils/ssh-api.js";
 
 const inputSchema = {};
 

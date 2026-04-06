@@ -9,7 +9,7 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    if: github.repository == 'TMHSDigital/Home-Lab-Developer-Tools'
+    if: github.repository == 'TMHSDigital/Home-Lab-Developer-Tools' && vars.PI_CONFIGURED == 'true'
     steps:
       - uses: actions/checkout@v6
 

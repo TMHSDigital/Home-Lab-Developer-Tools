@@ -20,7 +20,7 @@
 
 ---
 
-## v0.1.0 - Foundation (current)
+## v0.1.0 - Foundation
 
 - [x] 10 skills covering core home lab workflows
 - [x] 5 rules for best-practice enforcement

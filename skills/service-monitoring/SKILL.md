@@ -1,6 +1,12 @@
 ---
 name: service-monitoring
 description: Set up and use Prometheus, Grafana, Uptime Kuma, and Alertmanager for home lab observability.
+tools:
+  - homelab_serviceHealth
+  - homelab_serviceLogs
+  - homelab_serviceRestart
+  - homelab_prometheusQuery
+  - homelab_uptimeKumaStatus
 ---
 
 # Service Monitoring

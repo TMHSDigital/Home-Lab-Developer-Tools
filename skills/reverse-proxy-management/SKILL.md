@@ -1,6 +1,10 @@
 ---
 name: reverse-proxy-management
 description: Configure Nginx Proxy Manager for reverse proxying, SSL certificates, and access control.
+tools:
+  - homelab_npmProxyHosts
+  - homelab_npmCerts
+  - homelab_certCheck
 ---
 
 # Reverse Proxy Management

@@ -1,6 +1,10 @@
 ---
 name: dns-management
 description: Manage AdGuard Home DNS filtering, blocklists, local DNS records, and query log analysis.
+tools:
+  - homelab_adguardStats
+  - homelab_adguardFilters
+  - homelab_adguardQueryLog
 ---
 
 # DNS Management

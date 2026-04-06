@@ -1,6 +1,10 @@
 ---
 name: alerting-rules
 description: Write Prometheus alerting rules and configure Alertmanager routing for home lab notifications.
+tools:
+  - homelab_alertList
+  - homelab_prometheusQuery
+  - homelab_ntfySend
 ---
 
 # Alerting Rules

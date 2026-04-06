@@ -1,6 +1,9 @@
 ---
 name: storage-management
 description: Manage Samba shares, Syncthing file sync, Docker volumes, and disk space on the Raspberry Pi.
+tools:
+  - homelab_diskUsage
+  - homelab_volumeBackup
 ---
 
 # Storage Management

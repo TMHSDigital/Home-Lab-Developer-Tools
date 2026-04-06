@@ -1,6 +1,11 @@
 ---
 name: network-configuration
 description: Configure and manage AdGuard DNS, Nginx Proxy Manager, Tailscale VPN, and port mappings.
+tools:
+  - homelab_networkInfo
+  - homelab_adguardStats
+  - homelab_npmProxyHosts
+  - homelab_openPorts
 ---
 
 # Network Configuration

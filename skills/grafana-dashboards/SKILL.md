@@ -1,6 +1,9 @@
 ---
 name: grafana-dashboards
 description: Create, import, export, and manage Grafana dashboards for home lab observability.
+tools:
+  - homelab_grafanaSnapshot
+  - homelab_prometheusQuery
 ---
 
 # Grafana Dashboards

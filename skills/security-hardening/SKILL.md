@@ -1,6 +1,11 @@
 ---
 name: security-hardening
 description: Harden the home lab with UFW firewall rules, fail2ban, SSH lockdown, and container security practices.
+tools:
+  - homelab_ufwStatus
+  - homelab_fail2banStatus
+  - homelab_openPorts
+  - homelab_containerScan
 ---
 
 # Security Hardening

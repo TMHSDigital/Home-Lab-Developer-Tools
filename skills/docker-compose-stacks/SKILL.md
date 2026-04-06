@@ -1,6 +1,11 @@
 ---
 name: docker-compose-stacks
 description: Manage multi-file Docker Compose deployments on a Raspberry Pi home lab server.
+tools:
+  - homelab_composeUp
+  - homelab_composeDown
+  - homelab_composePull
+  - homelab_composePs
 ---
 
 # Docker Compose Stacks

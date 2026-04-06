@@ -1,6 +1,14 @@
 ---
 name: troubleshooting
 description: Debug container crashes, network connectivity issues, Pi hardware problems, and service failures.
+tools:
+  - homelab_serviceLogs
+  - homelab_serviceHealth
+  - homelab_piStatus
+  - homelab_journalLogs
+  - homelab_logSearch
+  - homelab_healthCheck
+  - homelab_diagnostics
 ---
 
 # Troubleshooting

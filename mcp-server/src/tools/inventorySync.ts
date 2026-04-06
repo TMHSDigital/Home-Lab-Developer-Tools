@@ -1,8 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   source: z
     .enum(["ansible", "tailscale"])
     .describe("Discovery source: 'ansible' reads inventory file, 'tailscale' queries Tailscale peers"),
@@ -20,7 +22,7 @@ export function register(server: McpServer): void {
             process.env.HOMELAB_ANSIBLE_INVENTORY || "/etc/ansible/hosts";
           const cmd =
             `test -f '${inventoryPath}' && cat '${inventoryPath}' || echo 'Inventory file not found at ${inventoryPath}. Set HOMELAB_ANSIBLE_INVENTORY to the correct path.'`;
-          const output = await execSSH(cmd);
+          const output = await execSSH(cmd, args.node);
           return {
             content: [{
               type: "text" as const,
@@ -31,7 +33,7 @@ export function register(server: McpServer): void {
 
         const cmd =
           "command -v tailscale >/dev/null 2>&1 && tailscale status 2>&1 || echo 'Tailscale is not installed or not in PATH.'";
-        const output = await execSSH(cmd);
+        const output = await execSSH(cmd, args.node);
         return {
           content: [{
             type: "text" as const,

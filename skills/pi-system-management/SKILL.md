@@ -1,6 +1,10 @@
 ---
 name: pi-system-management
 description: Monitor and manage Raspberry Pi hardware - CPU temperature, throttling, memory, disk, and safe reboots.
+tools:
+  - homelab_piStatus
+  - homelab_piReboot
+  - homelab_diskUsage
 ---
 
 # Pi System Management
