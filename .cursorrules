@@ -8,7 +8,7 @@
 ## Plugin conventions
 - Skills live in `skills/<skill-name>/SKILL.md` (one per directory, kebab-case).
 - Rules live in `rules/<rule-name>.mdc`.
-- Every skill SKILL.md must have YAML frontmatter with `name` (matching directory) and `description`.
+- Every skill SKILL.md must have YAML frontmatter with `name` (matching directory), `description`, and `tools` (list of MCP tools the skill uses).
 - Every rule .mdc must have YAML frontmatter with `description` and `alwaysApply`.
 - Skill sections in order: Trigger, Required Inputs, Workflow, Key References, Example Interaction, MCP Usage, Common Pitfalls, See Also.
 

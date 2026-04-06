@@ -185,6 +185,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full documentation (README, CLAUDE.md, CONTRIBUTING, ROADMAP, SECURITY)
 - Project logo (assets/logo.png)
 
+[0.10.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.10.0
 [0.9.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.9.0
 [0.8.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.8.0
 [0.7.0]: https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.7.0

@@ -174,7 +174,7 @@ npm install -g @tmhs/homelab-mcp
 - Tool names follow `homelab_camelCase`.
 - Each tool file exports a `register(server)` function.
 - All SSH interaction goes through `execSSH()` from `utils/ssh-api.ts`.
-- Skills use kebab-case directory names with YAML frontmatter.
+- Skills use kebab-case directory names with YAML frontmatter (`name`, `description`, `tools`).
 - Rules use kebab-case filenames with `description` and `alwaysApply` frontmatter.
 
 ## Release Hygiene

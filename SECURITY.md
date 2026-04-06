@@ -15,7 +15,7 @@ This project connects to remote hosts via SSH. Security considerations:
 - SSH private keys must never be committed to the repository
 - The `.env` file containing connection details is gitignored
 - MCP tools execute commands on remote hosts -- review tool actions before running
-- The `homelab_piReboot` and `homelab_backupRun` tools require explicit confirmation parameters
+- Tools with destructive actions require explicit `confirm=true` parameters: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`
 
 ## Best Practices
 

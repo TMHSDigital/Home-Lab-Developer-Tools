@@ -69,6 +69,8 @@ Home-Lab-Developer-Tools/
 ---
 name: your-skill-name
 description: One-line description of what this skill does.
+tools:
+  - homelab_toolName
 ---
 
 # Your Skill Title
@@ -136,8 +138,10 @@ Describe which `homelab_*` MCP tools this skill uses.
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
+  ...nodeParam,
   paramName: z.string().min(1).describe("What this parameter does"),
 };
 
@@ -148,7 +152,7 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       try {
-        const output = await execSSH("command");
+        const output = await execSSH("command", args.node);
         return {
           content: [{ type: "text" as const, text: output }],
         };
