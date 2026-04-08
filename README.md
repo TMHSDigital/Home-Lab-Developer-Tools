@@ -381,9 +381,8 @@ See [ROADMAP.md](ROADMAP.md) for detailed per-version tool, skill, and rule brea
 
 ## Related Projects
 
-- [Home-Lab](https://github.com/TMHSDigital/Home-Lab) - The infrastructure repo this toolkit manages
-- [raspi5-win-bootstrap](https://github.com/TMHSDigital/raspi5-win-bootstrap) - Day-0 Pi setup
 - [Docker-Developer-Tools](https://github.com/TMHSDigital/Docker-Developer-Tools) - Docker workflows plugin (same structure)
+- [Developer-Tools-Directory](https://github.com/TMHSDigital/Developer-Tools-Directory) - Centralized catalog of all developer tools
 
 ## Contributing
 
