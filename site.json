@@ -15,5 +15,20 @@
   "links": {
     "npm": "https://www.npmjs.com/package/@tmhs/homelab-mcp",
     "github": "https://github.com/TMHSDigital/Home-Lab-Developer-Tools"
-  }
+  },
+  "quickStart": {
+    "title": "Get started in seconds",
+    "command": "npm install -g @tmhs/homelab-mcp"
+  },
+  "compatibility": {
+    "cursor": "0.49+",
+    "os": ["Windows", "macOS", "Linux"],
+    "node": "18+",
+    "claude": "Claude Code compatible"
+  },
+  "relatedTools": [
+    { "name": "Docker Developer Tools", "url": "https://tmhsdigital.github.io/Docker-Developer-Tools/", "description": "Docker container workflows for Cursor" },
+    { "name": "Monday Cursor Plugin", "url": "https://tmhsdigital.github.io/Monday-Cursor-Plugin/", "description": "Monday.com project management integration" },
+    { "name": "Developer Tools Directory", "url": "https://tmhsdigital.github.io/Developer-Tools-Directory/", "description": "Browse all TMHSDigital developer tools" }
+  ]
 }

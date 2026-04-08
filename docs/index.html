@@ -197,6 +197,54 @@
       .section-actions { margin-left: 0; }
     }
 
+    /* SKILL DETAIL ROWS */
+    details.skill-row { border-bottom: 1px solid rgba(48,54,61,0.5); }
+    details.skill-row > summary { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0.75rem; cursor: pointer; list-style: none; transition: background 0.15s; }
+    details.skill-row > summary::-webkit-details-marker { display: none; }
+    details.skill-row > summary::before { content: ''; display: inline-block; width: 0; height: 0; border-left: 5px solid var(--accent-light); border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform 0.2s; flex-shrink: 0; }
+    details.skill-row[open] > summary::before { transform: rotate(90deg); }
+    details.skill-row > summary:hover { background: var(--bg3); }
+    .skill-name { font-weight: 500; color: var(--text); white-space: nowrap; min-width: 140px; }
+    .skill-desc { color: var(--text-dim); font-size: 0.875rem; }
+    .skill-detail { padding: 0.5rem 0.75rem 1rem 1.75rem; }
+    .skill-detail-group { margin-bottom: 0.75rem; }
+    .skill-detail-group strong { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); margin-bottom: 0.35rem; }
+    .skill-detail-group ul { list-style: disc; padding-left: 1.25rem; font-size: 0.875rem; color: var(--text); }
+    .skill-detail-group li { margin-bottom: 0.2rem; }
+    .skill-tools { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .skill-tools code { background: var(--bg3); padding: 0.15rem 0.5rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-light); }
+    .skill-category-label { display: inline-block; font-size: 0.6875rem; color: var(--text-dim); background: var(--bg3); padding: 0.1rem 0.5rem; border-radius: 10px; }
+
+    /* QUICK START */
+    .quick-start { position: relative; max-width: 640px; margin: 0 auto 2rem; }
+    .quick-start-title { font-size: 0.8125rem; color: var(--text-dim); text-align: center; margin-bottom: 0.5rem; font-weight: 500; }
+    .quick-start-block { position: relative; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 3rem 1rem 1.25rem; font-family: var(--font-mono); font-size: 0.9rem; color: var(--accent-light); overflow-x: auto; white-space: pre; line-height: 1.6; }
+    .quick-start-copy { position: absolute; top: 0.625rem; right: 0.625rem; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); cursor: pointer; padding: 0.3rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s, border-color 0.2s; }
+    .quick-start-copy:hover { color: var(--accent-light); border-color: var(--accent); }
+    .quick-start-copy svg { width: 16px; height: 16px; }
+
+    /* COMPATIBILITY BADGES */
+    .compat-row { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .compat-pill { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.75rem; background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 999px; font-size: 0.75rem; font-weight: 500; color: var(--accent-light); white-space: nowrap; }
+    .compat-pill svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* CHANGELOG */
+    .changelog-entry { margin-bottom: 1.25rem; }
+    .changelog-version { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .changelog-date { font-size: 0.8125rem; color: var(--text-dim); margin-left: 0.5rem; }
+    .changelog-heading { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-light); margin: 0.75rem 0 0.35rem; }
+    .changelog-items { list-style: disc; padding-left: 1.25rem; font-size: 0.875rem; color: var(--text-dim); }
+    .changelog-items li { margin-bottom: 0.2rem; }
+    .changelog-link { display: inline-block; margin-top: 0.75rem; font-size: 0.8125rem; }
+
+    /* RELATED TOOLS */
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .related-card { display: flex; flex-direction: column; padding: 1rem 1.25rem; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; transition: border-color 0.2s, transform 0.15s; text-decoration: none; color: inherit; }
+    .related-card:hover { border-color: var(--accent); transform: translateY(-2px); color: inherit; }
+    .related-card-name { font-weight: 600; font-size: 0.9375rem; color: var(--text); display: flex; align-items: center; gap: 0.4rem; }
+    .related-card-name svg { width: 14px; height: 14px; color: var(--accent-light); flex-shrink: 0; }
+    .related-card-desc { font-size: 0.8125rem; color: var(--text-dim); margin-top: 0.35rem; }
+
     /* SR ONLY */
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
@@ -221,6 +269,8 @@
         <li><a href="#rules">Rules</a></li>
         <li><a href="#mcp-tools">MCP Tools</a></li>
         <li><a href="#install">Install</a></li>
+        <li><a href="#changelog">Changelog</a></li>
+        <li><a href="#related">Related</a></li>
         <li><a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools">GitHub</a></li>
         <li>
           <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -242,6 +292,35 @@
         <div class="stat"><div class="stat-val" data-target="11">0</div><div class="stat-lbl">Rules</div></div>
         <div class="stat"><div class="stat-val" data-target="50">0</div><div class="stat-lbl">MCP Tools</div></div>
       </div>
+      
+      <div class="compat-row">
+        
+        <span class="compat-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          Cursor 0.49+
+        </span>
+        
+        
+        <span class="compat-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Windows / macOS / Linux
+        </span>
+        
+        
+        <span class="compat-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Node 18+
+        </span>
+        
+        
+        <span class="compat-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M9 12l2 2 4-4"/></svg>
+          Claude Code compatible
+        </span>
+        
+      </div>
+      
+
       <div class="hero-badges">
         <a class="badge" href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools">
           <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -254,6 +333,16 @@
         </a>
         
       </div>
+
+      
+      <div class="quick-start">
+        <div class="quick-start-title">Get started in seconds</div>
+        <div class="quick-start-block" id="quickStartCode">npm install -g @tmhs/homelab-mcp</div>
+        <button class="quick-start-copy" id="quickStartCopy" aria-label="Copy command">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"/></svg>
+        </button>
+      </div>
+      
     </div>
   </section>
 
@@ -273,122 +362,491 @@
     <details class="cat-group" id="skills-body">
       <summary class="sr-only">Skills list</summary>
       <div class="cat-body">
-        <table class="data-table">
-          <thead><tr><th>Name</th><th>Description</th></tr></thead>
-          <tbody>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Alerting Rules</span>
+            <span class="skill-desc">Write Prometheus alerting rules and configure Alertmanager routing for home lab notifications.</span>
+          </summary>
+          <div class="skill-detail">
             
-            <tr>
-              <td class="name-cell">Alerting Rules</td>
-              <td>Write Prometheus alerting rules and configure Alertmanager routing for home lab notifications.</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about creating or editing Prometheus alerts</li><li>User wants notifications when a service goes down or a threshold is breached</li><li>User mentions &#34;alert&#34;, &#34;alerting&#34;, &#34;Alertmanager&#34;, &#34;notification&#34;, or &#34;firing&#34;</li><li>User asks why alerts are not firing or notifications are not arriving</li><li>User wants to silence or inhibit specific alerts</li><li>User asks about alert routing or grouping configuration</li></ul>
+            </div>
             
-            <tr>
-              <td class="name-cell">Ansible Workflows</td>
-              <td>Write and run Ansible playbooks for multi-node home lab provisioning and configuration management.</td>
-            </tr>
             
-            <tr>
-              <td class="name-cell">Backup and Recovery</td>
-              <td>Configure and manage restic backups including scheduling, verification, and disaster recovery.</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_alertList</code><code>homelab_prometheusQuery</code><code>homelab_ntfySend</code></div>
+            </div>
             
-            <tr>
-              <td class="name-cell">Certificate Management</td>
-              <td>Let&#39;s Encrypt, self-signed certs, renewal automation, NPM cert integration</td>
-            </tr>
+            <span class="skill-category-label">alerting-rules</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Ansible Workflows</span>
+            <span class="skill-desc">Write and run Ansible playbooks for multi-node home lab provisioning and configuration management.</span>
+          </summary>
+          <div class="skill-detail">
             
-            <tr>
-              <td class="name-cell">Disaster Recovery</td>
-              <td>Full Pi disaster recovery -- backup verification, restore workflows, SD card imaging, and migration checklists</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>Create or edit Ansible playbooks for home lab provisioning</li><li>Set up or modify the Ansible inventory for Pi nodes</li><li>Run playbooks from Windows using Docker or WSL</li><li>Write roles for deploying services, configuring networking, or hardening security</li><li>Debug Ansible task failures or connection issues</li><li>Manage group_vars and host_vars for environment-specific configuration</li></ul>
+            </div>
             
-            <tr>
-              <td class="name-cell">DNS Management</td>
-              <td>Manage AdGuard Home DNS filtering, blocklists, local DNS records, and query log analysis.</td>
-            </tr>
             
-            <tr>
-              <td class="name-cell">Docker Compose Stacks</td>
-              <td>Manage multi-file Docker Compose deployments on a Raspberry Pi home lab server.</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_inventorySync</code><code>homelab_nodeList</code><code>homelab_nodeExec</code></div>
+            </div>
             
-            <tr>
-              <td class="name-cell">Grafana Dashboards</td>
-              <td>Create, import, export, and manage Grafana dashboards for home lab observability.</td>
-            </tr>
+            <span class="skill-category-label">ansible-workflows</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Backup and Recovery</span>
+            <span class="skill-desc">Configure and manage restic backups including scheduling, verification, and disaster recovery.</span>
+          </summary>
+          <div class="skill-detail">
             
-            <tr>
-              <td class="name-cell">Log Analysis</td>
-              <td>Structured log querying, journald workflows, and container log searching</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about backups, snapshots, or restore procedures</li><li>User wants to set up or verify a backup schedule</li><li>User asks &#34;is my data backed up?&#34; or &#34;when was the last backup?&#34;</li><li>User mentions &#34;restic&#34;, &#34;snapshot&#34;, &#34;retention&#34;, or &#34;disaster recovery&#34;</li><li>User wants to restore a file, volume, or entire service from backup</li><li>User asks about backup storage, repository health, or integrity checks</li></ul>
+            </div>
             
-            <tr>
-              <td class="name-cell">Multi-Node Management</td>
-              <td>Managing fleets, node inventory, parallel operations, cross-node monitoring</td>
-            </tr>
             
-            <tr>
-              <td class="name-cell">Network Configuration</td>
-              <td>Configure and manage AdGuard DNS, Nginx Proxy Manager, Tailscale VPN, and port mappings.</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_backupStatus</code><code>homelab_backupRun</code><code>homelab_backupList</code><code>homelab_backupDiff</code></div>
+            </div>
             
-            <tr>
-              <td class="name-cell">Notification Workflows</td>
-              <td>Ntfy setup, alert routing, and notification pipelines</td>
-            </tr>
+            <span class="skill-category-label">backup-recovery</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Certificate Management</span>
+            <span class="skill-desc">Let&#39;s Encrypt, self-signed certs, renewal automation, NPM cert integration</span>
+          </summary>
+          <div class="skill-detail">
             
-            <tr>
-              <td class="name-cell">OS Update Management</td>
-              <td>Unattended-upgrades config, kernel updates, reboot scheduling</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about SSL certificates, HTTPS, or TLS on their home lab</li><li>User wants to check certificate expiry dates</li><li>User mentions &#34;certbot&#34;, &#34;Let&#39;s Encrypt&#34;, &#34;SSL&#34;, &#34;TLS&#34;, &#34;HTTPS&#34;, or &#34;certificate&#34;</li><li>User wants to renew or provision a certificate</li><li>User asks about NPM certificate management</li><li>User wants to set up automatic certificate renewal</li><li>User reports browser certificate warnings</li></ul>
+            </div>
             
-            <tr>
-              <td class="name-cell">Performance Tuning</td>
-              <td>Kernel params, swap config, I/O scheduler, GPU memory split</td>
-            </tr>
             
-            <tr>
-              <td class="name-cell">Pi System Management</td>
-              <td>Monitor and manage Raspberry Pi hardware - CPU temperature, throttling, memory, disk, and safe reboots.</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_certCheck</code><code>homelab_certRenew</code><code>homelab_certList</code><code>homelab_npmCerts</code></div>
+            </div>
             
-            <tr>
-              <td class="name-cell">Reverse Proxy Management</td>
-              <td>Configure Nginx Proxy Manager for reverse proxying, SSL certificates, and access control.</td>
-            </tr>
+            <span class="skill-category-label">certificate-management</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Disaster Recovery</span>
+            <span class="skill-desc">Full Pi disaster recovery -- backup verification, restore workflows, SD card imaging, and migration checklists</span>
+          </summary>
+          <div class="skill-detail">
             
-            <tr>
-              <td class="name-cell">Secrets Management</td>
-              <td>Managing credentials with Vaultwarden, environment variables, Docker secrets, and security auditing</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks how to restore their Pi after a failure</li><li>User wants to verify backups are complete and recent</li><li>User needs to migrate to new hardware (new Pi, new SD card)</li><li>User wants to recover a specific Docker volume or service</li><li>User asks about backup strategy, retention, or coverage</li><li>User mentions &#34;restore&#34;, &#34;disaster recovery&#34;, &#34;migration&#34;, or &#34;SD card imaging&#34;</li><li>User asks what changed between backups</li></ul>
+            </div>
             
-            <tr>
-              <td class="name-cell">Security Hardening</td>
-              <td>Harden the home lab with UFW firewall rules, fail2ban, SSH lockdown, and container security practices.</td>
-            </tr>
             
-            <tr>
-              <td class="name-cell">Service Monitoring</td>
-              <td>Set up and use Prometheus, Grafana, Uptime Kuma, and Alertmanager for home lab observability.</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_backupList</code><code>homelab_backupRestore</code><code>homelab_backupDiff</code><code>homelab_volumeBackup</code><code>homelab_backupStatus</code><code>homelab_backupRun</code></div>
+            </div>
             
-            <tr>
-              <td class="name-cell">SSH Management</td>
-              <td>Manage SSH keys, harden SSH configuration, set up tunnels, and troubleshoot connection issues.</td>
-            </tr>
+            <span class="skill-category-label">disaster-recovery</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">DNS Management</span>
+            <span class="skill-desc">Manage AdGuard Home DNS filtering, blocklists, local DNS records, and query log analysis.</span>
+          </summary>
+          <div class="skill-detail">
             
-            <tr>
-              <td class="name-cell">Storage Management</td>
-              <td>Manage Samba shares, Syncthing file sync, Docker volumes, and disk space on the Raspberry Pi.</td>
-            </tr>
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about DNS filtering, ad blocking, or AdGuard configuration</li><li>User wants to add or remove blocklists</li><li>User asks about DNS query logs or which domains are being blocked</li><li>User mentions &#34;AdGuard&#34;, &#34;DNS&#34;, &#34;blocklist&#34;, &#34;ad blocking&#34;, or &#34;query log&#34;</li><li>User asks why a website or service is not working (could be DNS blocking)</li><li>User wants to create local DNS records or rewrites</li><li>User asks about upstream DNS servers or DNS-over-HTTPS/TLS</li></ul>
+            </div>
             
-            <tr>
-              <td class="name-cell">Troubleshooting</td>
-              <td>Debug container crashes, network connectivity issues, Pi hardware problems, and service failures.</td>
-            </tr>
             
-          </tbody>
-        </table>
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_adguardStats</code><code>homelab_adguardFilters</code><code>homelab_adguardQueryLog</code></div>
+            </div>
+            
+            <span class="skill-category-label">dns-management</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Docker Compose Stacks</span>
+            <span class="skill-desc">Manage multi-file Docker Compose deployments on a Raspberry Pi home lab server.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks to start, stop, update, or restart a Docker service</li><li>User mentions a specific service name (Grafana, AdGuard, Portainer, etc.)</li><li>User wants to pull new images or redeploy a stack</li><li>User asks about compose file structure or stack organization</li><li>User says &#34;deploy&#34;, &#34;compose up&#34;, &#34;update containers&#34;, or &#34;pull images&#34;</li><li>User reports a service is down or not responding</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_composeUp</code><code>homelab_composeDown</code><code>homelab_composePull</code><code>homelab_composePs</code></div>
+            </div>
+            
+            <span class="skill-category-label">docker-compose-stacks</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Grafana Dashboards</span>
+            <span class="skill-desc">Create, import, export, and manage Grafana dashboards for home lab observability.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about creating or editing a Grafana dashboard</li><li>User wants to visualize specific metrics (CPU, memory, disk, network, container stats)</li><li>User mentions &#34;Grafana&#34;, &#34;dashboard&#34;, &#34;panel&#34;, &#34;graph&#34;, or &#34;visualization&#34;</li><li>User asks to export or back up a dashboard</li><li>User wants to add a new data source to Grafana</li><li>User asks about Grafana variables or templating</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_grafanaSnapshot</code><code>homelab_prometheusQuery</code></div>
+            </div>
+            
+            <span class="skill-category-label">grafana-dashboards</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Log Analysis</span>
+            <span class="skill-desc">Structured log querying, journald workflows, and container log searching</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about system logs, journald, or syslog on their Pi</li><li>User wants to search Docker container logs for errors or patterns</li><li>User mentions &#34;logs&#34;, &#34;journalctl&#34;, &#34;log search&#34;, &#34;error logs&#34;, or &#34;debug logs&#34;</li><li>User wants to correlate events across multiple services</li><li>User asks why a service crashed or restarted</li><li>User wants to filter logs by priority, time range, or unit</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_journalLogs</code><code>homelab_logSearch</code><code>homelab_serviceLogs</code></div>
+            </div>
+            
+            <span class="skill-category-label">log-analysis</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Multi-Node Management</span>
+            <span class="skill-desc">Managing fleets, node inventory, parallel operations, cross-node monitoring</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about managing multiple machines, servers, or Pis</li><li>User mentions &#34;nodes&#34;, &#34;fleet&#34;, &#34;inventory&#34;, or &#34;multi-node&#34;</li><li>User wants to run commands on a specific named host</li><li>User asks about Ansible inventory or Tailscale peer discovery</li><li>User wants to compare status across multiple machines</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_nodeList</code><code>homelab_nodeExec</code><code>homelab_nodeStatus</code><code>homelab_inventorySync</code></div>
+            </div>
+            
+            <span class="skill-category-label">multi-node-management</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Network Configuration</span>
+            <span class="skill-desc">Configure and manage AdGuard DNS, Nginx Proxy Manager, Tailscale VPN, and port mappings.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about DNS, ad blocking, or AdGuard configuration</li><li>User wants to set up a reverse proxy for a service</li><li>User asks about SSL certificates or HTTPS for local services</li><li>User mentions Tailscale, VPN, or remote access</li><li>User asks about ports, firewall rules, or iptables/nftables</li><li>User says &#34;I can&#39;t reach [service]&#34; or &#34;DNS isn&#39;t working&#34;</li><li>User wants to expose a service externally or via a custom domain</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_networkInfo</code><code>homelab_adguardStats</code><code>homelab_npmProxyHosts</code><code>homelab_openPorts</code></div>
+            </div>
+            
+            <span class="skill-category-label">network-configuration</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Notification Workflows</span>
+            <span class="skill-desc">Ntfy setup, alert routing, and notification pipelines</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about notifications, alerts, or push messages for their home lab</li><li>User wants to set up or configure Ntfy</li><li>User mentions &#34;ntfy&#34;, &#34;notifications&#34;, &#34;alerts&#34;, &#34;push notifications&#34;, or &#34;webhooks&#34;</li><li>User wants to send test notifications or debug notification delivery</li><li>User asks about routing Prometheus alerts to their phone</li><li>User wants to build automated notification pipelines</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_ntfySend</code><code>homelab_ntfyTopics</code><code>homelab_alertList</code></div>
+            </div>
+            
+            <span class="skill-category-label">notification-workflows</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">OS Update Management</span>
+            <span class="skill-desc">Unattended-upgrades config, kernel updates, reboot scheduling</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about updating their Pi&#39;s OS or packages</li><li>User wants to check for available updates without applying them</li><li>User asks about unattended-upgrades or automatic updates</li><li>User mentions &#34;apt upgrade&#34;, &#34;kernel update&#34;, &#34;reboot schedule&#34;, or &#34;package management&#34;</li><li>User wants to review what was recently installed or upgraded</li><li>User asks about update policies or scheduling maintenance windows</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_aptUpdate</code><code>homelab_aptUpgradable</code><code>homelab_aptHistory</code><code>homelab_kernelInfo</code><code>homelab_systemdServices</code></div>
+            </div>
+            
+            <span class="skill-category-label">os-update-management</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Performance Tuning</span>
+            <span class="skill-desc">Kernel params, swap config, I/O scheduler, GPU memory split</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about improving Pi performance or reducing latency</li><li>User mentions &#34;slow&#34;, &#34;swap&#34;, &#34;memory&#34;, &#34;GPU memory split&#34;, or &#34;I/O scheduler&#34;</li><li>User wants to optimize their Pi for Docker workloads</li><li>User asks about kernel parameters, sysctl tuning, or boot config</li><li>User wants to reduce SD card wear or optimize storage I/O</li><li>User asks about CPU governor, overclocking, or thermal management</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_kernelInfo</code><code>homelab_piStatus</code><code>homelab_systemdServices</code></div>
+            </div>
+            
+            <span class="skill-category-label">performance-tuning</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Pi System Management</span>
+            <span class="skill-desc">Monitor and manage Raspberry Pi hardware - CPU temperature, throttling, memory, disk, and safe reboots.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about Pi health, temperature, CPU stats, or throttling</li><li>User wants to check memory or disk usage on the Pi</li><li>User requests a reboot or shutdown of the Pi</li><li>User mentions &#34;vcgencmd&#34;, &#34;thermal&#34;, &#34;throttle&#34;, or &#34;system status&#34;</li><li>User asks &#34;is the Pi okay?&#34; or &#34;is the server overheating?&#34;</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_piStatus</code><code>homelab_piReboot</code><code>homelab_diskUsage</code></div>
+            </div>
+            
+            <span class="skill-category-label">pi-system-management</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Reverse Proxy Management</span>
+            <span class="skill-desc">Configure Nginx Proxy Manager for reverse proxying, SSL certificates, and access control.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about reverse proxy setup or configuration</li><li>User wants to expose a service via a custom domain</li><li>User asks about SSL certificates, HTTPS, or Let&#39;s Encrypt</li><li>User mentions &#34;NPM&#34;, &#34;Nginx Proxy Manager&#34;, &#34;reverse proxy&#34;, or &#34;proxy host&#34;</li><li>User asks about access lists or restricting access to a service</li><li>User wants to see what services are proxied</li><li>User says &#34;I can&#39;t reach [service] via my domain&#34;</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_npmProxyHosts</code><code>homelab_npmCerts</code><code>homelab_certCheck</code></div>
+            </div>
+            
+            <span class="skill-category-label">reverse-proxy-management</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Secrets Management</span>
+            <span class="skill-desc">Managing credentials with Vaultwarden, environment variables, Docker secrets, and security auditing</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about managing passwords, API keys, or credentials in their home lab</li><li>User wants to set up or configure Vaultwarden</li><li>User asks about Docker secrets vs environment variables</li><li>User mentions &#34;secrets&#34;, &#34;credentials&#34;, &#34;passwords&#34;, &#34;API keys&#34;, or &#34;Vaultwarden&#34;</li><li>User wants to audit their setup for hardcoded or weak credentials</li><li>User asks about securing environment variables in Docker Compose</li><li>User wants to rotate credentials or tokens</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_containerScan</code><code>homelab_ufwStatus</code><code>homelab_fail2banStatus</code><code>homelab_openPorts</code></div>
+            </div>
+            
+            <span class="skill-category-label">secrets-management</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Security Hardening</span>
+            <span class="skill-desc">Harden the home lab with UFW firewall rules, fail2ban, SSH lockdown, and container security practices.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>Configure or modify UFW firewall rules on the Pi</li><li>Set up or tune fail2ban jails for SSH, Nginx, or other services</li><li>Lock down SSH to key-only authentication</li><li>Harden Docker containers (non-root users, read-only filesystems, capability dropping)</li><li>Secure Vaultwarden, Nginx Proxy Manager, or other exposed services</li><li>Protect the Docker socket from unauthorized access</li><li>Audit the current security posture of the home lab</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_ufwStatus</code><code>homelab_fail2banStatus</code><code>homelab_openPorts</code><code>homelab_containerScan</code></div>
+            </div>
+            
+            <span class="skill-category-label">security-hardening</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Service Monitoring</span>
+            <span class="skill-desc">Set up and use Prometheus, Grafana, Uptime Kuma, and Alertmanager for home lab observability.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>User asks about monitoring, metrics, dashboards, or alerts</li><li>User wants to add a new scrape target to Prometheus</li><li>User asks to create or modify a Grafana dashboard</li><li>User wants to set up Uptime Kuma monitors for a service</li><li>User mentions &#34;Prometheus&#34;, &#34;Grafana&#34;, &#34;alert&#34;, &#34;uptime&#34;, or &#34;ntfy&#34;</li><li>User asks why they are not receiving notifications for outages</li><li>User wants to check if all services are healthy</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_serviceHealth</code><code>homelab_serviceLogs</code><code>homelab_serviceRestart</code><code>homelab_prometheusQuery</code><code>homelab_uptimeKumaStatus</code></div>
+            </div>
+            
+            <span class="skill-category-label">service-monitoring</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">SSH Management</span>
+            <span class="skill-desc">Manage SSH keys, harden SSH configuration, set up tunnels, and troubleshoot connection issues.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>Generate or rotate SSH keys for Pi access</li><li>Harden sshd_config on the Raspberry Pi</li><li>Set up SSH tunnels or port forwarding to home lab services</li><li>Debug SSH connection failures or timeouts</li><li>Configure SSH agent forwarding from Windows to the Pi</li><li>Manage authorized_keys entries for multiple users or machines</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_sshTest</code></div>
+            </div>
+            
+            <span class="skill-category-label">ssh-management</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Storage Management</span>
+            <span class="skill-desc">Manage Samba shares, Syncthing file sync, Docker volumes, and disk space on the Raspberry Pi.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>Create or modify Samba shares on the Pi</li><li>Configure Syncthing for file synchronization between devices</li><li>Manage Docker volumes (named volumes vs bind mounts)</li><li>Monitor disk usage and free space on the Pi</li><li>Clean up unused Docker images, volumes, or build cache</li><li>Set up automated cleanup or log rotation strategies</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_diskUsage</code><code>homelab_volumeBackup</code></div>
+            </div>
+            
+            <span class="skill-category-label">storage-management</span>
+          </div>
+        </details>
+        
+        <details class="skill-row">
+          <summary>
+            <span class="skill-name">Troubleshooting</span>
+            <span class="skill-desc">Debug container crashes, network connectivity issues, Pi hardware problems, and service failures.</span>
+          </summary>
+          <div class="skill-detail">
+            
+            <div class="skill-detail-group">
+              <strong>Triggers</strong>
+              <ul><li>Diagnose why a Docker container is crashing or restarting</li><li>Debug network connectivity between services or from external clients</li><li>Investigate Raspberry Pi hardware issues (throttling, overheating, undervoltage)</li><li>Troubleshoot systemd service failures (Cockpit, Samba, node_exporter)</li><li>Resolve DNS issues with AdGuard Home</li><li>Debug reverse proxy errors in Nginx Proxy Manager</li><li>Investigate general &#34;service is down&#34; reports from Uptime Kuma or Homepage</li></ul>
+            </div>
+            
+            
+            <div class="skill-detail-group">
+              <strong>MCP Tools</strong>
+              <div class="skill-tools"><code>homelab_serviceLogs</code><code>homelab_serviceHealth</code><code>homelab_piStatus</code><code>homelab_journalLogs</code><code>homelab_logSearch</code><code>homelab_healthCheck</code><code>homelab_diagnostics</code></div>
+            </div>
+            
+            <span class="skill-category-label">troubleshooting</span>
+          </div>
+        </details>
+        
       </div>
     </details>
   </section>
@@ -908,6 +1366,94 @@
   </section>
   
 
+  <!-- Changelog -->
+  
+  <section class="section" id="changelog">
+    <div class="section-header">
+      <h2>Changelog</h2>
+      <div class="section-actions">
+        <button class="btn-sm toggle-section" data-target="changelog-body">Expand</button>
+      </div>
+    </div>
+    <details class="cat-group" id="changelog-body">
+      <summary class="sr-only">Recent changelog</summary>
+      <div class="cat-body">
+        
+        <div class="changelog-entry">
+          <span class="changelog-version">v0.10.0</span>
+          <span class="changelog-date">2026-04-05</span>
+          
+          <div class="changelog-heading">Added</div>
+          <ul class="changelog-items">
+            <li>2 new MCP tools for testing and diagnostics</li><li>`homelab_healthCheck` -- comprehensive self-test (SSH, Docker, curl, restic, certbot, systemd)</li><li>`homelab_diagnostics` -- collect debug info bundle (OS, kernel, Docker, memory, disk, network)</li><li>Integration tests with mocked SSH -- first tests covering actual tool handler logic</li><li>E2E test suite gated behind `HOMELAB_TEST_PI=true` env var for live Pi testing</li><li>`.github/workflows/e2e.yml` CI workflow for manual/scheduled E2E runs against a real Pi</li><li>Input validation tests for both new tools</li>
+          </ul>
+          
+        </div>
+        
+        <div class="changelog-entry">
+          <span class="changelog-version">v0.9.0</span>
+          <span class="changelog-date">2026-04-05</span>
+          
+          <div class="changelog-heading">Added</div>
+          <ul class="changelog-items">
+            <li>4 new MCP tools for multi-node management</li><li>`homelab_nodeList` -- list all managed nodes and their connection status</li><li>`homelab_nodeExec` -- execute a command on a specific node by name (requires confirm=true)</li><li>`homelab_nodeStatus` -- get system status for a specific node (uptime, CPU, memory, disk)</li><li>`homelab_inventorySync` -- discover nodes from Ansible inventory or Tailscale</li><li>1 new skill</li><li>`multi-node-management` -- managing fleets, node inventory, parallel operations, cross-node monitoring</li><li>1 new rule</li><li>`inventory-consistency` -- flag nodes in config missing from HOMELAB_NODES registry</li><li>`HOMELAB_NODES` env var for multi-node SSH configuration (JSON object)</li><li>`HOMELAB_ANSIBLE_INVENTORY` env var for Ansible inventory path</li><li>Input validation tests for all 4 new tools</li>
+          </ul>
+          
+          <div class="changelog-heading">Changed</div>
+          <ul class="changelog-items">
+            <li>**Infrastructure refactor:** `ssh-api.ts` now supports a node registry via `HOMELAB_NODES` env var</li><li>`execSSH()` accepts an optional `node` parameter to target specific nodes</li><li>All 44 existing tools now accept an optional `node` parameter (defaults to primary Pi)</li><li>New `node-param.ts` utility provides shared zod schema fragment for the node parameter</li>
+          </ul>
+          
+          <div class="changelog-heading">Changed</div>
+          <ul class="changelog-items">
+            <li>**Infrastructure refactor:** `ssh-api.ts` now supports a node registry via `HOMELAB_NODES` env var</li><li>`execSSH()` accepts an optional `node` parameter to target specific nodes</li><li>All 44 existing tools now accept an optional `node` parameter (defaults to primary Pi)</li><li>New `node-param.ts` utility provides shared zod schema fragment for the node parameter</li>
+          </ul>
+          
+        </div>
+        
+        <a class="changelog-link" href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/blob/main/CHANGELOG.md">View full changelog on GitHub &rarr;</a>
+      </div>
+    </details>
+  </section>
+  
+
+  <!-- Related Tools -->
+  
+  <section class="section" id="related">
+    <div class="section-header">
+      <h2>Related Tools</h2>
+      <span class="count">3</span>
+    </div>
+    <div class="related-grid">
+      
+      <a class="related-card" href="https://tmhsdigital.github.io/Docker-Developer-Tools/">
+        <span class="related-card-name">
+          Docker Developer Tools
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+        </span>
+        <span class="related-card-desc">Docker container workflows for Cursor</span>
+      </a>
+      
+      <a class="related-card" href="https://tmhsdigital.github.io/Monday-Cursor-Plugin/">
+        <span class="related-card-name">
+          Monday Cursor Plugin
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+        </span>
+        <span class="related-card-desc">Monday.com project management integration</span>
+      </a>
+      
+      <a class="related-card" href="https://tmhsdigital.github.io/Developer-Tools-Directory/">
+        <span class="related-card-name">
+          Developer Tools Directory
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+        </span>
+        <span class="related-card-desc">Browse all TMHSDigital developer tools</span>
+      </a>
+      
+    </div>
+  </section>
+  
+
   </div><!-- /.content-area -->
 
   <!-- Footer -->
@@ -1022,6 +1568,14 @@
     function copyText(text) {
       navigator.clipboard.writeText(text).then(function () { showToast('Copied to clipboard'); });
     }
+
+    /* Quick-start copy button */
+    (function () {
+      var btn = document.getElementById('quickStartCopy');
+      var block = document.getElementById('quickStartCode');
+      if (!btn || !block) return;
+      btn.addEventListener('click', function () { copyText(block.textContent.trim()); });
+    })();
 
     /* Auto-add copy buttons next to <code> in install steps */
     (function () {
