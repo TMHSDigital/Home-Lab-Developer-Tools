@@ -142,6 +142,9 @@
       .section-actions { margin-left: 0; }
     }
 
+    /* SR ONLY */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
     /* REDUCED MOTION */
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
@@ -199,123 +202,131 @@
     <div class="section-header">
       <h2>Skills</h2>
       <span class="count">22</span>
+      <div class="section-actions">
+        <button class="btn-sm toggle-section" data-target="skills-body">Collapse</button>
+      </div>
     </div>
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">Alerting Rules</td>
-          <td>Write Prometheus alerting rules and configure Alertmanager routing for home lab notifications.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Ansible Workflows</td>
-          <td>Write and run Ansible playbooks for multi-node home lab provisioning and configuration management.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Backup and Recovery</td>
-          <td>Configure and manage restic backups including scheduling, verification, and disaster recovery.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Certificate Management</td>
-          <td>Let&#39;s Encrypt, self-signed certs, renewal automation, NPM cert integration</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Disaster Recovery</td>
-          <td>Full Pi disaster recovery -- backup verification, restore workflows, SD card imaging, and migration checklists</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">DNS Management</td>
-          <td>Manage AdGuard Home DNS filtering, blocklists, local DNS records, and query log analysis.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Docker Compose Stacks</td>
-          <td>Manage multi-file Docker Compose deployments on a Raspberry Pi home lab server.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Grafana Dashboards</td>
-          <td>Create, import, export, and manage Grafana dashboards for home lab observability.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Log Analysis</td>
-          <td>Structured log querying, journald workflows, and container log searching</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Multi-Node Management</td>
-          <td>Managing fleets, node inventory, parallel operations, cross-node monitoring</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Network Configuration</td>
-          <td>Configure and manage AdGuard DNS, Nginx Proxy Manager, Tailscale VPN, and port mappings.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Notification Workflows</td>
-          <td>Ntfy setup, alert routing, and notification pipelines</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">OS Update Management</td>
-          <td>Unattended-upgrades config, kernel updates, reboot scheduling</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Performance Tuning</td>
-          <td>Kernel params, swap config, I/O scheduler, GPU memory split</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Pi System Management</td>
-          <td>Monitor and manage Raspberry Pi hardware - CPU temperature, throttling, memory, disk, and safe reboots.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Reverse Proxy Management</td>
-          <td>Configure Nginx Proxy Manager for reverse proxying, SSL certificates, and access control.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Secrets Management</td>
-          <td>Managing credentials with Vaultwarden, environment variables, Docker secrets, and security auditing</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Security Hardening</td>
-          <td>Harden the home lab with UFW firewall rules, fail2ban, SSH lockdown, and container security practices.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Service Monitoring</td>
-          <td>Set up and use Prometheus, Grafana, Uptime Kuma, and Alertmanager for home lab observability.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">SSH Management</td>
-          <td>Manage SSH keys, harden SSH configuration, set up tunnels, and troubleshoot connection issues.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Storage Management</td>
-          <td>Manage Samba shares, Syncthing file sync, Docker volumes, and disk space on the Raspberry Pi.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Troubleshooting</td>
-          <td>Debug container crashes, network connectivity issues, Pi hardware problems, and service failures.</td>
-        </tr>
-        
-      </tbody>
-    </table>
+    <details class="cat-group" id="skills-body" open>
+      <summary class="sr-only">Skills list</summary>
+      <div class="cat-body">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td class="name-cell">Alerting Rules</td>
+              <td>Write Prometheus alerting rules and configure Alertmanager routing for home lab notifications.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Ansible Workflows</td>
+              <td>Write and run Ansible playbooks for multi-node home lab provisioning and configuration management.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Backup and Recovery</td>
+              <td>Configure and manage restic backups including scheduling, verification, and disaster recovery.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Certificate Management</td>
+              <td>Let&#39;s Encrypt, self-signed certs, renewal automation, NPM cert integration</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Disaster Recovery</td>
+              <td>Full Pi disaster recovery -- backup verification, restore workflows, SD card imaging, and migration checklists</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">DNS Management</td>
+              <td>Manage AdGuard Home DNS filtering, blocklists, local DNS records, and query log analysis.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Docker Compose Stacks</td>
+              <td>Manage multi-file Docker Compose deployments on a Raspberry Pi home lab server.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Grafana Dashboards</td>
+              <td>Create, import, export, and manage Grafana dashboards for home lab observability.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Log Analysis</td>
+              <td>Structured log querying, journald workflows, and container log searching</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Multi-Node Management</td>
+              <td>Managing fleets, node inventory, parallel operations, cross-node monitoring</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Network Configuration</td>
+              <td>Configure and manage AdGuard DNS, Nginx Proxy Manager, Tailscale VPN, and port mappings.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Notification Workflows</td>
+              <td>Ntfy setup, alert routing, and notification pipelines</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">OS Update Management</td>
+              <td>Unattended-upgrades config, kernel updates, reboot scheduling</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Performance Tuning</td>
+              <td>Kernel params, swap config, I/O scheduler, GPU memory split</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Pi System Management</td>
+              <td>Monitor and manage Raspberry Pi hardware - CPU temperature, throttling, memory, disk, and safe reboots.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Reverse Proxy Management</td>
+              <td>Configure Nginx Proxy Manager for reverse proxying, SSL certificates, and access control.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Secrets Management</td>
+              <td>Managing credentials with Vaultwarden, environment variables, Docker secrets, and security auditing</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Security Hardening</td>
+              <td>Harden the home lab with UFW firewall rules, fail2ban, SSH lockdown, and container security practices.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Service Monitoring</td>
+              <td>Set up and use Prometheus, Grafana, Uptime Kuma, and Alertmanager for home lab observability.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">SSH Management</td>
+              <td>Manage SSH keys, harden SSH configuration, set up tunnels, and troubleshoot connection issues.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Storage Management</td>
+              <td>Manage Samba shares, Syncthing file sync, Docker volumes, and disk space on the Raspberry Pi.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Troubleshooting</td>
+              <td>Debug container crashes, network connectivity issues, Pi hardware problems, and service failures.</td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </details>
   </section>
   
 
@@ -325,79 +336,87 @@
     <div class="section-header">
       <h2>Rules</h2>
       <span class="count">11</span>
+      <div class="section-actions">
+        <button class="btn-sm toggle-section" data-target="rules-body">Collapse</button>
+      </div>
     </div>
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Scope</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">Ansible Best Practices</td>
-          <td class="scope-cell"></td>
-          <td>Flag Ansible antipatterns including non-FQCN modules, missing tags, and shell commands when modules exist.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Backup Coverage</td>
-          <td class="scope-cell"></td>
-          <td>Flag Docker Compose services with persistent data that lack backup coverage.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Compose Arm64</td>
-          <td class="scope-cell"></td>
-          <td>Flag Docker Compose issues specific to arm64 Raspberry Pi deployments including incompatible images and missing healthchecks.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Exposed Ports</td>
-          <td class="scope-cell"></td>
-          <td>Flag Docker Compose services with exposed host ports that should use a reverse proxy instead.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Homelab Secrets</td>
-          <td class="scope-cell"></td>
-          <td>Flag hardcoded credentials, IP addresses, SSH keys, and secrets in home lab code and configuration files.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Inventory Consistency</td>
-          <td class="scope-cell"></td>
-          <td>Flag inconsistencies between node registry and inventory or configuration files.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Privileged Containers</td>
-          <td class="scope-cell"></td>
-          <td>Flag Docker Compose services running with elevated privileges or missing security restrictions.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Resource Limits</td>
-          <td class="scope-cell"></td>
-          <td>Flag Docker Compose services without memory or CPU limits set.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Ssh Safety</td>
-          <td class="scope-cell"></td>
-          <td>Flag dangerous SSH commands that could cause data loss or system damage on the Raspberry Pi.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Weak Credentials</td>
-          <td class="scope-cell"></td>
-          <td>Flag default, weak, or improperly stored credentials in Docker Compose files and environment configs.</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">Yaml Conventions</td>
-          <td class="scope-cell"></td>
-          <td>Enforce YAML formatting conventions for consistency across compose files, Ansible playbooks, and monitoring configs.</td>
-        </tr>
-        
-      </tbody>
-    </table>
+    <details class="cat-group" id="rules-body" open>
+      <summary class="sr-only">Rules list</summary>
+      <div class="cat-body">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Scope</th><th>Description</th></tr></thead>
+          <tbody>
+            
+            <tr>
+              <td class="name-cell">Ansible Best Practices</td>
+              <td class="scope-cell"></td>
+              <td>Flag Ansible antipatterns including non-FQCN modules, missing tags, and shell commands when modules exist.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Backup Coverage</td>
+              <td class="scope-cell"></td>
+              <td>Flag Docker Compose services with persistent data that lack backup coverage.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Compose Arm64</td>
+              <td class="scope-cell"></td>
+              <td>Flag Docker Compose issues specific to arm64 Raspberry Pi deployments including incompatible images and missing healthchecks.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Exposed Ports</td>
+              <td class="scope-cell"></td>
+              <td>Flag Docker Compose services with exposed host ports that should use a reverse proxy instead.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Homelab Secrets</td>
+              <td class="scope-cell"></td>
+              <td>Flag hardcoded credentials, IP addresses, SSH keys, and secrets in home lab code and configuration files.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Inventory Consistency</td>
+              <td class="scope-cell"></td>
+              <td>Flag inconsistencies between node registry and inventory or configuration files.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Privileged Containers</td>
+              <td class="scope-cell"></td>
+              <td>Flag Docker Compose services running with elevated privileges or missing security restrictions.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Resource Limits</td>
+              <td class="scope-cell"></td>
+              <td>Flag Docker Compose services without memory or CPU limits set.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Ssh Safety</td>
+              <td class="scope-cell"></td>
+              <td>Flag dangerous SSH commands that could cause data loss or system damage on the Raspberry Pi.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Weak Credentials</td>
+              <td class="scope-cell"></td>
+              <td>Flag default, weak, or improperly stored credentials in Docker Compose files and environment configs.</td>
+            </tr>
+            
+            <tr>
+              <td class="name-cell">Yaml Conventions</td>
+              <td class="scope-cell"></td>
+              <td>Enforce YAML formatting conventions for consistency across compose files, Ansible playbooks, and monitoring configs.</td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </details>
   </section>
   
 
@@ -798,20 +817,30 @@
   <!-- Install -->
   
   <section class="section" id="install">
-    <div class="section-header"><h2>Installation</h2></div>
-    <ol class="install-steps">
-      
-      <li><span>Clone the repository</span></li>
-      
-      <li><span>Open the folder in Cursor IDE</span></li>
-      
-      <li><span>Install MCP server: <code>cd mcp-server && npm install</code></span></li>
-      
-      <li><span>Configure SSH access to your Raspberry Pi / home lab nodes</span></li>
-      
-      <li><span>Start using the AI skills and rules</span></li>
-      
-    </ol>
+    <div class="section-header">
+      <h2>Installation</h2>
+      <div class="section-actions">
+        <button class="btn-sm toggle-section" data-target="install-body">Collapse</button>
+      </div>
+    </div>
+    <details class="cat-group" id="install-body" open>
+      <summary class="sr-only">Installation steps</summary>
+      <div class="cat-body">
+        <ol class="install-steps">
+          
+          <li><span>Clone the repository</span></li>
+          
+          <li><span>Open the folder in Cursor IDE</span></li>
+          
+          <li><span>Install MCP server: <code>cd mcp-server && npm install</code></span></li>
+          
+          <li><span>Configure SSH access to your Raspberry Pi / home lab nodes</span></li>
+          
+          <li><span>Start using the AI skills and rules</span></li>
+          
+        </ol>
+      </div>
+    </details>
   </section>
   
 
@@ -931,6 +960,18 @@
         var allOpen = Array.prototype.every.call(details, function (d) { return d.open; });
         details.forEach(function (d) { d.open = !allOpen; });
         btn.textContent = allOpen ? 'Expand all' : 'Collapse all';
+      });
+    })();
+
+    /* Section collapse/expand toggles (Skills, Rules) */
+    (function () {
+      document.querySelectorAll('.toggle-section').forEach(function (btn) {
+        var targetId = btn.getAttribute('data-target');
+        var details = document.getElementById(targetId);
+        if (!details) return;
+        function updateLabel() { btn.textContent = details.open ? 'Collapse' : 'Expand'; }
+        btn.addEventListener('click', function () { details.open = !details.open; updateLabel(); });
+        details.addEventListener('toggle', updateLabel);
       });
     })();
 
