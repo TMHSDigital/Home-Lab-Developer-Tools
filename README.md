@@ -17,15 +17,15 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/actions"><img src="https://img.shields.io/github/actions/workflow/status/TMHSDigital/Home-Lab-Developer-Tools/validate.yml?label=validate" alt="validate"></a>
-  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/actions"><img src="https://img.shields.io/github/actions/workflow/status/TMHSDigital/Home-Lab-Developer-Tools/codeql.yml?label=CodeQL" alt="CodeQL"></a>
+  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/actions/workflows/validate.yml"><img src="https://img.shields.io/github/actions/workflow/status/TMHSDigital/Home-Lab-Developer-Tools/validate.yml?label=validate" alt="validate"></a>
+  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/TMHSDigital/Home-Lab-Developer-Tools/codeql.yml?label=CodeQL" alt="CodeQL"></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/stars/TMHSDigital/Home-Lab-Developer-Tools?style=flat" alt="stars">
-  <img src="https://img.shields.io/github/issues/TMHSDigital/Home-Lab-Developer-Tools" alt="issues">
-  <img src="https://img.shields.io/github/issues-pr/TMHSDigital/Home-Lab-Developer-Tools" alt="PRs">
-  <img src="https://img.shields.io/npm/dm/@tmhs/homelab-mcp" alt="downloads">
+  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/stargazers"><img src="https://img.shields.io/github/stars/TMHSDigital/Home-Lab-Developer-Tools?style=flat" alt="stars"></a>
+  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/issues"><img src="https://img.shields.io/github/issues/TMHSDigital/Home-Lab-Developer-Tools" alt="issues"></a>
+  <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools/pulls"><img src="https://img.shields.io/github/issues-pr/TMHSDigital/Home-Lab-Developer-Tools" alt="PRs"></a>
+  <a href="https://www.npmjs.com/package/@tmhs/homelab-mcp"><img src="https://img.shields.io/npm/dm/@tmhs/homelab-mcp" alt="downloads"></a>
 </p>
 
 <p align="center">
@@ -268,7 +268,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ---
 
 <details>
-<summary><h2>Installation</h2></summary>
+<summary><strong>Installation</strong></summary>
 
 &nbsp;
 
@@ -321,7 +321,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 </details>
 
 <details>
-<summary><h2>Example Prompts</h2> - one per skill</summary>
+<summary><strong>Example Prompts</strong> - one per skill</summary>
 
 &nbsp;
 
@@ -353,7 +353,7 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 </details>
 
 <details>
-<summary><h2>Roadmap</h2></summary>
+<summary><strong>Roadmap</strong></summary>
 
 &nbsp;
 
