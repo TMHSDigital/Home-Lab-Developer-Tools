@@ -11,34 +11,10 @@
   <meta property="og:image" content="assets/logo.png" />
   <link rel="icon" href="assets/logo.png" />
   <style>
-    @font-face {
-      font-family: 'Inter';
-      font-style: normal;
-      font-weight: 400;
-      font-display: swap;
-      src: url('fonts/inter-regular.woff2') format('woff2');
-    }
-    @font-face {
-      font-family: 'Inter';
-      font-style: normal;
-      font-weight: 500;
-      font-display: swap;
-      src: url('fonts/inter-medium.woff2') format('woff2');
-    }
-    @font-face {
-      font-family: 'Inter';
-      font-style: normal;
-      font-weight: 700;
-      font-display: swap;
-      src: url('fonts/inter-bold.woff2') format('woff2');
-    }
-    @font-face {
-      font-family: 'JetBrains Mono';
-      font-style: normal;
-      font-weight: 400;
-      font-display: swap;
-      src: url('fonts/jetbrains-mono-regular.woff2') format('woff2');
-    }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/inter-regular.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('fonts/inter-medium.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; font-display: swap; src: url('fonts/inter-bold.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/jetbrains-mono-regular.woff2') format('woff2'); }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -58,261 +34,95 @@
     }
 
     html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
     a { color: var(--accent-light); text-decoration: none; transition: color 0.2s; }
     a:hover { color: #fff; }
 
-    /* --- NAV --- */
-    .nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(13, 17, 23, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 1.5rem;
-    }
-    .nav-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 56px;
-    }
-    .nav-brand {
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--text);
-      white-space: nowrap;
-    }
-    .nav-links {
-      display: flex;
-      gap: 1.5rem;
-      list-style: none;
-    }
-    .nav-links a {
-      color: var(--text-dim);
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover,
-    .nav-links a.active { color: var(--accent-light); }
+    /* NAV */
+    .nav { position: sticky; top: 0; z-index: 100; background: rgba(13,17,23,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 1.5rem; }
+    .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .nav-brand { font-weight: 700; font-size: 1rem; color: var(--text); white-space: nowrap; }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a { color: var(--text-dim); font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--accent-light); }
+    .nav-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; padding: 0.5rem; }
+    .nav-toggle svg { width: 24px; height: 24px; }
 
-    /* --- HERO --- */
-    .hero {
-      text-align: center;
-      padding: 5rem 1.5rem 3.5rem;
-      background: linear-gradient(180deg, var(--hero-from), var(--hero-to));
-    }
+    /* HERO */
+    .hero { text-align: center; padding: 5rem 1.5rem 3.5rem; background: linear-gradient(180deg, var(--hero-from), var(--hero-to)); }
     .hero-inner { max-width: 720px; margin: 0 auto; }
-    .hero h1 {
-      font-size: 2.75rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, var(--text), var(--accent-light));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero p {
-      font-size: 1.125rem;
-      color: var(--text-dim);
-      margin-bottom: 2rem;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 2.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
+    .hero h1 { font-size: 2.75rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, var(--text), var(--accent-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 1.125rem; color: var(--text-dim); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .stats { display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
     .stat { text-align: center; }
-    .stat-val {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--accent-light);
-      font-family: var(--font-mono);
-    }
-    .stat-lbl {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-top: 0.25rem;
-    }
-
-    .hero-badges {
-      display: flex;
-      justify-content: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-top: 1.5rem;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .badge:hover {
-      border-color: var(--accent);
-      background: var(--bg3);
-      color: var(--text);
-    }
+    .stat-val { font-size: 2rem; font-weight: 700; color: var(--accent-light); font-family: var(--font-mono); }
+    .stat-lbl { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.25rem; }
+    .hero-badges { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.5rem; }
+    .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.875rem; font-weight: 500; transition: border-color 0.2s, background 0.2s; }
+    .badge:hover { border-color: var(--accent); background: var(--bg3); color: var(--text); }
     .badge svg { width: 18px; height: 18px; flex-shrink: 0; }
 
-    /* --- SECTIONS --- */
-    .section {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 3rem 1.5rem;
-    }
-    .section h2 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 2px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .section h2 .count {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text-dim);
-      background: var(--bg2);
-      padding: 0.15rem 0.6rem;
-      border-radius: 12px;
-    }
+    /* SECTIONS */
+    .section { max-width: 1000px; margin: 0 auto; padding: 3rem 1.5rem; }
+    .section-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
+    .section-header h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+    .count { font-size: 0.875rem; font-weight: 500; color: var(--text-dim); background: var(--bg2); padding: 0.15rem 0.6rem; border-radius: 12px; }
+    .section-actions { margin-left: auto; display: flex; gap: 0.5rem; align-items: center; }
+    .btn-sm { padding: 0.3rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: color 0.2s, border-color 0.2s; font-family: var(--font-sans); }
+    .btn-sm:hover { color: var(--accent-light); border-color: var(--accent); }
 
-    .category-label {
-      font-size: 0.8125rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--accent-light);
-      margin: 1.5rem 0 0.75rem;
-    }
+    /* SEARCH */
+    .search-wrap { margin-bottom: 1rem; position: relative; }
+    .search-input { width: 100%; padding: 0.6rem 0.75rem 0.6rem 2.25rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.875rem; font-family: var(--font-sans); outline: none; transition: border-color 0.2s; }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text-dim); }
+    .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); pointer-events: none; }
+    .search-icon svg { width: 16px; height: 16px; }
+    .search-meta { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.35rem; }
+    .search-shortcut { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 0.625rem; color: var(--text-dim); background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.4rem; font-family: var(--font-mono); pointer-events: none; }
 
-    /* --- TABLE --- */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9375rem;
-    }
-    .data-table th {
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-dim);
-      padding: 0.625rem 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .data-table td {
-      padding: 0.625rem 0.75rem;
-      border-bottom: 1px solid rgba(48, 54, 61, 0.5);
-      color: var(--text-dim);
-      vertical-align: top;
-    }
-    .data-table tr:hover td {
-      background: rgba(22, 27, 34, 0.5);
-    }
-    .data-table .name-cell {
-      color: var(--text);
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    .data-table .scope-cell {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      color: var(--accent-light);
-    }
+    /* DETAILS / COLLAPSIBLE */
+    details.cat-group { margin-bottom: 0.25rem; }
+    details.cat-group > summary { display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 0.75rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; list-style: none; font-weight: 600; font-size: 0.875rem; color: var(--text); transition: background 0.15s; }
+    details.cat-group > summary::-webkit-details-marker { display: none; }
+    details.cat-group > summary::before { content: ''; display: inline-block; width: 0; height: 0; border-left: 5px solid var(--accent-light); border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform 0.2s; flex-shrink: 0; }
+    details.cat-group[open] > summary::before { transform: rotate(90deg); }
+    details.cat-group > summary:hover { background: var(--bg3); }
+    details.cat-group > summary .cat-count { font-weight: 400; color: var(--text-dim); font-size: 0.75rem; margin-left: auto; }
+    details.cat-group > .cat-body { padding: 0.25rem 0 0.5rem; }
 
-    /* --- INSTALL --- */
-    .install-steps {
-      list-style: none;
-      counter-reset: step;
-    }
-    .install-steps li {
-      counter-increment: step;
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 1rem 0;
-      border-bottom: 1px solid rgba(48, 54, 61, 0.4);
-    }
-    .install-steps li::before {
-      content: counter(step);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #fff;
-      font-weight: 700;
-      font-size: 0.8125rem;
-    }
-    .install-steps code {
-      background: var(--bg2);
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 0.85em;
-    }
-    .copy-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      margin-left: 0.5rem;
-      padding: 0.15rem 0.5rem;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text-dim);
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .copy-btn:hover { color: var(--accent-light); border-color: var(--accent); }
+    /* TABLE */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+    .data-table th { text-align: left; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-dim); padding: 0.625rem 0.75rem; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 0.625rem 0.75rem; border-bottom: 1px solid rgba(48,54,61,0.5); color: var(--text-dim); vertical-align: top; }
+    .data-table tr:hover td { background: rgba(22,27,34,0.5); }
+    .data-table .name-cell { color: var(--text); font-weight: 500; white-space: nowrap; }
+    .data-table .scope-cell { font-family: var(--font-mono); font-size: 0.8125rem; color: var(--accent-light); }
+    tr.hidden-row { display: none; }
 
-    /* --- FOOTER --- */
-    footer {
-      border-top: 1px solid var(--border);
-      text-align: center;
-      padding: 2.5rem 1.5rem;
-      color: var(--text-dim);
-      font-size: 0.8125rem;
-    }
+    /* INSTALL */
+    .install-steps { list-style: none; counter-reset: step; }
+    .install-steps li { counter-increment: step; display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid rgba(48,54,61,0.4); }
+    .install-steps li::before { content: counter(step); flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.8125rem; }
+    .install-steps code { background: var(--bg2); padding: 0.2rem 0.5rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.85em; position: relative; }
+    .copy-icon { display: inline-flex; align-items: center; margin-left: 0.35rem; padding: 0.15rem; cursor: pointer; color: var(--text-dim); transition: color 0.2s; vertical-align: middle; }
+    .copy-icon:hover { color: var(--accent-light); }
+    .copy-icon svg { width: 14px; height: 14px; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(100%); background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 0.5rem 1.25rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 500; opacity: 0; transition: transform 0.3s, opacity 0.3s; z-index: 200; pointer-events: none; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* BACK TO TOP */
+    .back-to-top { position: fixed; bottom: 1.5rem; right: 1.5rem; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 150; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .back-to-top.visible { opacity: 1; pointer-events: auto; }
+    .back-to-top svg { width: 20px; height: 20px; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); text-align: center; padding: 2.5rem 1.5rem; color: var(--text-dim); font-size: 0.8125rem; }
     footer a { color: var(--accent-light); }
 
-    /* --- RESPONSIVE --- */
+    /* RESPONSIVE */
     @media (max-width: 768px) {
       .hero h1 { font-size: 2rem; }
       .stats { gap: 1.25rem; }
@@ -321,12 +131,21 @@
       .nav-links a { font-size: 0.8rem; }
       .data-table { font-size: 0.875rem; }
     }
-    @media (max-width: 480px) {
+    @media (max-width: 640px) {
+      .nav-toggle { display: block; }
+      .nav-links { display: none; position: absolute; top: 56px; left: 0; right: 0; flex-direction: column; background: rgba(13,17,23,0.97); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; gap: 0.75rem; }
+      .nav-links.open { display: flex; }
       .hero { padding: 3rem 1rem 2rem; }
       .hero h1 { font-size: 1.5rem; }
-      .nav-brand { font-size: 0.875rem; }
-      .nav-links { gap: 0.5rem; }
       .hero-badges { flex-direction: column; align-items: center; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .section-actions { margin-left: 0; }
+    }
+
+    /* REDUCED MOTION */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
     }
   </style>
 </head>
@@ -336,6 +155,9 @@
   <nav class="nav">
     <div class="nav-inner">
       <span class="nav-brand">Home Lab Developer Tools</span>
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
       <ul class="nav-links">
         <li><a href="#skills">Skills</a></li>
         <li><a href="#rules">Rules</a></li>
@@ -351,13 +173,11 @@
     <div class="hero-inner">
       <h1>Home Lab Developer Tools</h1>
       <p>Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors - 22 skills, 11 rules, and 50 MCP tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration on a Raspberry Pi home lab via SSH.</p>
-
       <div class="stats">
         <div class="stat"><div class="stat-val" data-target="22">0</div><div class="stat-lbl">Skills</div></div>
         <div class="stat"><div class="stat-val" data-target="11">0</div><div class="stat-lbl">Rules</div></div>
         <div class="stat"><div class="stat-val" data-target="50">0</div><div class="stat-lbl">MCP Tools</div></div>
       </div>
-
       <div class="hero-badges">
         <a class="badge" href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools">
           <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -376,119 +196,122 @@
   <!-- Skills -->
   
   <section class="section" id="skills">
-    <h2>Skills <span class="count">22</span></h2>
+    <div class="section-header">
+      <h2>Skills</h2>
+      <span class="count">22</span>
+    </div>
     <table class="data-table">
       <thead><tr><th>Name</th><th>Description</th></tr></thead>
       <tbody>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Alerting Rules</td>
+          <td>Write Prometheus alerting rules and configure Alertmanager routing for home lab notifications.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Ansible Workflows</td>
+          <td>Write and run Ansible playbooks for multi-node home lab provisioning and configuration management.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Backup and Recovery</td>
+          <td>Configure and manage restic backups including scheduling, verification, and disaster recovery.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Certificate Management</td>
+          <td>Let&#39;s Encrypt, self-signed certs, renewal automation, NPM cert integration</td>
         </tr>
         
         <tr>
-          <td class="name-cell">Backup Strategy Recommendations</td>
-          <td>---</td>
+          <td class="name-cell">Disaster Recovery</td>
+          <td>Full Pi disaster recovery -- backup verification, restore workflows, SD card imaging, and migration checklists</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">DNS Management</td>
+          <td>Manage AdGuard Home DNS filtering, blocklists, local DNS records, and query log analysis.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Docker Compose Stacks</td>
+          <td>Manage multi-file Docker Compose deployments on a Raspberry Pi home lab server.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Grafana Dashboards</td>
+          <td>Create, import, export, and manage Grafana dashboards for home lab observability.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Log Analysis</td>
+          <td>Structured log querying, journald workflows, and container log searching</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Multi-Node Management</td>
+          <td>Managing fleets, node inventory, parallel operations, cross-node monitoring</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Network Configuration</td>
+          <td>Configure and manage AdGuard DNS, Nginx Proxy Manager, Tailscale VPN, and port mappings.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Notification Workflows</td>
+          <td>Ntfy setup, alert routing, and notification pipelines</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">OS Update Management</td>
+          <td>Unattended-upgrades config, kernel updates, reboot scheduling</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Performance Tuning</td>
+          <td>Kernel params, swap config, I/O scheduler, GPU memory split</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Pi System Management</td>
+          <td>Monitor and manage Raspberry Pi hardware - CPU temperature, throttling, memory, disk, and safe reboots.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Reverse Proxy Management</td>
+          <td>Configure Nginx Proxy Manager for reverse proxying, SSL certificates, and access control.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">Example Interaction</td>
-          <td>---</td>
+          <td class="name-cell">Secrets Management</td>
+          <td>Managing credentials with Vaultwarden, environment variables, Docker secrets, and security auditing</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Security Hardening</td>
+          <td>Harden the home lab with UFW firewall rules, fail2ban, SSH lockdown, and container security practices.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Service Monitoring</td>
+          <td>Set up and use Prometheus, Grafana, Uptime Kuma, and Alertmanager for home lab observability.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">SSH Management</td>
+          <td>Manage SSH keys, harden SSH configuration, set up tunnels, and troubleshoot connection issues.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Storage Management</td>
+          <td>Manage Samba shares, Syncthing file sync, Docker volumes, and disk space on the Raspberry Pi.</td>
         </tr>
         
         <tr>
-          <td class="name-cell">See Also</td>
-          <td>---</td>
+          <td class="name-cell">Troubleshooting</td>
+          <td>Debug container crashes, network connectivity issues, Pi hardware problems, and service failures.</td>
         </tr>
         
       </tbody>
@@ -499,7 +322,10 @@
   <!-- Rules -->
   
   <section class="section" id="rules">
-    <h2>Rules <span class="count">11</span></h2>
+    <div class="section-header">
+      <h2>Rules</h2>
+      <span class="count">11</span>
+    </div>
     <table class="data-table">
       <thead><tr><th>Name</th><th>Scope</th><th>Description</th></tr></thead>
       <tbody>
@@ -578,357 +404,393 @@
   <!-- MCP Tools -->
   
   <section class="section" id="mcp-tools">
-    <h2>MCP Tools <span class="count">50</span></h2>
+    <div class="section-header">
+      <h2>MCP Tools</h2>
+      <span class="count">50</span>
+      
+      <div class="section-actions">
+        <button class="btn-sm" id="toggleAllCats">Expand all</button>
+      </div>
+      
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04z"/></svg></span>
+      <input class="search-input" id="toolSearch" type="text" placeholder="Filter tools..." autocomplete="off" />
+      <span class="search-shortcut">/</span>
+      <div class="search-meta" id="toolSearchMeta"></div>
+    </div>
     
-    
-    <div class="category-label">AdGuard Home</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_adguardStats</td>
-          <td>AdGuard Home DNS statistics and query counts</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_adguardFilters</td>
-          <td>List AdGuard Home filter lists</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_adguardQueryLog</td>
-          <td>Search the AdGuard Home DNS query log</td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-    
-    <div class="category-label">Backups</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_backupStatus</td>
-          <td>Check latest restic backup snapshots</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_backupRun</td>
-          <td>Trigger a restic backup</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_backupList</td>
-          <td>List all restic backup snapshots</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_backupRestore</td>
-          <td>Restore files from a restic backup snapshot</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_backupDiff</td>
-          <td>Show difference between two backup snapshots</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_volumeBackup</td>
-          <td>Back up a Docker volume to restic</td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-    
-    <div class="category-label">Connectivity &amp; Diagnostics</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_sshTest</td>
-          <td>Test SSH connectivity to the Raspberry Pi</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_healthCheck</td>
-          <td>Comprehensive self-test: SSH, Docker, required tools</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_diagnostics</td>
-          <td>Collect debug info: OS, kernel, Docker, memory, disk, network</td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-    
-    <div class="category-label">Docker &amp; Compose</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_composeUp</td>
-          <td>Start Docker Compose stacks</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_composeDown</td>
-          <td>Stop Docker Compose stacks</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_composePull</td>
-          <td>Pull latest Docker images for compose stacks</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_composePs</td>
-          <td>List running Docker Compose containers</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_serviceHealth</td>
-          <td>Check Docker container health status</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_serviceLogs</td>
-          <td>Tail recent logs from a Docker container</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_serviceRestart</td>
-          <td>Restart a Docker container</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_containerScan</td>
-          <td>Scan running container images for vulnerabilities using Trivy</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_logSearch</td>
-          <td>Search across Docker container logs with grep patterns</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_journalLogs</td>
-          <td>Query systemd journal logs with filters</td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-    
-    <div class="category-label">Inventory &amp; Nodes</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_inventorySync</td>
-          <td>Discover nodes from Ansible inventory or Tailscale network</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_nodeList</td>
-          <td>List all managed nodes and their connection status</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_nodeStatus</td>
-          <td>Get system status for a specific node</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_nodeExec</td>
-          <td>Execute a shell command on a specific node</td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-    
-    <div class="category-label">Monitoring</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_prometheusQuery</td>
-          <td>Run a PromQL query against Prometheus</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_grafanaSnapshot</td>
-          <td>Export a Grafana dashboard configuration</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_uptimeKumaStatus</td>
-          <td>Get status of all Uptime Kuma monitors</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_alertList</td>
-          <td>List alerts from Alertmanager</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_speedtestResults</td>
-          <td>Get recent speedtest results</td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-    
-    <div class="category-label">Notifications</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_ntfySend</td>
-          <td>Send a push notification via Ntfy</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_ntfyTopics</td>
-          <td>List Ntfy topics and recent messages</td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-    
-    <div class="category-label">Raspberry Pi</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_piStatus</td>
-          <td>Raspberry Pi status: CPU temp, memory, disk, uptime, throttle state</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_piReboot</td>
-          <td>Safely reboot the Raspberry Pi</td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-    
-    <div class="category-label">System &amp; Security</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_diskUsage</td>
-          <td>Get detailed disk usage breakdown</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_kernelInfo</td>
-          <td>Kernel version, boot parameters, loaded modules</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_systemdServices</td>
-          <td>List systemd units or get status of a specific unit</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_aptUpdate</td>
-          <td>Run apt update and list upgradable packages</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_aptUpgradable</td>
-          <td>List upgradable packages with versions</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_aptHistory</td>
-          <td>Show recent apt install, upgrade, and remove history</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_networkInfo</td>
-          <td>IP addresses, interfaces, DNS, and Tailscale status</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_openPorts</td>
-          <td>Scan for listening TCP ports and map to processes</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_ufwStatus</td>
-          <td>List UFW firewall rules and status</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_fail2banStatus</td>
-          <td>List fail2ban jails, banned IPs, and ban counts</td>
-        </tr>
-        
-      </tbody>
-    </table>
-    
-    
-    <div class="category-label">TLS &amp; Reverse Proxy</div>
-    
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Description</th></tr></thead>
-      <tbody>
-        
-        <tr>
-          <td class="name-cell">homelab_certCheck</td>
-          <td>Check SSL certificate expiry, issuer, and fingerprint</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_certRenew</td>
-          <td>Trigger Let&#39;s Encrypt certificate renewal</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_certList</td>
-          <td>List managed SSL certificates from certbot and NPM</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_npmCerts</td>
-          <td>List Nginx Proxy Manager SSL certificates</td>
-        </tr>
-        
-        <tr>
-          <td class="name-cell">homelab_npmProxyHosts</td>
-          <td>List Nginx Proxy Manager proxy host configs</td>
-        </tr>
-        
-      </tbody>
-    </table>
+      
+      <details class="cat-group" open data-cat="AdGuard Home">
+        <summary>AdGuard Home <span class="cat-count">3</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_adguardStats</td>
+                <td>AdGuard Home DNS statistics and query counts</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_adguardFilters</td>
+                <td>List AdGuard Home filter lists</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_adguardQueryLog</td>
+                <td>Search the AdGuard Home DNS query log</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
+      <details class="cat-group" data-cat="Backups">
+        <summary>Backups <span class="cat-count">6</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_backupStatus</td>
+                <td>Check latest restic backup snapshots</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_backupRun</td>
+                <td>Trigger a restic backup</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_backupList</td>
+                <td>List all restic backup snapshots</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_backupRestore</td>
+                <td>Restore files from a restic backup snapshot</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_backupDiff</td>
+                <td>Show difference between two backup snapshots</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_volumeBackup</td>
+                <td>Back up a Docker volume to restic</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
+      <details class="cat-group" data-cat="Connectivity &amp; Diagnostics">
+        <summary>Connectivity &amp; Diagnostics <span class="cat-count">3</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_sshTest</td>
+                <td>Test SSH connectivity to the Raspberry Pi</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_healthCheck</td>
+                <td>Comprehensive self-test: SSH, Docker, required tools</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_diagnostics</td>
+                <td>Collect debug info: OS, kernel, Docker, memory, disk, network</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
+      <details class="cat-group" data-cat="Docker &amp; Compose">
+        <summary>Docker &amp; Compose <span class="cat-count">10</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_composeUp</td>
+                <td>Start Docker Compose stacks</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_composeDown</td>
+                <td>Stop Docker Compose stacks</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_composePull</td>
+                <td>Pull latest Docker images for compose stacks</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_composePs</td>
+                <td>List running Docker Compose containers</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_serviceHealth</td>
+                <td>Check Docker container health status</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_serviceLogs</td>
+                <td>Tail recent logs from a Docker container</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_serviceRestart</td>
+                <td>Restart a Docker container</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_containerScan</td>
+                <td>Scan running container images for vulnerabilities using Trivy</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_logSearch</td>
+                <td>Search across Docker container logs with grep patterns</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_journalLogs</td>
+                <td>Query systemd journal logs with filters</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
+      <details class="cat-group" data-cat="Inventory &amp; Nodes">
+        <summary>Inventory &amp; Nodes <span class="cat-count">4</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_inventorySync</td>
+                <td>Discover nodes from Ansible inventory or Tailscale network</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_nodeList</td>
+                <td>List all managed nodes and their connection status</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_nodeStatus</td>
+                <td>Get system status for a specific node</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_nodeExec</td>
+                <td>Execute a shell command on a specific node</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
+      <details class="cat-group" data-cat="Monitoring">
+        <summary>Monitoring <span class="cat-count">5</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_prometheusQuery</td>
+                <td>Run a PromQL query against Prometheus</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_grafanaSnapshot</td>
+                <td>Export a Grafana dashboard configuration</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_uptimeKumaStatus</td>
+                <td>Get status of all Uptime Kuma monitors</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_alertList</td>
+                <td>List alerts from Alertmanager</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_speedtestResults</td>
+                <td>Get recent speedtest results</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
+      <details class="cat-group" data-cat="Notifications">
+        <summary>Notifications <span class="cat-count">2</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_ntfySend</td>
+                <td>Send a push notification via Ntfy</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_ntfyTopics</td>
+                <td>List Ntfy topics and recent messages</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
+      <details class="cat-group" data-cat="Raspberry Pi">
+        <summary>Raspberry Pi <span class="cat-count">2</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_piStatus</td>
+                <td>Raspberry Pi status: CPU temp, memory, disk, uptime, throttle state</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_piReboot</td>
+                <td>Safely reboot the Raspberry Pi</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
+      <details class="cat-group" data-cat="System &amp; Security">
+        <summary>System &amp; Security <span class="cat-count">10</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_diskUsage</td>
+                <td>Get detailed disk usage breakdown</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_kernelInfo</td>
+                <td>Kernel version, boot parameters, loaded modules</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_systemdServices</td>
+                <td>List systemd units or get status of a specific unit</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_aptUpdate</td>
+                <td>Run apt update and list upgradable packages</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_aptUpgradable</td>
+                <td>List upgradable packages with versions</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_aptHistory</td>
+                <td>Show recent apt install, upgrade, and remove history</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_networkInfo</td>
+                <td>IP addresses, interfaces, DNS, and Tailscale status</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_openPorts</td>
+                <td>Scan for listening TCP ports and map to processes</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_ufwStatus</td>
+                <td>List UFW firewall rules and status</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_fail2banStatus</td>
+                <td>List fail2ban jails, banned IPs, and ban counts</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
+      <details class="cat-group" data-cat="TLS &amp; Reverse Proxy">
+        <summary>TLS &amp; Reverse Proxy <span class="cat-count">5</span></summary>
+        <div class="cat-body">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+            <tbody>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_certCheck</td>
+                <td>Check SSL certificate expiry, issuer, and fingerprint</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_certRenew</td>
+                <td>Trigger Let&#39;s Encrypt certificate renewal</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_certList</td>
+                <td>List managed SSL certificates from certbot and NPM</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_npmCerts</td>
+                <td>List Nginx Proxy Manager SSL certificates</td>
+              </tr>
+              
+              <tr data-tool>
+                <td class="name-cell">homelab_npmProxyHosts</td>
+                <td>List Nginx Proxy Manager proxy host configs</td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </details>
+      
     
   </section>
   
@@ -936,14 +798,14 @@
   <!-- Install -->
   
   <section class="section" id="install">
-    <h2>Installation</h2>
+    <div class="section-header"><h2>Installation</h2></div>
     <ol class="install-steps">
       
       <li><span>Clone the repository</span></li>
       
       <li><span>Open the folder in Cursor IDE</span></li>
       
-      <li><span>Install MCP server: &lt;code&gt;cd mcp-server &amp;&amp; npm install&lt;/code&gt;</span></li>
+      <li><span>Install MCP server: <code>cd mcp-server && npm install</code></span></li>
       
       <li><span>Configure SSH access to your Raspberry Pi / home lab nodes</span></li>
       
@@ -962,47 +824,117 @@
     </p>
   </footer>
 
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Back to top -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
   <script>
-    // Animated stat counters
+    /* Toast */
     (function () {
-      const observer = new IntersectionObserver(function (entries) {
+      var toastEl = document.getElementById('toast');
+      var timer;
+      window.showToast = function (msg) {
+        clearTimeout(timer);
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        timer = setTimeout(function () { toastEl.classList.remove('show'); }, 2000);
+      };
+    })();
+
+    /* Animated stat counters */
+    (function () {
+      var prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
-          const el = entry.target;
-          const target = parseInt(el.getAttribute('data-target'), 10);
+          var el = entry.target;
+          var target = parseInt(el.getAttribute('data-target'), 10);
           if (isNaN(target)) return;
           observer.unobserve(el);
-          const duration = 1200;
-          const start = performance.now();
+          if (prefersReduce) { el.textContent = target; return; }
+          var duration = 1200, start = performance.now();
           function tick(now) {
-            const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            el.textContent = Math.round(eased * target);
-            if (progress < 1) requestAnimationFrame(tick);
+            var p = Math.min((now - start) / duration, 1);
+            el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
+            if (p < 1) requestAnimationFrame(tick);
           }
           requestAnimationFrame(tick);
         });
       }, { threshold: 0.3 });
-      document.querySelectorAll('.stat-val[data-target]').forEach(function (el) {
-        observer.observe(el);
+      document.querySelectorAll('.stat-val[data-target]').forEach(function (el) { observer.observe(el); });
+    })();
+
+    /* Copy to clipboard with toast */
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(function () { showToast('Copied to clipboard'); });
+    }
+
+    /* Auto-add copy buttons next to <code> in install steps */
+    (function () {
+      document.querySelectorAll('.install-steps code').forEach(function (code) {
+        var btn = document.createElement('span');
+        btn.className = 'copy-icon';
+        btn.title = 'Copy';
+        btn.innerHTML = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"/></svg>';
+        btn.addEventListener('click', function () { copyText(code.textContent); });
+        code.parentNode.insertBefore(btn, code.nextSibling);
       });
     })();
 
-    // Copy to clipboard
-    document.querySelectorAll('.copy-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var text = btn.getAttribute('data-copy');
-        if (!text) return;
-        navigator.clipboard.writeText(text).then(function () {
-          var orig = btn.textContent;
-          btn.textContent = 'Copied!';
-          setTimeout(function () { btn.textContent = orig; }, 1500);
+    /* MCP tool search / filter */
+    (function () {
+      var input = document.getElementById('toolSearch');
+      var meta = document.getElementById('toolSearchMeta');
+      if (!input) return;
+      var rows = document.querySelectorAll('#mcp-tools [data-tool]');
+      var total = rows.length;
+      function filter() {
+        var q = input.value.toLowerCase().trim();
+        var shown = 0;
+        rows.forEach(function (tr) {
+          var text = tr.textContent.toLowerCase();
+          var match = !q || text.indexOf(q) !== -1;
+          tr.classList.toggle('hidden-row', !match);
+          if (match) shown++;
         });
+        if (q) {
+          meta.textContent = shown + ' of ' + total;
+          document.querySelectorAll('.cat-group').forEach(function (d) {
+            var vis = d.querySelectorAll('[data-tool]:not(.hidden-row)').length;
+            if (vis > 0) { d.open = true; d.style.display = ''; }
+            else { d.style.display = 'none'; }
+          });
+        } else {
+          meta.textContent = '';
+          document.querySelectorAll('.cat-group').forEach(function (d) { d.style.display = ''; });
+        }
+      }
+      input.addEventListener('input', filter);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === '/' && !e.ctrlKey && !e.metaKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          input.focus();
+        }
       });
-    });
+    })();
 
-    // Scroll spy
+    /* Expand / collapse all categories */
+    (function () {
+      var btn = document.getElementById('toggleAllCats');
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        var details = document.querySelectorAll('#mcp-tools .cat-group');
+        var allOpen = Array.prototype.every.call(details, function (d) { return d.open; });
+        details.forEach(function (d) { d.open = !allOpen; });
+        btn.textContent = allOpen ? 'Expand all' : 'Collapse all';
+      });
+    })();
+
+    /* Scroll spy */
     (function () {
       var links = document.querySelectorAll('.nav-links a[href^="#"]');
       if (!links.length) return;
@@ -1015,14 +947,32 @@
       function onScroll() {
         var scrollY = window.scrollY + 80;
         var current = null;
-        sections.forEach(function (s) {
-          if (s.el.offsetTop <= scrollY) current = s;
-        });
+        sections.forEach(function (s) { if (s.el.offsetTop <= scrollY) current = s; });
         links.forEach(function (l) { l.classList.remove('active'); });
         if (current) current.link.classList.add('active');
       }
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
+    })();
+
+    /* Back to top */
+    (function () {
+      var btn = document.getElementById('backToTop');
+      window.addEventListener('scroll', function () {
+        btn.classList.toggle('visible', window.scrollY > 400);
+      }, { passive: true });
+      btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    })();
+
+    /* Mobile nav toggle */
+    (function () {
+      var toggle = document.querySelector('.nav-toggle');
+      var links = document.querySelector('.nav-links');
+      if (!toggle || !links) return;
+      toggle.addEventListener('click', function () { links.classList.toggle('open'); });
+      links.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', function () { links.classList.remove('open'); });
+      });
     })();
   </script>
 
