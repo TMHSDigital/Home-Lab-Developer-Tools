@@ -5,7 +5,11 @@ on:
   push:
     branches: [main]
     paths:
-      - "docs/**"
+      - "skills/**"
+      - "rules/**"
+      - "mcp-tools.json"
+      - "site.json"
+      - ".cursor-plugin/plugin.json"
       - "assets/**"
   workflow_dispatch:
 
@@ -26,8 +30,21 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Copy assets into docs
-        run: cp -r assets docs/assets
+      - uses: actions/checkout@v6
+        with:
+          repository: TMHSDigital/Developer-Tools-Directory
+          path: _template
+          sparse-checkout: site-template
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r _template/site-template/requirements.txt
+
+      - name: Build site
+        run: python _template/site-template/build_site.py --repo-root . --out docs
 
       - name: Configure Pages
         uses: actions/configure-pages@v6

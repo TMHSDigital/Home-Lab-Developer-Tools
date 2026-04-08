@@ -1,349 +1,1030 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Home Lab Developer Tools</title>
-  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors. 22 skills, 11 rules, 50 MCP tools.">
-  <meta property="og:title" content="Home Lab Developer Tools">
-  <meta property="og:description" content="22 skills, 11 rules, 50 MCP tools for managing a Raspberry Pi home lab via SSH.">
-  <meta property="og:type" content="website">
+  <meta name="description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors - 22 skills, 11 rules, and 50 MCP tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration on a Raspberry Pi home lab via SSH." />
+  <meta property="og:title" content="Home Lab Developer Tools" />
+  <meta property="og:description" content="Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors - 22 skills, 11 rules, and 50 MCP tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration on a Raspberry Pi home lab via SSH." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/logo.png" />
+  <link rel="icon" href="assets/logo.png" />
   <style>
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/inter-regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 500;
+      font-display: swap;
+      src: url('fonts/inter-medium.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Inter';
+      font-style: normal;
+      font-weight: 700;
+      font-display: swap;
+      src: url('fonts/inter-bold.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'JetBrains Mono';
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url('fonts/jetbrains-mono-regular.woff2') format('woff2');
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
+      --accent: #58a6ff;
+      --accent-light: #79c0ff;
       --bg: #0d1117;
-      --surface: #161b22;
+      --bg2: #161b22;
+      --bg3: #1c2128;
       --border: #30363d;
       --text: #e6edf3;
-      --text-muted: #8b949e;
-      --accent: #58a6ff;
-      --accent-subtle: #1f6feb33;
-      --green: #3fb950;
-      --orange: #d29922;
+      --text-dim: #8b949e;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      --hero-from: #0d1117;
+      --hero-to: #161b22;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-family: var(--font-sans);
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
+      min-height: 100vh;
     }
-    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
 
-    header {
-      text-align: center;
-      padding: 64px 0 48px;
+    a { color: var(--accent-light); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: #fff; }
+
+    /* --- NAV --- */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
     }
-    header h1 { font-size: 2.5rem; margin-bottom: 8px; }
-    header p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
-    .version {
-      display: inline-block;
-      background: var(--accent-subtle);
-      color: var(--accent);
-      padding: 4px 12px;
-      border-radius: 16px;
-      font-size: 0.85rem;
-      margin-top: 16px;
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+    .nav-brand {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-dim);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--accent-light); }
+
+    /* --- HERO --- */
+    .hero {
+      text-align: center;
+      padding: 5rem 1.5rem 3.5rem;
+      background: linear-gradient(180deg, var(--hero-from), var(--hero-to));
+    }
+    .hero-inner { max-width: 720px; margin: 0 auto; }
+    .hero h1 {
+      font-size: 2.75rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--text), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--text-dim);
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .stats {
       display: flex;
       justify-content: center;
-      gap: 48px;
-      padding: 32px 0;
-      border-bottom: 1px solid var(--border);
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
     .stat { text-align: center; }
-    .stat-number { font-size: 2rem; font-weight: 700; color: var(--accent); }
-    .stat-label { color: var(--text-muted); font-size: 0.9rem; }
+    .stat-val {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent-light);
+      font-family: var(--font-mono);
+    }
+    .stat-lbl {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 0.25rem;
+    }
 
-    section { padding: 48px 0; border-bottom: 1px solid var(--border); }
-    section:last-child { border-bottom: none; }
-    h2 { font-size: 1.5rem; margin-bottom: 24px; }
-    h3 { font-size: 1.1rem; margin: 24px 0 12px; color: var(--text-muted); }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
-    th { color: var(--text-muted); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
-    td code { background: var(--surface); padding: 2px 6px; border-radius: 4px; font-size: 0.9rem; }
-
-    .install-block {
-      background: var(--surface);
+    .hero-badges {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg2);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 20px;
-      margin-top: 16px;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: border-color 0.2s, background 0.2s;
     }
-    .install-block pre {
-      background: var(--bg);
-      padding: 16px;
-      border-radius: 6px;
-      overflow-x: auto;
-      font-size: 0.9rem;
-      margin-top: 12px;
+    .badge:hover {
+      border-color: var(--accent);
+      background: var(--bg3);
+      color: var(--text);
     }
-    .install-block code { color: var(--green); }
+    .badge svg { width: 18px; height: 18px; flex-shrink: 0; }
 
-    footer {
-      text-align: center;
-      padding: 32px 0;
-      color: var(--text-muted);
-      font-size: 0.85rem;
+    /* --- SECTIONS --- */
+    .section {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
     }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    .section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section h2 .count {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      background: var(--bg2);
+      padding: 0.15rem 0.6rem;
+      border-radius: 12px;
+    }
+
+    .category-label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-light);
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    /* --- TABLE --- */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9375rem;
+    }
+    .data-table th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+      padding: 0.625rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .data-table td {
+      padding: 0.625rem 0.75rem;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+      color: var(--text-dim);
+      vertical-align: top;
+    }
+    .data-table tr:hover td {
+      background: rgba(22, 27, 34, 0.5);
+    }
+    .data-table .name-cell {
+      color: var(--text);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .data-table .scope-cell {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--accent-light);
+    }
+
+    /* --- INSTALL --- */
+    .install-steps {
+      list-style: none;
+      counter-reset: step;
+    }
+    .install-steps li {
+      counter-increment: step;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(48, 54, 61, 0.4);
+    }
+    .install-steps li::before {
+      content: counter(step);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.8125rem;
+    }
+    .install-steps code {
+      background: var(--bg2);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-left: 0.5rem;
+      padding: 0.15rem 0.5rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .copy-btn:hover { color: var(--accent-light); border-color: var(--accent); }
+
+    /* --- FOOTER --- */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      color: var(--text-dim);
+      font-size: 0.8125rem;
+    }
+    footer a { color: var(--accent-light); }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+      .stats { gap: 1.25rem; }
+      .stat-val { font-size: 1.5rem; }
+      .nav-links { gap: 0.75rem; }
+      .nav-links a { font-size: 0.8rem; }
+      .data-table { font-size: 0.875rem; }
+    }
+    @media (max-width: 480px) {
+      .hero { padding: 3rem 1rem 2rem; }
+      .hero h1 { font-size: 1.5rem; }
+      .nav-brand { font-size: 0.875rem; }
+      .nav-links { gap: 0.5rem; }
+      .hero-badges { flex-direction: column; align-items: center; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="container">
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <span class="nav-brand">Home Lab Developer Tools</span>
+      <ul class="nav-links">
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#rules">Rules</a></li>
+        <li><a href="#mcp-tools">MCP Tools</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
       <h1>Home Lab Developer Tools</h1>
-      <p>Home lab and Raspberry Pi workflows for Cursor, Claude Code, and any MCP-compatible editor.</p>
-      <span class="version">v0.10.0</span>
+      <p>Home lab and Raspberry Pi workflows for Cursor, Claude Code, and MCP-compatible editors - 22 skills, 11 rules, and 50 MCP tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration on a Raspberry Pi home lab via SSH.</p>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-val" data-target="22">0</div><div class="stat-lbl">Skills</div></div>
+        <div class="stat"><div class="stat-val" data-target="11">0</div><div class="stat-lbl">Rules</div></div>
+        <div class="stat"><div class="stat-val" data-target="50">0</div><div class="stat-lbl">MCP Tools</div></div>
+      </div>
+
+      <div class="hero-badges">
+        <a class="badge" href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+        
+        <a class="badge" href="https://www.npmjs.com/package/@tmhs/homelab-mcp">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 0v16h16V0H0zm13 13H8V5H5v8H3V3h10v10z"/></svg>
+          npm
+        </a>
+        
+      </div>
     </div>
-  </header>
+  </section>
 
-  <div class="container">
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-number" data-target="22">22</div>
-        <div class="stat-label">Skills</div>
-      </div>
-      <div class="stat">
-        <div class="stat-number" data-target="11">11</div>
-        <div class="stat-label">Rules</div>
-      </div>
-      <div class="stat">
-        <div class="stat-number" data-target="50">50</div>
-        <div class="stat-label">MCP Tools</div>
-      </div>
-    </div>
+  <!-- Skills -->
+  
+  <section class="section" id="skills">
+    <h2>Skills <span class="count">22</span></h2>
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Backup Strategy Recommendations</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Example Interaction</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">See Also</td>
+          <td>---</td>
+        </tr>
+        
+      </tbody>
+    </table>
+  </section>
+  
 
-    <section>
-      <h2>MCP Tools</h2>
-      <p>All tools connect to your Raspberry Pi via SSH for live system management.</p>
+  <!-- Rules -->
+  
+  <section class="section" id="rules">
+    <h2>Rules <span class="count">11</span></h2>
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Scope</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">Ansible Best Practices</td>
+          <td class="scope-cell"></td>
+          <td>Flag Ansible antipatterns including non-FQCN modules, missing tags, and shell commands when modules exist.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Backup Coverage</td>
+          <td class="scope-cell"></td>
+          <td>Flag Docker Compose services with persistent data that lack backup coverage.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Compose Arm64</td>
+          <td class="scope-cell"></td>
+          <td>Flag Docker Compose issues specific to arm64 Raspberry Pi deployments including incompatible images and missing healthchecks.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Exposed Ports</td>
+          <td class="scope-cell"></td>
+          <td>Flag Docker Compose services with exposed host ports that should use a reverse proxy instead.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Homelab Secrets</td>
+          <td class="scope-cell"></td>
+          <td>Flag hardcoded credentials, IP addresses, SSH keys, and secrets in home lab code and configuration files.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Inventory Consistency</td>
+          <td class="scope-cell"></td>
+          <td>Flag inconsistencies between node registry and inventory or configuration files.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Privileged Containers</td>
+          <td class="scope-cell"></td>
+          <td>Flag Docker Compose services running with elevated privileges or missing security restrictions.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Resource Limits</td>
+          <td class="scope-cell"></td>
+          <td>Flag Docker Compose services without memory or CPU limits set.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Ssh Safety</td>
+          <td class="scope-cell"></td>
+          <td>Flag dangerous SSH commands that could cause data loss or system damage on the Raspberry Pi.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Weak Credentials</td>
+          <td class="scope-cell"></td>
+          <td>Flag default, weak, or improperly stored credentials in Docker Compose files and environment configs.</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">Yaml Conventions</td>
+          <td class="scope-cell"></td>
+          <td>Enforce YAML formatting conventions for consistency across compose files, Ansible playbooks, and monitoring configs.</td>
+        </tr>
+        
+      </tbody>
+    </table>
+  </section>
+  
 
-      <h3>System (4)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_piStatus</code></td><td>CPU temp, memory, disk, uptime, throttle state</td></tr>
-          <tr><td><code>homelab_piReboot</code></td><td>Safe reboot with pre-checks</td></tr>
-          <tr><td><code>homelab_diskUsage</code></td><td>Disk usage breakdown by directory</td></tr>
-          <tr><td><code>homelab_aptUpdate</code></td><td>Run apt update, list upgradable packages</td></tr>
-        </tbody>
-      </table>
+  <!-- MCP Tools -->
+  
+  <section class="section" id="mcp-tools">
+    <h2>MCP Tools <span class="count">50</span></h2>
+    
+    
+    <div class="category-label">AdGuard Home</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_adguardStats</td>
+          <td>AdGuard Home DNS statistics and query counts</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_adguardFilters</td>
+          <td>List AdGuard Home filter lists</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_adguardQueryLog</td>
+          <td>Search the AdGuard Home DNS query log</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    <div class="category-label">Backups</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_backupStatus</td>
+          <td>Check latest restic backup snapshots</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_backupRun</td>
+          <td>Trigger a restic backup</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_backupList</td>
+          <td>List all restic backup snapshots</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_backupRestore</td>
+          <td>Restore files from a restic backup snapshot</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_backupDiff</td>
+          <td>Show difference between two backup snapshots</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_volumeBackup</td>
+          <td>Back up a Docker volume to restic</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    <div class="category-label">Connectivity &amp; Diagnostics</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_sshTest</td>
+          <td>Test SSH connectivity to the Raspberry Pi</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_healthCheck</td>
+          <td>Comprehensive self-test: SSH, Docker, required tools</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_diagnostics</td>
+          <td>Collect debug info: OS, kernel, Docker, memory, disk, network</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    <div class="category-label">Docker &amp; Compose</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_composeUp</td>
+          <td>Start Docker Compose stacks</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_composeDown</td>
+          <td>Stop Docker Compose stacks</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_composePull</td>
+          <td>Pull latest Docker images for compose stacks</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_composePs</td>
+          <td>List running Docker Compose containers</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_serviceHealth</td>
+          <td>Check Docker container health status</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_serviceLogs</td>
+          <td>Tail recent logs from a Docker container</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_serviceRestart</td>
+          <td>Restart a Docker container</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_containerScan</td>
+          <td>Scan running container images for vulnerabilities using Trivy</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_logSearch</td>
+          <td>Search across Docker container logs with grep patterns</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_journalLogs</td>
+          <td>Query systemd journal logs with filters</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    <div class="category-label">Inventory &amp; Nodes</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_inventorySync</td>
+          <td>Discover nodes from Ansible inventory or Tailscale network</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_nodeList</td>
+          <td>List all managed nodes and their connection status</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_nodeStatus</td>
+          <td>Get system status for a specific node</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_nodeExec</td>
+          <td>Execute a shell command on a specific node</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    <div class="category-label">Monitoring</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_prometheusQuery</td>
+          <td>Run a PromQL query against Prometheus</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_grafanaSnapshot</td>
+          <td>Export a Grafana dashboard configuration</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_uptimeKumaStatus</td>
+          <td>Get status of all Uptime Kuma monitors</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_alertList</td>
+          <td>List alerts from Alertmanager</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_speedtestResults</td>
+          <td>Get recent speedtest results</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    <div class="category-label">Notifications</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_ntfySend</td>
+          <td>Send a push notification via Ntfy</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_ntfyTopics</td>
+          <td>List Ntfy topics and recent messages</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    <div class="category-label">Raspberry Pi</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_piStatus</td>
+          <td>Raspberry Pi status: CPU temp, memory, disk, uptime, throttle state</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_piReboot</td>
+          <td>Safely reboot the Raspberry Pi</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    <div class="category-label">System &amp; Security</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_diskUsage</td>
+          <td>Get detailed disk usage breakdown</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_kernelInfo</td>
+          <td>Kernel version, boot parameters, loaded modules</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_systemdServices</td>
+          <td>List systemd units or get status of a specific unit</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_aptUpdate</td>
+          <td>Run apt update and list upgradable packages</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_aptUpgradable</td>
+          <td>List upgradable packages with versions</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_aptHistory</td>
+          <td>Show recent apt install, upgrade, and remove history</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_networkInfo</td>
+          <td>IP addresses, interfaces, DNS, and Tailscale status</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_openPorts</td>
+          <td>Scan for listening TCP ports and map to processes</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_ufwStatus</td>
+          <td>List UFW firewall rules and status</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_fail2banStatus</td>
+          <td>List fail2ban jails, banned IPs, and ban counts</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+    
+    <div class="category-label">TLS &amp; Reverse Proxy</div>
+    
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Description</th></tr></thead>
+      <tbody>
+        
+        <tr>
+          <td class="name-cell">homelab_certCheck</td>
+          <td>Check SSL certificate expiry, issuer, and fingerprint</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_certRenew</td>
+          <td>Trigger Let&#39;s Encrypt certificate renewal</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_certList</td>
+          <td>List managed SSL certificates from certbot and NPM</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_npmCerts</td>
+          <td>List Nginx Proxy Manager SSL certificates</td>
+        </tr>
+        
+        <tr>
+          <td class="name-cell">homelab_npmProxyHosts</td>
+          <td>List Nginx Proxy Manager proxy host configs</td>
+        </tr>
+        
+      </tbody>
+    </table>
+    
+  </section>
+  
 
-      <h3>Containers (3)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_serviceHealth</code></td><td>Docker container health status</td></tr>
-          <tr><td><code>homelab_serviceLogs</code></td><td>Tail container logs</td></tr>
-          <tr><td><code>homelab_serviceRestart</code></td><td>Restart a container</td></tr>
-        </tbody>
-      </table>
+  <!-- Install -->
+  
+  <section class="section" id="install">
+    <h2>Installation</h2>
+    <ol class="install-steps">
+      
+      <li><span>Clone the repository</span></li>
+      
+      <li><span>Open the folder in Cursor IDE</span></li>
+      
+      <li><span>Install MCP server: &lt;code&gt;cd mcp-server &amp;&amp; npm install&lt;/code&gt;</span></li>
+      
+      <li><span>Configure SSH access to your Raspberry Pi / home lab nodes</span></li>
+      
+      <li><span>Start using the AI skills and rules</span></li>
+      
+    </ol>
+  </section>
+  
 
-      <h3>Compose (4)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_composeUp</code></td><td>Start compose stacks</td></tr>
-          <tr><td><code>homelab_composeDown</code></td><td>Stop compose stacks</td></tr>
-          <tr><td><code>homelab_composePull</code></td><td>Pull latest images</td></tr>
-          <tr><td><code>homelab_composePs</code></td><td>List running compose containers</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Monitoring (5)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_prometheusQuery</code></td><td>Run a PromQL query against Prometheus</td></tr>
-          <tr><td><code>homelab_grafanaSnapshot</code></td><td>Export a Grafana dashboard configuration by UID</td></tr>
-          <tr><td><code>homelab_uptimeKumaStatus</code></td><td>Get the status of all Uptime Kuma monitors</td></tr>
-          <tr><td><code>homelab_alertList</code></td><td>List alerts from Alertmanager by state</td></tr>
-          <tr><td><code>homelab_speedtestResults</code></td><td>Get recent Speedtest Tracker results</td></tr>
-        </tbody>
-      </table>
-
-      <h3>DNS / Proxy (5)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_adguardStats</code></td><td>AdGuard Home DNS statistics and top blocked domains</td></tr>
-          <tr><td><code>homelab_adguardFilters</code></td><td>List AdGuard filter/blocklists and status</td></tr>
-          <tr><td><code>homelab_adguardQueryLog</code></td><td>Search the AdGuard DNS query log</td></tr>
-          <tr><td><code>homelab_npmProxyHosts</code></td><td>List NPM proxy host configurations</td></tr>
-          <tr><td><code>homelab_npmCerts</code></td><td>List SSL certificates and expiry dates</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Network (1)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_networkInfo</code></td><td>IP addresses, DNS, Tailscale status</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Backup (6)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_backupStatus</code></td><td>Check latest restic snapshots</td></tr>
-          <tr><td><code>homelab_backupRun</code></td><td>Trigger restic backup</td></tr>
-          <tr><td><code>homelab_backupList</code></td><td>List all restic snapshots with filtering</td></tr>
-          <tr><td><code>homelab_backupRestore</code></td><td>Restore files from a snapshot</td></tr>
-          <tr><td><code>homelab_backupDiff</code></td><td>Show differences between two snapshots</td></tr>
-          <tr><td><code>homelab_volumeBackup</code></td><td>Back up a Docker volume to restic</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Security (4)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_ufwStatus</code></td><td>List UFW firewall rules and status</td></tr>
-          <tr><td><code>homelab_fail2banStatus</code></td><td>List fail2ban jails, banned IPs, and ban counts</td></tr>
-          <tr><td><code>homelab_openPorts</code></td><td>Scan listening TCP ports and map to processes</td></tr>
-          <tr><td><code>homelab_containerScan</code></td><td>Scan container images for vulnerabilities via Trivy</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Logs / Notifications (4)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_journalLogs</code></td><td>Query systemd journal with unit, priority, and time filters</td></tr>
-          <tr><td><code>homelab_logSearch</code></td><td>Search across container logs with grep patterns</td></tr>
-          <tr><td><code>homelab_ntfySend</code></td><td>Send a push notification via Ntfy</td></tr>
-          <tr><td><code>homelab_ntfyTopics</code></td><td>List Ntfy topics and recent messages</td></tr>
-        </tbody>
-      </table>
-
-      <h3>OS / Packages (4)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_aptUpgradable</code></td><td>List upgradable packages with version details</td></tr>
-          <tr><td><code>homelab_aptHistory</code></td><td>Show recent apt install/upgrade/remove history</td></tr>
-          <tr><td><code>homelab_kernelInfo</code></td><td>Kernel version, boot parameters, loaded modules</td></tr>
-          <tr><td><code>homelab_systemdServices</code></td><td>List systemd units or get status of a specific unit</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Certificates (3)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_certCheck</code></td><td>Check SSL certificate expiry, issuer, and fingerprint</td></tr>
-          <tr><td><code>homelab_certRenew</code></td><td>Trigger Let's Encrypt certificate renewal</td></tr>
-          <tr><td><code>homelab_certList</code></td><td>List all managed certificates from certbot and NPM</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Multi-Node (4)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_nodeList</code></td><td>List all managed nodes and connection status</td></tr>
-          <tr><td><code>homelab_nodeExec</code></td><td>Execute a command on a specific node</td></tr>
-          <tr><td><code>homelab_nodeStatus</code></td><td>Get system status for a specific node</td></tr>
-          <tr><td><code>homelab_inventorySync</code></td><td>Discover nodes from Ansible inventory or Tailscale</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Diagnostics (2)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_healthCheck</code></td><td>Comprehensive self-test (SSH, Docker, curl, restic, certbot, systemd)</td></tr>
-          <tr><td><code>homelab_diagnostics</code></td><td>Collect debug info bundle (OS, kernel, Docker, memory, disk, network)</td></tr>
-        </tbody>
-      </table>
-
-      <h3>SSH (1)</h3>
-      <table>
-        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>homelab_sshTest</code></td><td>Test SSH connectivity</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>Skills</h2>
-      <table>
-        <thead><tr><th>Skill</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td>pi-system-management</td><td>Monitor Pi hardware -- temp, throttling, memory, reboots</td></tr>
-          <tr><td>docker-compose-stacks</td><td>Manage multi-file Docker Compose deployments</td></tr>
-          <tr><td>service-monitoring</td><td>Prometheus, Grafana, Uptime Kuma, alert rules</td></tr>
-          <tr><td>grafana-dashboards</td><td>Create, import, and manage Grafana dashboards</td></tr>
-          <tr><td>alerting-rules</td><td>Prometheus alerting rules and Alertmanager routing</td></tr>
-          <tr><td>network-configuration</td><td>AdGuard DNS, NPM, Tailscale VPN, port management</td></tr>
-          <tr><td>dns-management</td><td>AdGuard filters, local DNS records, blocklists</td></tr>
-          <tr><td>reverse-proxy-management</td><td>NPM routing, SSL config, access lists</td></tr>
-          <tr><td>backup-recovery</td><td>Restic backup config, scheduling, and restore</td></tr>
-          <tr><td>disaster-recovery</td><td>Full Pi restore, SD card imaging, migration checklist</td></tr>
-          <tr><td>ssh-management</td><td>SSH keys, hardening, tunnels, troubleshooting</td></tr>
-          <tr><td>ansible-workflows</td><td>Ansible playbooks for multi-node management</td></tr>
-          <tr><td>security-hardening</td><td>UFW, fail2ban, SSH lockdown, container security</td></tr>
-          <tr><td>secrets-management</td><td>Vaultwarden, env vars, Docker secrets, credential auditing</td></tr>
-          <tr><td>log-analysis</td><td>Structured log querying, journald workflows, container log searching</td></tr>
-          <tr><td>notification-workflows</td><td>Ntfy setup, alert routing, notification pipelines</td></tr>
-          <tr><td>os-update-management</td><td>Unattended-upgrades, kernel updates, reboot scheduling</td></tr>
-          <tr><td>performance-tuning</td><td>Kernel params, swap config, I/O scheduler, GPU memory split</td></tr>
-          <tr><td>certificate-management</td><td>Let's Encrypt, self-signed certs, renewal automation, NPM cert integration</td></tr>
-          <tr><td>multi-node-management</td><td>Managing fleets, node inventory, parallel operations, cross-node monitoring</td></tr>
-          <tr><td>storage-management</td><td>Samba, Syncthing, volumes, disk monitoring</td></tr>
-          <tr><td>troubleshooting</td><td>Debug crashes, network issues, hardware problems</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>Rules</h2>
-      <table>
-        <thead><tr><th>Rule</th><th>Scope</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td>homelab-secrets</td><td>Global</td><td>Flag hardcoded passwords, IPs, and SSH keys</td></tr>
-          <tr><td>compose-arm64</td><td>Compose files</td><td>Flag images without arm64 support, missing healthchecks</td></tr>
-          <tr><td>ssh-safety</td><td>Global</td><td>Flag dangerous SSH commands</td></tr>
-          <tr><td>yaml-conventions</td><td>YAML files</td><td>Enforce 2-space indent, document start, explicit booleans</td></tr>
-          <tr><td>ansible-best-practices</td><td>Ansible files</td><td>Flag non-FQCN modules, missing tags, shell misuse</td></tr>
-          <tr><td>exposed-ports</td><td>Compose files</td><td>Flag services with exposed host ports that should use a proxy</td></tr>
-          <tr><td>backup-coverage</td><td>Compose files</td><td>Flag Docker volumes not covered by any backup job</td></tr>
-          <tr><td>privileged-containers</td><td>Compose files</td><td>Flag containers with elevated privileges or missing security opts</td></tr>
-          <tr><td>weak-credentials</td><td>Compose / .env</td><td>Flag default/weak passwords and insecure credential storage</td></tr>
-          <tr><td>resource-limits</td><td>Compose files</td><td>Flag containers without memory or CPU limits</td></tr>
-          <tr><td>inventory-consistency</td><td>Inventory / .env</td><td>Flag nodes in config missing from HOMELAB_NODES registry</td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>Installation</h2>
-      <div class="install-block">
-        <strong>Cursor</strong>
-        <pre><code>cd mcp-server && npm install && npm run build</code></pre>
-        <p style="margin-top: 12px; color: var(--text-muted);">Then add the MCP config to <code>.cursor/mcp.json</code>. See <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools#companion-home-lab-mcp-server">README</a> for details.</p>
-      </div>
-      <div class="install-block" style="margin-top: 16px;">
-        <strong>Claude Code</strong>
-        <pre><code>cd mcp-server && npm install && npm run build
-claude mcp add homelab node ./mcp-server/dist/index.js</code></pre>
-      </div>
-      <div class="install-block" style="margin-top: 16px;">
-        <strong>npm (global)</strong>
-        <pre><code>npm install -g @tmhs/homelab-mcp</code></pre>
-      </div>
-    </section>
-  </div>
-
+  <!-- Footer -->
   <footer>
-    <p>Built by <a href="https://github.com/TMHSDigital">TMHSDigital</a> | <a href="https://github.com/TMHSDigital/Home-Lab-Developer-Tools">GitHub</a> | <a href="https://www.npmjs.com/package/@tmhs/homelab-mcp">npm</a></p>
+    <p>
+      Built by <a href="https://github.com/TMHSDigital">TMHSDigital</a>
+      &middot; CC-BY-NC-ND-4.0
+      &middot; v0.10.0
+    </p>
   </footer>
+
+  <script>
+    // Animated stat counters
+    (function () {
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const target = parseInt(el.getAttribute('data-target'), 10);
+          if (isNaN(target)) return;
+          observer.unobserve(el);
+          const duration = 1200;
+          const start = performance.now();
+          function tick(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(eased * target);
+            if (progress < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        });
+      }, { threshold: 0.3 });
+      document.querySelectorAll('.stat-val[data-target]').forEach(function (el) {
+        observer.observe(el);
+      });
+    })();
+
+    // Copy to clipboard
+    document.querySelectorAll('.copy-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var text = btn.getAttribute('data-copy');
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(function () {
+          var orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(function () { btn.textContent = orig; }, 1500);
+        });
+      });
+    });
+
+    // Scroll spy
+    (function () {
+      var links = document.querySelectorAll('.nav-links a[href^="#"]');
+      if (!links.length) return;
+      var sections = [];
+      links.forEach(function (link) {
+        var id = link.getAttribute('href').slice(1);
+        var el = document.getElementById(id);
+        if (el) sections.push({ el: el, link: link });
+      });
+      function onScroll() {
+        var scrollY = window.scrollY + 80;
+        var current = null;
+        sections.forEach(function (s) {
+          if (s.el.offsetTop <= scrollY) current = s;
+        });
+        links.forEach(function (l) { l.classList.remove('active'); });
+        if (current) current.link.classList.add('active');
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+
 </body>
 </html>

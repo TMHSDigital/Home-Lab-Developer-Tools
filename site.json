@@ -1,0 +1,19 @@
+{
+  "accent": "#58a6ff",
+  "accentLight": "#79c0ff",
+  "heroGradientFrom": "#0d1117",
+  "heroGradientTo": "#161b22",
+  "favicon": "assets/logo.png",
+  "ogImage": "assets/logo.png",
+  "installSteps": [
+    "Clone the repository",
+    "Open the folder in Cursor IDE",
+    "Install MCP server: <code>cd mcp-server && npm install</code>",
+    "Configure SSH access to your Raspberry Pi / home lab nodes",
+    "Start using the AI skills and rules"
+  ],
+  "links": {
+    "npm": "https://www.npmjs.com/package/@tmhs/homelab-mcp",
+    "github": "https://github.com/TMHSDigital/Home-Lab-Developer-Tools"
+  }
+}
