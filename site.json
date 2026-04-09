@@ -6,11 +6,11 @@
   "favicon": "assets/logo.png",
   "ogImage": "assets/logo.png",
   "installSteps": [
-    "Clone the repository",
-    "Open the folder in Cursor IDE",
-    "Install MCP server: <code>cd mcp-server && npm install</code>",
-    "Configure SSH access to your Raspberry Pi / home lab nodes",
-    "Start using the AI skills and rules"
+    "<strong>Option A: npm (recommended)</strong><br><code>npm install -g @tmhs/homelab-mcp</code>",
+    "<strong>Option B: from source</strong><br><code>git clone https://github.com/TMHSDigital/Home-Lab-Developer-Tools.git</code><br><code>cd Home-Lab-Developer-Tools/mcp-server && npm install && npm run build</code>",
+    "<strong>Add to Cursor MCP config</strong> (<code>.cursor/mcp.json</code>):<br><code>{\"mcpServers\":{\"homelab\":{\"command\":\"npx\",\"args\":[\"-y\",\"@tmhs/homelab-mcp\"],\"env\":{\"HOMELAB_PI_HOST\":\"192.168.1.x\",\"HOMELAB_PI_USER\":\"pi\",\"HOMELAB_PI_KEY_PATH\":\"~/.ssh/id_rsa\"}}}}</code>",
+    "<strong>Configure SSH:</strong> Set <code>HOMELAB_PI_HOST</code>, <code>HOMELAB_PI_USER</code>, and <code>HOMELAB_PI_KEY_PATH</code> in the env block above. See <code>.env.example</code> for all optional vars (Grafana, AdGuard, Ntfy, etc.).",
+    "Open any project in Cursor and the 22 skills, 11 rules, and 50 MCP tools are available immediately."
   ],
   "links": {
     "npm": "https://www.npmjs.com/package/@tmhs/homelab-mcp",
