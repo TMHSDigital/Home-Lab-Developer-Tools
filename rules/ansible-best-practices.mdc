@@ -3,6 +3,7 @@ description: Flag Ansible antipatterns including non-FQCN modules, missing tags,
 alwaysApply: false
 globs:
   - "**/ansible/**/*.yml"
+standards-version: 1.6.3
 ---
 
 # Ansible Best Practices

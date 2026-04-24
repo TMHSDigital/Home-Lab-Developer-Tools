@@ -4,6 +4,7 @@ alwaysApply: false
 globs:
   - "**/compose*.yml"
   - "**/docker-compose*.yml"
+standards-version: 1.6.3
 ---
 
 # Exposed Ports

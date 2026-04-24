@@ -4,6 +4,7 @@ alwaysApply: false
 globs:
   - "**/*.yml"
   - "**/*.yaml"
+standards-version: 1.6.3
 ---
 
 # YAML Conventions

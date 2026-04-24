@@ -4,6 +4,7 @@ description: Create, import, export, and manage Grafana dashboards for home lab 
 tools:
   - homelab_grafanaSnapshot
   - homelab_prometheusQuery
+standards-version: 1.6.3
 ---
 
 # Grafana Dashboards

@@ -5,6 +5,7 @@ tools:
   - homelab_ntfySend
   - homelab_ntfyTopics
   - homelab_alertList
+standards-version: 1.6.3
 ---
 
 # Notification Workflows
