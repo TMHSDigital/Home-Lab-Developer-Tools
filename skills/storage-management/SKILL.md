@@ -4,6 +4,7 @@ description: Manage Samba shares, Syncthing file sync, Docker volumes, and disk 
 tools:
   - homelab_diskUsage
   - homelab_volumeBackup
+standards-version: 1.6.3
 ---
 
 # Storage Management

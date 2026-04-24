@@ -5,6 +5,7 @@ tools:
   - homelab_piStatus
   - homelab_piReboot
   - homelab_diskUsage
+standards-version: 1.6.3
 ---
 
 # Pi System Management

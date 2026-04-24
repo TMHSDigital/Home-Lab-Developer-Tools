@@ -7,6 +7,7 @@ tools:
   - homelab_aptHistory
   - homelab_kernelInfo
   - homelab_systemdServices
+standards-version: 1.6.3
 ---
 
 # OS Update Management

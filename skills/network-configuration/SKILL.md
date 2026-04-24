@@ -6,6 +6,7 @@ tools:
   - homelab_adguardStats
   - homelab_npmProxyHosts
   - homelab_openPorts
+standards-version: 1.6.3
 ---
 
 # Network Configuration

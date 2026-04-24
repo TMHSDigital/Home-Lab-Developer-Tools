@@ -5,6 +5,7 @@ tools:
   - homelab_npmProxyHosts
   - homelab_npmCerts
   - homelab_certCheck
+standards-version: 1.6.3
 ---
 
 # Reverse Proxy Management

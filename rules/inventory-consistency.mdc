@@ -5,6 +5,7 @@ globs:
   - "**/hosts"
   - "**/inventory*"
   - "**/.env*"
+standards-version: 1.6.3
 ---
 
 # Inventory Consistency
