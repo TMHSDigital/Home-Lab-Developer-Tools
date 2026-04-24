@@ -1,3 +1,5 @@
+<!-- standards-version: 1.6.3 -->
+
 # CLAUDE.md
 
 Project documentation for Claude Code and AI assistants working on this repository.
