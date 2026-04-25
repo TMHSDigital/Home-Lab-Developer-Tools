@@ -12,7 +12,7 @@ Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.13.0
+**Version:** 0.13.1
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
