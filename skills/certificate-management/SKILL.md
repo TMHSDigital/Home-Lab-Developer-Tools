@@ -6,7 +6,7 @@ tools:
   - homelab_certRenew
   - homelab_certList
   - homelab_npmCerts
-standards-version: 1.6.3
+standards-version: 1.7.0
 ---
 
 # Certificate Management

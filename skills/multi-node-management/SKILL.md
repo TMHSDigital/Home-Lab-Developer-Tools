@@ -6,7 +6,7 @@ tools:
   - homelab_nodeExec
   - homelab_nodeStatus
   - homelab_inventorySync
-standards-version: 1.6.3
+standards-version: 1.7.0
 ---
 
 # Multi-Node Management

@@ -7,7 +7,7 @@ tools:
   - homelab_serviceRestart
   - homelab_prometheusQuery
   - homelab_uptimeKumaStatus
-standards-version: 1.6.3
+standards-version: 1.7.0
 ---
 
 # Service Monitoring
