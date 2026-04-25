@@ -6,7 +6,7 @@ tools:
   - homelab_backupRun
   - homelab_backupList
   - homelab_backupDiff
-standards-version: 1.6.3
+standards-version: 1.7.0
 ---
 
 # Backup and Recovery

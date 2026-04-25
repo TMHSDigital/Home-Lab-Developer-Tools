@@ -5,7 +5,7 @@ tools:
   - homelab_inventorySync
   - homelab_nodeList
   - homelab_nodeExec
-standards-version: 1.6.3
+standards-version: 1.7.0
 ---
 
 # Ansible Workflows

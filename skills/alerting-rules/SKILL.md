@@ -5,7 +5,7 @@ tools:
   - homelab_alertList
   - homelab_prometheusQuery
   - homelab_ntfySend
-standards-version: 1.6.3
+standards-version: 1.7.0
 ---
 
 # Alerting Rules

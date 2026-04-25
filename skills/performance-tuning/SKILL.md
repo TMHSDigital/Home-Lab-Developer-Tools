@@ -5,7 +5,7 @@ tools:
   - homelab_kernelInfo
   - homelab_piStatus
   - homelab_systemdServices
-standards-version: 1.6.3
+standards-version: 1.7.0
 ---
 
 # Performance Tuning
