@@ -31,3 +31,4 @@ __pycache__/
 # Keys
 *.pem
 *.key
+# Phase 2c: release-doc-sync verification trigger (DTD#5)
