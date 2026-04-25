@@ -5,7 +5,7 @@ tools:
   - homelab_journalLogs
   - homelab_logSearch
   - homelab_serviceLogs
-standards-version: 1.7.0
+standards-version: 1.9.0
 ---
 
 # Log Analysis

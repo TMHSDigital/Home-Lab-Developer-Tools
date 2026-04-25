@@ -8,7 +8,7 @@ tools:
   - homelab_volumeBackup
   - homelab_backupStatus
   - homelab_backupRun
-standards-version: 1.7.0
+standards-version: 1.9.0
 ---
 
 # Disaster Recovery

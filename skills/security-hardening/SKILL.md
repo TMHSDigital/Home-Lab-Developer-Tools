@@ -6,7 +6,7 @@ tools:
   - homelab_fail2banStatus
   - homelab_openPorts
   - homelab_containerScan
-standards-version: 1.7.0
+standards-version: 1.9.0
 ---
 
 # Security Hardening

@@ -5,7 +5,7 @@ tools:
   - homelab_adguardStats
   - homelab_adguardFilters
   - homelab_adguardQueryLog
-standards-version: 1.7.0
+standards-version: 1.9.0
 ---
 
 # DNS Management
