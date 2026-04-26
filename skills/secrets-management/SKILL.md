@@ -6,7 +6,7 @@ tools:
   - homelab_ufwStatus
   - homelab_fail2banStatus
   - homelab_openPorts
-standards-version: 1.7.0
+standards-version: 1.9.0
 ---
 
 # Secrets Management

@@ -6,7 +6,7 @@ tools:
   - homelab_composeDown
   - homelab_composePull
   - homelab_composePs
-standards-version: 1.7.0
+standards-version: 1.9.0
 ---
 
 # Docker Compose Stacks

@@ -9,7 +9,7 @@ tools:
   - homelab_logSearch
   - homelab_healthCheck
   - homelab_diagnostics
-standards-version: 1.7.0
+standards-version: 1.9.0
 ---
 
 # Troubleshooting

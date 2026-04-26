@@ -3,7 +3,7 @@ name: ssh-management
 description: Manage SSH keys, harden SSH configuration, set up tunnels, and troubleshoot connection issues.
 tools:
   - homelab_sshTest
-standards-version: 1.7.0
+standards-version: 1.9.0
 ---
 
 # SSH Management
