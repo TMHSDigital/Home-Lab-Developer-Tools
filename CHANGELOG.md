@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-05-22
+
+### Added
+
+- Runtime command safety guard in `execSSH` -- blocks catastrophic patterns (`rm -rf /`, `mkfs` on block devices, `dd` to block devices, fork bomb, `chmod -R 777 /`, curl/wget pipe to shell, `poweroff`/`halt`/`shutdown -h`) before opening an SSH connection. Override with `HOMELAB_ALLOW_DANGEROUS_COMMANDS=true`.
+- `HOMELAB_DRY_RUN` mode -- when set, `execSSH` returns a description string without connecting. Unsafe commands are still rejected in dry-run mode.
+- `UnsafeCommandError` class in `utils/errors.ts` for runtime guard rejections.
+- Shared `confirmParam` and `confirmCancelled` helpers in `utils/confirm-param.ts` consumed by all confirm-gated tools.
+- `mcp-server/src/utils/__tests__/ssh-guard.test.ts` -- unit tests for the command guard and dry-run mode using the real module (no mock).
+
+### Changed
+
+- `homelab_serviceRestart`, `homelab_composeUp`, and `homelab_composeDown` now require `confirm=true` to proceed. Calls without it return a cancellation message and make no changes.
+- Default SSH host changed from personal hostname to generic `raspberrypi.local`; default user changed from personal username to `pi`. Override via `HOMELAB_PI_HOST` and `HOMELAB_PI_USER`.
+- All confirm-gated tools now use the shared `confirmParam`/`confirmCancelled` helpers for consistent messaging (standardizes "aborted" -> "cancelled" in `certRenew` and `nodeExec`).
+- `composePull` remains ungated (pull only downloads images, does not change running state).
+
 ## [0.13.2] - 2026-04-26
 
 See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.13.2) for details.

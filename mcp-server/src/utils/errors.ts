@@ -40,3 +40,14 @@ export class CommandFailedError extends SSHError {
     this.exitCode = exitCode;
   }
 }
+
+export class UnsafeCommandError extends SSHError {
+  constructor(command: string, pattern: string) {
+    super(
+      `Refused to execute potentially destructive command (matched: ${pattern}). ` +
+        `Set HOMELAB_ALLOW_DANGEROUS_COMMANDS=true to override.`,
+      command,
+    );
+    this.name = "UnsafeCommandError";
+  }
+}

@@ -13,6 +13,7 @@ const inputSchema = {
     .describe("Specific compose files to pull images for. Omit for all."),
 };
 
+// Intentionally ungated: pull only downloads images, does not change running state.
 export function register(server: McpServer): void {
   server.tool(
     "homelab_composePull",

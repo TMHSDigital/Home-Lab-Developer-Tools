@@ -13,7 +13,7 @@ vi.mock("../../utils/ssh-api.js", () => ({
   })),
   checkSSHAvailable: vi.fn(),
   listNodes: vi.fn(() => [
-    { name: "default", host: "raspi5.local" },
+    { name: "default", host: "raspberrypi.local" },
     { name: "nas", host: "nas.local" },
   ]),
   getNodeConfig: vi.fn(),
@@ -116,7 +116,7 @@ describe("integration tests (mocked SSH)", () => {
       const handler = captureHandler(register);
       const result = await handler({ confirm: false });
 
-      expect(result.content[0].text).toContain("aborted");
+      expect(result.content[0].text).toContain("cancelled");
       expect(mockExecSSH).not.toHaveBeenCalled();
     });
 
@@ -129,7 +129,34 @@ describe("integration tests (mocked SSH)", () => {
         confirm: false,
       });
 
-      expect(result.content[0].text).toContain("aborted");
+      expect(result.content[0].text).toContain("cancelled");
+      expect(mockExecSSH).not.toHaveBeenCalled();
+    });
+
+    it("serviceRestart blocks when confirm=false", async () => {
+      const { register } = await import("../serviceRestart.js");
+      const handler = captureHandler(register);
+      const result = await handler({ service: "grafana", confirm: false });
+
+      expect(result.content[0].text).toContain("cancelled");
+      expect(mockExecSSH).not.toHaveBeenCalled();
+    });
+
+    it("composeUp blocks when confirm=false", async () => {
+      const { register } = await import("../composeUp.js");
+      const handler = captureHandler(register);
+      const result = await handler({ confirm: false });
+
+      expect(result.content[0].text).toContain("cancelled");
+      expect(mockExecSSH).not.toHaveBeenCalled();
+    });
+
+    it("composeDown blocks when confirm=false", async () => {
+      const { register } = await import("../composeDown.js");
+      const handler = captureHandler(register);
+      const result = await handler({ confirm: false });
+
+      expect(result.content[0].text).toContain("cancelled");
       expect(mockExecSSH).not.toHaveBeenCalled();
     });
   });
@@ -145,7 +172,7 @@ describe("integration tests (mocked SSH)", () => {
       const result = await handler({});
 
       const text = result.content[0].text;
-      expect(text).toContain("default (raspi5.local) -- online");
+      expect(text).toContain("default (raspberrypi.local) -- online");
       expect(text).toContain("nas (nas.local) -- offline");
     });
   });

@@ -121,6 +121,7 @@ Service-to-stack mapping (quick reference):
 
 ## Common Pitfalls
 
+- **Confirm gate** -- `homelab_composeUp`, `homelab_composeDown`, and `homelab_serviceRestart` now require `confirm=true` to proceed. Calls without it return a cancellation message and do nothing.
 - **Pulling all stacks at once** -- avoid calling `homelab_composePull` on every
   stack simultaneously. The Pi has limited bandwidth and disk I/O. Update one
   stack at a time.

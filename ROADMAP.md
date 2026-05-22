@@ -16,6 +16,7 @@
 | v0.10.0 | Testing Infrastructure | +2 | -- | -- | 50 |
 | v0.11.0 | Documentation Site | -- | -- | -- | 50 |
 | v0.12.0 | Polish and Hardening | +2 | -- | -- | 52 |
+| v0.14.0 | Security Hardening | -- | -- | -- | 50 |
 | **v1.0.0** | **Stable Release** | -- | -- | -- | **52** |
 
 ---
@@ -212,6 +213,18 @@ Real test coverage before v1.0.
 - [x] Integration tests with mocked SSH (vi.mock execSSH)
 - [x] E2E test suite that runs against a real Pi (gated behind `HOMELAB_TEST_PI=true` env var)
 - [x] CI workflow for manual/scheduled E2E runs (.github/workflows/e2e.yml)
+
+---
+
+## v0.14.0 - Security Hardening
+
+- [x] Runtime command safety guard in `execSSH` blocking catastrophic patterns
+- [x] `HOMELAB_DRY_RUN` env var for testing without SSH connections
+- [x] Confirm gate extended to `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`
+- [x] Shared `confirmParam`/`confirmCancelled` helpers used by all gated tools
+- [x] Personal SSH defaults replaced with generic `raspberrypi.local` / `pi` placeholders
+- [x] `UnsafeCommandError` error class for guard rejections
+- [x] Unit tests for command guard and dry-run mode
 
 ---
 

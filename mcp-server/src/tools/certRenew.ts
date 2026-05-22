@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -9,9 +10,7 @@ const inputSchema = {
     .string()
     .optional()
     .describe("Specific certificate name to renew. Renews all eligible certificates if omitted"),
-  confirm: z
-    .boolean()
-    .describe("Safety gate -- must be true to proceed with renewal"),
+  ...confirmParam,
 };
 
 export function register(server: McpServer): void {
@@ -21,12 +20,7 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       if (!args.confirm) {
-        return {
-          content: [{
-            type: "text" as const,
-            text: "Renewal aborted -- set confirm=true to proceed.",
-          }],
-        };
+        return confirmCancelled("Renewal");
       }
 
       try {

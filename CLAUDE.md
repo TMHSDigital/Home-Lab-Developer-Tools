@@ -12,7 +12,7 @@ Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-
 
 This is a monorepo -- the skills, rules, and companion MCP server live in the same repository. The MCP server connects to a Raspberry Pi via SSH to execute commands.
 
-**Version:** 0.13.2
+**Version:** 0.14.0
 **License:** CC-BY-NC-ND-4.0
 **npm:** @tmhs/homelab-mcp
 **Author:** TMHSDigital
@@ -178,6 +178,13 @@ npm install -g @tmhs/homelab-mcp
 - All SSH interaction goes through `execSSH()` from `utils/ssh-api.ts`.
 - Skills use kebab-case directory names with YAML frontmatter (`name`, `description`, `tools`).
 - Rules use kebab-case filenames with `description` and `alwaysApply` frontmatter.
+
+## Security
+
+- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`.
+- `execSSH()` runs `assertCommandSafe()` before opening any SSH connection. This blocks catastrophic patterns (`rm -rf /`, `mkfs` on block devices, fork bombs, `poweroff`, etc.). Override with `HOMELAB_ALLOW_DANGEROUS_COMMANDS=true`.
+- `HOMELAB_DRY_RUN=true` makes `execSSH` return a description string instead of connecting. The command guard still runs in dry-run mode.
+- No personal SSH usernames, hostnames, or key names in code or docs. Use `pi` / `raspberrypi.local` / `~/.ssh/id_ed25519` as generic defaults.
 
 ## Release Hygiene
 

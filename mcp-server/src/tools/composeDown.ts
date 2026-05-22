@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 
 const COMPOSE_DIR = process.env.HOMELAB_COMPOSE_DIR || "/opt/homelab/docker";
 
@@ -16,6 +17,7 @@ const inputSchema = {
     .optional()
     .default(false)
     .describe("Also remove named volumes declared in compose file"),
+  ...confirmParam,
 };
 
 export function register(server: McpServer): void {
@@ -24,6 +26,10 @@ export function register(server: McpServer): void {
     "Stop Docker Compose stacks on the Pi",
     inputSchema,
     async (args) => {
+      if (!args.confirm) {
+        return confirmCancelled("Compose down");
+      }
+
       try {
         let files = "-f compose.base.yml";
         if (args.stacks && args.stacks.length > 0) {

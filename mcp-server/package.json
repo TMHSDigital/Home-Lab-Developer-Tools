@@ -1,6 +1,6 @@
 {
   "name": "@tmhs/homelab-mcp",
-  "version": "0.10.0",
+  "version": "0.14.0",
   "description": "MCP server for home lab operations via SSH - 50 tools for system status, Docker Compose management, service health, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and administration on a Raspberry Pi.",
   "type": "module",
   "main": "dist/index.js",

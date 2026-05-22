@@ -71,9 +71,9 @@ Set environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `HOMELAB_PI_HOST` | `raspi5.local` | Pi hostname or IP |
-| `HOMELAB_PI_USER` | `tmhs` | SSH username |
-| `HOMELAB_PI_KEY_PATH` | (empty) | Path to SSH private key |
+| `HOMELAB_PI_HOST` | `raspberrypi.local` | Pi hostname or IP |
+| `HOMELAB_PI_USER` | `pi` | SSH username |
+| `HOMELAB_PI_KEY_PATH` | (empty) | Path to SSH private key (e.g. `~/.ssh/id_ed25519`) |
 | `HOMELAB_COMPOSE_DIR` | `/opt/homelab/docker` | Compose project directory on Pi |
 | `HOMELAB_BACKUP_REPO` | `/mnt/backup/restic` | Restic backup repo path on Pi |
 | `HOMELAB_GRAFANA_TOKEN` | (empty) | Grafana API token (preferred auth method) |
@@ -93,6 +93,8 @@ Set environment variables:
 | `HOMELAB_NTFY_PORT` | `8080` | Ntfy server port override |
 | `HOMELAB_NODES` | (empty) | JSON object mapping node names to SSH config for multi-node support |
 | `HOMELAB_ANSIBLE_INVENTORY` | `/etc/ansible/hosts` | Ansible inventory file path for node discovery |
+| `HOMELAB_DRY_RUN` | (unset) | When set to any truthy value, `execSSH` prints the command without connecting |
+| `HOMELAB_ALLOW_DANGEROUS_COMMANDS` | (unset) | Set to `true` to bypass the runtime command safety guard |
 
 ## Usage with Cursor
 
@@ -105,9 +107,9 @@ Add to `.cursor/mcp.json`:
       "command": "node",
       "args": ["path/to/Home-Lab-Developer-Tools/mcp-server/dist/index.js"],
       "env": {
-        "HOMELAB_PI_HOST": "raspi5.local",
-        "HOMELAB_PI_USER": "tmhs",
-        "HOMELAB_PI_KEY_PATH": "~/.ssh/id_ed25519_pi"
+        "HOMELAB_PI_HOST": "raspberrypi.local",
+        "HOMELAB_PI_USER": "pi",
+        "HOMELAB_PI_KEY_PATH": "~/.ssh/id_ed25519"
       }
     }
   }

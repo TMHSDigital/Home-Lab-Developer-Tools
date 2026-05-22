@@ -9,8 +9,8 @@ export function register(server: McpServer): void {
     { ...nodeParam },
     async (args) => {
       try {
-        const host = process.env.HOMELAB_PI_HOST || "raspi5.local";
-        const user = process.env.HOMELAB_PI_USER || "tmhs";
+        const host = process.env.HOMELAB_PI_HOST || "raspberrypi.local";
+        const user = process.env.HOMELAB_PI_USER || "pi";
 
         const output = await execSSH("echo ok && hostname && uptime -p", args.node);
         const lines = output.split("\n");

@@ -1,13 +1,11 @@
-import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 
 const inputSchema = {
   ...nodeParam,
-  confirm: z
-    .boolean()
-    .describe("Must be true to trigger a backup. Safety check."),
+  ...confirmParam,
 };
 
 export function register(server: McpServer): void {
@@ -16,15 +14,11 @@ export function register(server: McpServer): void {
     "Trigger a restic backup on the Pi",
     inputSchema,
     async (args) => {
+      if (!args.confirm) {
+        return confirmCancelled("Backup");
+      }
+
       try {
-        if (!args.confirm) {
-          return {
-            content: [{
-              type: "text" as const,
-              text: "Backup cancelled. Set confirm=true to proceed.",
-            }],
-          };
-        }
 
         const output = await execSSH(
           "sudo /opt/backup/backup.sh 2>&1 || echo 'Backup script not found at /opt/backup/backup.sh'",

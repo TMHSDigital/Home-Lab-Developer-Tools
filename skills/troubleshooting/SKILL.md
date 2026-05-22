@@ -126,6 +126,7 @@ Use this skill when the user wants to:
 
 ## Common Pitfalls
 
+- **Confirm gate on restart and redeploy** -- `homelab_serviceRestart`, `homelab_composeUp`, and `homelab_composeDown` require `confirm=true`. If a restart call returns "cancelled", the gate is the reason.
 - **Reading only the last few log lines** -- some errors are logged at startup, not at the crash. Always pull enough log history to see the initial error.
 - **Restarting without diagnosing** -- blindly restarting a crashing container just resets the restart counter. Find the root cause in logs first.
 - **Ignoring Pi throttling** -- performance degradation and random service failures can be caused by undervoltage or overheating. Always check `homelab_piStatus` for hardware issues.

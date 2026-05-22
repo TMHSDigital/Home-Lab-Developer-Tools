@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -17,9 +18,7 @@ const inputSchema = {
     .string()
     .optional()
     .describe("Only restore files matching this pattern (e.g. /opt/homelab/docker/)"),
-  confirm: z
-    .boolean()
-    .describe("Must be true to proceed with restore. Safety check."),
+  ...confirmParam,
 };
 
 export function register(server: McpServer): void {
@@ -28,15 +27,11 @@ export function register(server: McpServer): void {
     "Restore files from a restic backup snapshot to a target path on the Pi",
     inputSchema,
     async (args) => {
+      if (!args.confirm) {
+        return confirmCancelled("Restore");
+      }
+
       try {
-        if (!args.confirm) {
-          return {
-            content: [{
-              type: "text" as const,
-              text: "Restore cancelled. Set confirm=true to proceed.",
-            }],
-          };
-        }
 
         const repo = process.env.HOMELAB_BACKUP_REPO || "/mnt/backup/restic";
         const includeFlag = args.include ? ` --include '${args.include}'` : "";

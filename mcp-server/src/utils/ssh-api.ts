@@ -6,7 +6,25 @@ import {
   SSHAuthError,
   SSHTimeoutError,
   CommandFailedError,
+  UnsafeCommandError,
 } from "./errors.js";
+
+const DANGEROUS_PATTERNS: Array<[RegExp, string]> = [
+  [/\brm\s+-[a-z]*r[a-z]*f?[a-z]*\s+(--no-preserve-root\s+)?\/(\s|\*|$)/i, "rm -rf /"],
+  [/\bmkfs(\.\w+)?\s+\/dev\//i, "mkfs on block device"],
+  [/\bdd\b[^|;&]*\bof=\/dev\//i, "dd to block device"],
+  [/:\(\)\s*\{\s*:\|:&\s*\};:/, "fork bomb"],
+  [/\bchmod\s+-R\s+777\s+\//, "chmod -R 777 /"],
+  [/\b(curl|wget)\b[^|]*\|\s*(sudo\s+)?(sh|bash)\b/i, "curl|sh pipe"],
+  [/\b(shutdown\s+-h|halt|poweroff)\b/i, "host power off"],
+];
+
+export function assertCommandSafe(command: string): void {
+  if (process.env.HOMELAB_ALLOW_DANGEROUS_COMMANDS === "true") return;
+  for (const [re, label] of DANGEROUS_PATTERNS) {
+    if (re.test(command)) throw new UnsafeCommandError(command, label);
+  }
+}
 
 const CONNECT_TIMEOUT_MS = 10_000;
 const EXEC_TIMEOUT_MS = 30_000;
@@ -19,8 +37,8 @@ interface NodeConfig {
 
 function getDefaultConfig(): NodeConfig {
   return {
-    host: process.env.HOMELAB_PI_HOST || "raspi5.local",
-    username: process.env.HOMELAB_PI_USER || "tmhs",
+    host: process.env.HOMELAB_PI_HOST || "raspberrypi.local",
+    username: process.env.HOMELAB_PI_USER || "pi",
     keyPath: process.env.HOMELAB_PI_KEY_PATH || "",
   };
 }
@@ -75,6 +93,13 @@ export async function execSSH(
   command: string,
   node?: string,
 ): Promise<string> {
+  assertCommandSafe(command);
+
+  if (process.env.HOMELAB_DRY_RUN && process.env.HOMELAB_DRY_RUN !== "false") {
+    const cfg = getNodeConfig(node);
+    return `[dry-run] would execute on ${cfg.host}: ${command}`;
+  }
+
   const { host, username, keyPath } = getNodeConfig(node);
 
   return new Promise((resolve, reject) => {

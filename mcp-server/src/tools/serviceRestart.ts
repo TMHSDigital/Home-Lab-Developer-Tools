@@ -2,10 +2,12 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 
 const inputSchema = {
   ...nodeParam,
   service: z.string().min(1).describe("Container name to restart"),
+  ...confirmParam,
 };
 
 export function register(server: McpServer): void {
@@ -14,6 +16,10 @@ export function register(server: McpServer): void {
     "Restart a Docker container on the Pi",
     inputSchema,
     async (args) => {
+      if (!args.confirm) {
+        return confirmCancelled("Restart");
+      }
+
       try {
         await execSSH(`docker restart ${args.service}`, args.node);
         const status = await execSSH(

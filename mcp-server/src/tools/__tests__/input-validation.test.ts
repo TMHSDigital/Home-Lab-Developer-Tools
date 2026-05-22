@@ -31,15 +31,29 @@ describe("input validation schemas", () => {
   describe("serviceRestart", () => {
     const schema = z.object({
       service: z.string().min(1),
+      confirm: z.boolean(),
     });
 
     it("rejects empty service name", () => {
-      expect(() => schema.parse({ service: "" })).toThrow();
+      expect(() => schema.parse({ service: "", confirm: true })).toThrow();
     });
 
     it("accepts valid service name", () => {
-      const result = schema.parse({ service: "nginx-proxy-manager" });
+      const result = schema.parse({ service: "nginx-proxy-manager", confirm: true });
       expect(result.service).toBe("nginx-proxy-manager");
+    });
+
+    it("rejects missing confirm", () => {
+      expect(() => schema.parse({ service: "prometheus" })).toThrow();
+    });
+
+    it("rejects non-boolean confirm", () => {
+      expect(() => schema.parse({ service: "prometheus", confirm: "yes" })).toThrow();
+    });
+
+    it("accepts boolean confirm", () => {
+      const result = schema.parse({ service: "prometheus", confirm: true });
+      expect(result.confirm).toBe(true);
     });
   });
 
@@ -139,16 +153,61 @@ describe("input validation schemas", () => {
   describe("composeUp", () => {
     const schema = z.object({
       stacks: z.array(z.string()).optional(),
+      confirm: z.boolean(),
+    });
+
+    it("rejects missing confirm", () => {
+      expect(() => schema.parse({})).toThrow();
+    });
+
+    it("rejects non-boolean confirm", () => {
+      expect(() => schema.parse({ confirm: "yes" })).toThrow();
+    });
+
+    it("accepts boolean confirm", () => {
+      const result = schema.parse({ confirm: true });
+      expect(result.confirm).toBe(true);
     });
 
     it("accepts empty stacks for all", () => {
-      const result = schema.parse({});
+      const result = schema.parse({ confirm: true });
       expect(result.stacks).toBeUndefined();
     });
 
     it("accepts specific stacks", () => {
-      const result = schema.parse({ stacks: ["compose.monitoring.yml"] });
+      const result = schema.parse({ stacks: ["compose.monitoring.yml"], confirm: true });
       expect(result.stacks).toEqual(["compose.monitoring.yml"]);
+    });
+  });
+
+  describe("composeDown", () => {
+    const schema = z.object({
+      stacks: z.array(z.string()).optional(),
+      removeVolumes: z.boolean().optional().default(false),
+      confirm: z.boolean(),
+    });
+
+    it("rejects missing confirm", () => {
+      expect(() => schema.parse({})).toThrow();
+    });
+
+    it("rejects non-boolean confirm", () => {
+      expect(() => schema.parse({ confirm: "yes" })).toThrow();
+    });
+
+    it("accepts boolean confirm", () => {
+      const result = schema.parse({ confirm: false });
+      expect(result.confirm).toBe(false);
+    });
+
+    it("defaults removeVolumes to false", () => {
+      const result = schema.parse({ confirm: true });
+      expect(result.removeVolumes).toBe(false);
+    });
+
+    it("accepts removeVolumes=true", () => {
+      const result = schema.parse({ confirm: true, removeVolumes: true });
+      expect(result.removeVolumes).toBe(true);
     });
   });
 

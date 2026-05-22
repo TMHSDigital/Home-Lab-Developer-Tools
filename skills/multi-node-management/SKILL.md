@@ -42,9 +42,9 @@ Set the `HOMELAB_NODES` environment variable as JSON:
 
 ```json
 {
-  "pi5": { "host": "raspi5.local", "user": "tmhs", "keyPath": "~/.ssh/id_ed25519_pi" },
-  "nas": { "host": "nas.local", "user": "admin", "keyPath": "~/.ssh/id_ed25519_nas" },
-  "pi-zero": { "host": "pizero.local", "user": "pi", "keyPath": "~/.ssh/id_ed25519_pz" }
+  "pi5": { "host": "raspberrypi.local", "user": "pi", "keyPath": "~/.ssh/id_ed25519" },
+  "nas": { "host": "nas.local", "user": "admin", "keyPath": "~/.ssh/id_ed25519" },
+  "pi-zero": { "host": "pizero.local", "user": "pi", "keyPath": "~/.ssh/id_ed25519" }
 }
 ```
 
@@ -90,7 +90,7 @@ Add this to your MCP config's `env` block. The default node (from `HOMELAB_PI_*`
 1. You need to add the NAS to your node registry. Update your MCP config's env to include:
 
    ```json
-   "HOMELAB_NODES": "{\"nas\":{\"host\":\"nas.local\",\"user\":\"admin\",\"keyPath\":\"~/.ssh/id_ed25519_nas\"}}"
+   "HOMELAB_NODES": "{\"nas\":{\"host\":\"nas.local\",\"user\":\"admin\",\"keyPath\":\"~/.ssh/id_ed25519\"}}"
    ```
 
 2. After restarting the MCP server, let me check both nodes.
@@ -98,7 +98,7 @@ Add this to your MCP config's `env` block. The default node (from `HOMELAB_PI_*`
    *Calls `homelab_nodeList`*
 
    Both nodes are online:
-   - default (raspi5.local) -- online
+   - default (raspberrypi.local) -- online
    - nas (nas.local) -- online
 
 3. Let me check the NAS status.

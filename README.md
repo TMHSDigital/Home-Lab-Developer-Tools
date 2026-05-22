@@ -146,9 +146,9 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
       "args": ["./mcp-server/dist/index.js"],
       "cwd": "<path-to>/Home-Lab-Developer-Tools",
       "env": {
-        "HOMELAB_PI_HOST": "raspi5.local",
-        "HOMELAB_PI_USER": "tmhs",
-        "HOMELAB_PI_KEY_PATH": "~/.ssh/id_ed25519_pi"
+        "HOMELAB_PI_HOST": "raspberrypi.local",
+        "HOMELAB_PI_USER": "pi",
+        "HOMELAB_PI_KEY_PATH": "~/.ssh/id_ed25519"
       }
     }
   }

@@ -2,13 +2,12 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 
 const inputSchema = {
   ...nodeParam,
   volume: z.string().min(1).describe("Docker volume name to back up"),
-  confirm: z
-    .boolean()
-    .describe("Must be true to trigger backup. Safety check."),
+  ...confirmParam,
 };
 
 export function register(server: McpServer): void {
@@ -17,15 +16,11 @@ export function register(server: McpServer): void {
     "Back up a specific Docker volume to the restic repository",
     inputSchema,
     async (args) => {
+      if (!args.confirm) {
+        return confirmCancelled("Volume backup");
+      }
+
       try {
-        if (!args.confirm) {
-          return {
-            content: [{
-              type: "text" as const,
-              text: "Volume backup cancelled. Set confirm=true to proceed.",
-            }],
-          };
-        }
 
         const repo = process.env.HOMELAB_BACKUP_REPO || "/mnt/backup/restic";
         const volumePath = `/var/lib/docker/volumes/${args.volume}/_data`;

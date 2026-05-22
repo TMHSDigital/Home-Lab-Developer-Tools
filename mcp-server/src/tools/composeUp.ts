@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 
 const COMPOSE_DIR = process.env.HOMELAB_COMPOSE_DIR || "/opt/homelab/docker";
 
@@ -11,6 +12,7 @@ const inputSchema = {
     .array(z.string())
     .optional()
     .describe("Specific compose files to start (e.g. ['compose.monitoring.yml']). Omit for all."),
+  ...confirmParam,
 };
 
 export function register(server: McpServer): void {
@@ -19,6 +21,10 @@ export function register(server: McpServer): void {
     "Start Docker Compose stacks on the Pi",
     inputSchema,
     async (args) => {
+      if (!args.confirm) {
+        return confirmCancelled("Compose up");
+      }
+
       try {
         let files = "-f compose.base.yml";
         if (args.stacks && args.stacks.length > 0) {

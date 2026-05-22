@@ -28,6 +28,6 @@ jobs:
             --exclude "localhost"
             --exclude "127.0.0.1"
             --exclude "example.com"
-            --exclude "raspi5.local"
+            --exclude "raspberrypi.local"
             "**/*.md"
             "**/*.mdc"
