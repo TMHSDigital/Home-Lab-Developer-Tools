@@ -175,14 +175,14 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 |---|---|
 | `homelab_serviceHealth` | Docker container health status |
 | `homelab_serviceLogs` | Tail container logs |
-| `homelab_serviceRestart` | Restart a container |
+| `homelab_serviceRestart` | Restart a container (requires confirm=true) |
 
 **Compose** (4)
 
 | Tool | What It Does |
 |---|---|
-| `homelab_composeUp` | Start compose stacks (all or specific) |
-| `homelab_composeDown` | Stop compose stacks |
+| `homelab_composeUp` | Start compose stacks (all or specific) (requires confirm=true) |
+| `homelab_composeDown` | Stop compose stacks (requires confirm=true) |
 | `homelab_composePull` | Pull latest images |
 | `homelab_composePs` | List running compose containers |
 
@@ -231,6 +231,28 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_fail2banStatus` | List fail2ban jails, banned IPs, and ban counts |
 | `homelab_openPorts` | Scan listening TCP ports and map to processes |
 | `homelab_containerScan` | Scan container images for vulnerabilities via Trivy |
+
+**Logs** (2)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_journalLogs` | Query systemd journal with unit, priority, and time filters |
+| `homelab_logSearch` | Search across container logs with grep patterns |
+
+**Notifications** (2)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_ntfySend` | Send a push notification via Ntfy |
+| `homelab_ntfyTopics` | List Ntfy topics and recent messages |
+
+**Certificates** (3)
+
+| Tool | What It Does |
+|---|---|
+| `homelab_certCheck` | Check SSL certificate expiry, issuer, and fingerprint |
+| `homelab_certRenew` | Trigger Let's Encrypt certificate renewal (requires confirm=true) |
+| `homelab_certList` | List all managed certificates from certbot and NPM |
 
 **OS / Packages** (4)
 
@@ -369,9 +391,9 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 | **v0.8.0** | **SSL/TLS Certificates** | **+3** | **+1** | **--** | **44** |
 | **v0.9.0** | **Multi-Node Foundation** | **+4** | **+1** | **+1** | **48** |
 | **v0.10.0** | **Testing Infrastructure** | **+2** | **--** | **--** | **50** |
-| v0.11.0 | Documentation Site | -- | -- | -- | 50 |
-| v0.12.0 | Polish and Hardening | +2 | -- | -- | 52 |
-| **v1.0.0** | **Stable Release** | -- | -- | -- | **52** |
+| **v0.14.0** | **Security Hardening** | **--** | **--** | **--** | **50** |
+| v0.15.0 | Documentation Site | -- | -- | -- | 50 |
+| v1.0.0 | Stable Release | -- | -- | -- | 50 |
 
 See [ROADMAP.md](ROADMAP.md) for detailed per-version tool, skill, and rule breakdowns.
 
