@@ -322,19 +322,38 @@ Then add the JSON config from the [MCP Server section](#companion-home-lab-mcp-s
 
 ### Claude Code (terminal or in Cursor)
 
-Claude Code reads `CLAUDE.md` automatically when you open this repo. For the MCP server, register it with:
+Claude Code reads `CLAUDE.md` automatically when you open this repo. To register the MCP server from the published npm package (no build needed):
+
+```bash
+# macOS / Linux
+claude mcp add homelab \
+  -e HOMELAB_PI_HOST=raspberrypi.local \
+  -e HOMELAB_PI_USER=pi \
+  -e HOMELAB_PI_KEY_PATH=~/.ssh/id_ed25519 \
+  -- npx -y @tmhs/homelab-mcp
+```
+
+```powershell
+# Windows (PowerShell)
+claude mcp add homelab `
+  -e HOMELAB_PI_HOST=raspberrypi.local `
+  -e HOMELAB_PI_USER=pi `
+  -e HOMELAB_PI_KEY_PATH=~/.ssh/id_ed25519 `
+  -- npx -y @tmhs/homelab-mcp
+```
+
+To run a local build instead, build it and point Claude Code at the absolute path of `dist/index.js`:
 
 ```bash
 cd mcp-server && npm install && npm run build
-claude mcp add homelab node ./mcp-server/dist/index.js
+claude mcp add homelab \
+  -e HOMELAB_PI_HOST=raspberrypi.local \
+  -e HOMELAB_PI_USER=pi \
+  -e HOMELAB_PI_KEY_PATH=~/.ssh/id_ed25519 \
+  -- node "$(pwd)/dist/index.js"
 ```
 
-Or if installed globally via npm:
-
-```bash
-npm install -g @tmhs/homelab-mcp
-claude mcp add homelab -- npx @tmhs/homelab-mcp
-```
+`HOMELAB_PI_KEY_PATH` may start with `~`; it is expanded to your home directory. See the [mcp-server configuration reference](mcp-server/README.md#configuration) and [`.env.example`](.env.example) for every setting.
 
 ### Other MCP clients
 
