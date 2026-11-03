@@ -17,7 +17,14 @@ vi.mock("../../utils/ssh-api.js", () => ({
     { name: "default", host: "raspberrypi.local" },
     { name: "nas", host: "nas.local" },
   ]),
-  getNodeConfig: vi.fn(),
+  getNodeConfig: vi.fn((node?: string) =>
+    node === "nas"
+      ? { host: "nas.local", username: "admin", keyPath: "", env: { HOMELAB_BACKUP_REPO: "/srv/restic" } }
+      : { host: "raspberrypi.local", username: "pi", keyPath: "", env: {} },
+  ),
+  nodeSetting: vi.fn((node: string | undefined, key: string) =>
+    node === "nas" && key === "HOMELAB_BACKUP_REPO" ? "/srv/restic" : process.env[key] || undefined,
+  ),
 }));
 
 import { execSSH, listNodes } from "../../utils/ssh-api.js";
@@ -172,6 +179,31 @@ describe("integration tests (mocked SSH)", () => {
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain("wrong password");
       expect(mockExecSSH.mock.calls[0][0]).not.toContain("2>/dev/null");
+    });
+  });
+
+  describe("per-node settings", () => {
+    it("sshTest reports the targeted node's user and host", async () => {
+      mockExecSSH.mockResolvedValueOnce("ok\nnas\nup 3 days");
+
+      const { register } = await import("../sshTest.js");
+      const handler = captureHandler(register);
+      const result = await handler({ node: "nas" });
+
+      expect(result.content[0].text).toContain("SSH connection to admin@nas.local: OK");
+      expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+    });
+
+    it("backup tools use the node's HOMELAB_BACKUP_REPO override", async () => {
+      mockExecSSH.mockResolvedValue("[]");
+
+      const { register } = await import("../backupList.js");
+      const handler = captureHandler(register);
+      await handler({ node: "nas" });
+      await handler({});
+
+      expect(mockExecSSH.mock.calls[0][0]).toContain("restic -r /srv/restic ");
+      expect(mockExecSSH.mock.calls[1][0]).toContain("restic -r /mnt/backup/restic ");
     });
   });
 

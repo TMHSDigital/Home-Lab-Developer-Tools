@@ -57,10 +57,12 @@ export function defaultExecTimeoutMs(): number {
   return Number.isFinite(n) && n > 0 ? n : DEFAULT_EXEC_TIMEOUT_MS;
 }
 
-interface NodeConfig {
+export interface NodeConfig {
   host: string;
   username: string;
   keyPath: string;
+  /** Per-node overrides for HOMELAB_* settings (compose dir, backup repo, ports, ...). */
+  env: Record<string, string>;
 }
 
 function getDefaultConfig(): NodeConfig {
@@ -68,11 +70,43 @@ function getDefaultConfig(): NodeConfig {
     host: process.env.HOMELAB_PI_HOST || "raspberrypi.local",
     username: process.env.HOMELAB_PI_USER || "pi",
     keyPath: process.env.HOMELAB_PI_KEY_PATH || "",
+    env: {},
   };
 }
 
 function optionalString(value: unknown): string {
   return typeof value === "string" ? value : "";
+}
+
+const SETTING_KEY_RE = /^HOMELAB_[A-Z0-9_]+$/;
+
+function parseNodeEnv(name: string, value: unknown): Record<string, string> {
+  if (value === undefined) return {};
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new SSHError(`HOMELAB_NODES entry "${name}": "env" must be an object of HOMELAB_* settings.`);
+  }
+  const env: Record<string, string> = {};
+  for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
+    if (!SETTING_KEY_RE.test(key)) {
+      throw new SSHError(`HOMELAB_NODES entry "${name}": env key "${key}" must look like HOMELAB_*.`);
+    }
+    if (typeof v !== "string" && typeof v !== "number") {
+      throw new SSHError(`HOMELAB_NODES entry "${name}": env value for ${key} must be a string or number.`);
+    }
+    env[key] = String(v);
+  }
+  return env;
+}
+
+/**
+ * Resolve a HOMELAB_* setting for a node: the node's `env` override from
+ * HOMELAB_NODES first, then the process environment.
+ */
+export function nodeSetting(node: string | undefined, key: string): string | undefined {
+  const override = getNodeConfig(node).env[key];
+  if (override !== undefined && override !== "") return override;
+  const value = process.env[key];
+  return value === undefined || value === "" ? undefined : value;
 }
 
 /**
@@ -94,7 +128,7 @@ function getNodesRegistry(): Map<string, NodeConfig> {
 
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
     throw new SSHError(
-      'HOMELAB_NODES must be a JSON object mapping node names to {"host", "user", "keyPath"}.',
+      'HOMELAB_NODES must be a JSON object mapping node names to {"host", "user", "keyPath", "env"}.',
     );
   }
 
@@ -111,6 +145,7 @@ function getNodesRegistry(): Map<string, NodeConfig> {
       host,
       username: optionalString(c.user) || optionalString(c.username) || "pi",
       keyPath: optionalString(c.keyPath),
+      env: parseNodeEnv(name, c.env),
     });
   }
   return registry;

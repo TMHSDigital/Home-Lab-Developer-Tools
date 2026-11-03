@@ -29,7 +29,7 @@ export function register(server: McpServer): void {
 
       try {
         const output = await execSSH(
-          buildComposeCommand("up -d --remove-orphans 2>&1", args.stacks),
+          buildComposeCommand("up -d --remove-orphans 2>&1", args.stacks, args.node),
           args.node,
           { timeoutMs: TIMEOUTS.medium },
         );

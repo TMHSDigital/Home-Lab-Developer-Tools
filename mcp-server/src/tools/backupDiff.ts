@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { backupRepo } from "../utils/config.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -16,7 +17,7 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       try {
-        const repo = process.env.HOMELAB_BACKUP_REPO || "/mnt/backup/restic";
+        const repo = backupRepo(args.node);
         const output = await execSSH(
           `sudo restic -r ${repo} diff '${args.snapshotA}' '${args.snapshotB}' 2>&1`,
           args.node,

@@ -1,3 +1,5 @@
+import { nodeSetting } from "./ssh-api.js";
+
 /**
  * Shared compose file selection for composeUp, composeDown, composePull and
  * composePs.
@@ -34,13 +36,13 @@ const SINGLE_FILE_FALLBACKS = [
 /** Allowed characters for file names configured via HOMELAB_COMPOSE_FILES. */
 const COMPOSE_FILE_RE = /^[A-Za-z0-9._/-]+$/;
 
-export function composeDir(): string {
-  return process.env.HOMELAB_COMPOSE_DIR || DEFAULT_COMPOSE_DIR;
+export function composeDir(node?: string): string {
+  return nodeSetting(node, "HOMELAB_COMPOSE_DIR") || DEFAULT_COMPOSE_DIR;
 }
 
 /** Parse HOMELAB_COMPOSE_FILES; returns null when unset or empty. */
-export function configuredComposeFiles(): string[] | null {
-  const raw = process.env.HOMELAB_COMPOSE_FILES;
+export function configuredComposeFiles(node?: string): string[] | null {
+  const raw = nodeSetting(node, "HOMELAB_COMPOSE_FILES");
   if (!raw || !raw.trim()) return null;
   const files = raw
     .split(",")
@@ -83,8 +85,8 @@ function discoverySnippet(dir: string): string {
  * When `stacks` is given, compose.base.yml is passed first followed by each
  * requested file (unchanged behavior).
  */
-export function buildComposeCommand(action: string, stacks?: string[]): string {
-  const dir = composeDir();
+export function buildComposeCommand(action: string, stacks?: string[], node?: string): string {
+  const dir = composeDir(node);
   const cd = `cd ${dir} || exit 1`;
 
   if (stacks && stacks.length > 0) {
@@ -92,7 +94,7 @@ export function buildComposeCommand(action: string, stacks?: string[]): string {
     return `${cd}; docker compose ${files} ${action}`;
   }
 
-  const configured = configuredComposeFiles();
+  const configured = configuredComposeFiles(node);
   if (configured) {
     const files = configured.map((f) => `-f ${f}`).join(" ");
     return `${cd}; docker compose ${files} ${action}`;

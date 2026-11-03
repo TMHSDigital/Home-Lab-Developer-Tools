@@ -21,7 +21,7 @@ export function register(server: McpServer): void {
     async (args) => {
       try {
         const output = await execSSH(
-          buildComposeCommand("pull 2>&1", args.stacks),
+          buildComposeCommand("pull 2>&1", args.stacks, args.node),
           args.node,
           { timeoutMs: TIMEOUTS.long },
         );

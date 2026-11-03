@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
 import { resticErrorResponse } from "../utils/restic.js";
 import { nodeParam } from "../utils/node-param.js";
+import { backupRepo } from "../utils/config.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -17,8 +18,9 @@ export function register(server: McpServer): void {
     "List all restic backup snapshots with optional filtering by path, tag, or host",
     inputSchema,
     async (args) => {
-      const repo = process.env.HOMELAB_BACKUP_REPO || "/mnt/backup/restic";
+      let repo = "";
       try {
+        repo = backupRepo(args.node);
         const flags: string[] = [];
         if (args.path) flags.push(`--path '${args.path}'`);
         if (args.tag) flags.push(`--tag '${args.tag}'`);

@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
 import { resticErrorResponse } from "../utils/restic.js";
 import { nodeParam } from "../utils/node-param.js";
+import { backupRepo } from "../utils/config.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -22,8 +23,9 @@ export function register(server: McpServer): void {
     "Check the latest restic backup snapshots on the Pi",
     inputSchema,
     async (args) => {
-      const repo = process.env.HOMELAB_BACKUP_REPO || "/mnt/backup/restic";
+      let repo = "";
       try {
+        repo = backupRepo(args.node);
         const output = await execSSH(
           `sudo restic -r ${repo} snapshots --latest ${args.count}`,
           args.node,

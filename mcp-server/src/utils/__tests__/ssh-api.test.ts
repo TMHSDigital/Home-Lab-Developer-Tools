@@ -9,6 +9,7 @@ import {
   isDryRun,
   getNodeConfig,
   listNodes,
+  nodeSetting,
 } from "../ssh-api.js";
 import { SSHAuthError, SSHError } from "../errors.js";
 
@@ -67,7 +68,7 @@ describe("node registry", () => {
       zero: { host: "zero.local", username: "ops" },
       other: { host: "other.local" },
     });
-    expect(getNodeConfig("nas")).toEqual({ host: "nas.local", username: "admin", keyPath: "~/.ssh/k" });
+    expect(getNodeConfig("nas")).toEqual({ host: "nas.local", username: "admin", keyPath: "~/.ssh/k", env: {} });
     expect(getNodeConfig("zero").username).toBe("ops");
     expect(getNodeConfig("other").username).toBe("pi");
     expect(listNodes().map((n) => n.name)).toEqual(["default", "nas", "zero", "other"]);
@@ -89,6 +90,25 @@ describe("node registry", () => {
   it("throws for unknown nodes and lists the available ones", () => {
     process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local" } });
     expect(() => getNodeConfig("typo")).toThrow(/Unknown node "typo"\. Available nodes: default, nas/);
+  });
+
+  it("resolves per-node settings before the process environment", () => {
+    process.env.HOMELAB_BACKUP_REPO = "/mnt/global";
+    process.env.HOMELAB_NODES = JSON.stringify({
+      nas: { host: "nas.local", env: { HOMELAB_BACKUP_REPO: "/srv/restic", HOMELAB_NPM_PORT: 8181 } },
+    });
+    expect(nodeSetting("nas", "HOMELAB_BACKUP_REPO")).toBe("/srv/restic");
+    expect(nodeSetting("nas", "HOMELAB_NPM_PORT")).toBe("8181");
+    expect(nodeSetting(undefined, "HOMELAB_BACKUP_REPO")).toBe("/mnt/global");
+    expect(nodeSetting("nas", "HOMELAB_COMPOSE_DIR")).toBeUndefined();
+    delete process.env.HOMELAB_BACKUP_REPO;
+  });
+
+  it("rejects malformed per-node env overrides", () => {
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local", env: { PATH: "/x" } } });
+    expect(() => getNodeConfig("nas")).toThrow(/must look like HOMELAB_/);
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local", env: ["x"] } });
+    expect(() => getNodeConfig("nas")).toThrow(/"env" must be an object/);
   });
 
   it("returns the env config for 'default' when not in the registry", () => {

@@ -11,7 +11,7 @@ export function register(server: McpServer): void {
     async (args) => {
       try {
         const output = await execSSH(
-          buildComposeCommand(`ps --format "table {{.Name}}\\t{{.Status}}\\t{{.Ports}}" 2>&1`),
+          buildComposeCommand(`ps --format "table {{.Name}}\\t{{.Status}}\\t{{.Ports}}" 2>&1`, undefined, args.node),
           args.node,
         );
 

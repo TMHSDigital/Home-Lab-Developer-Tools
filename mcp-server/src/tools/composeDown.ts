@@ -32,7 +32,7 @@ export function register(server: McpServer): void {
       try {
         const volFlag = args.removeVolumes ? " -v" : "";
         const output = await execSSH(
-          buildComposeCommand(`down${volFlag} 2>&1`, args.stacks),
+          buildComposeCommand(`down${volFlag} 2>&1`, args.stacks, args.node),
           args.node,
           { timeoutMs: TIMEOUTS.medium },
         );
