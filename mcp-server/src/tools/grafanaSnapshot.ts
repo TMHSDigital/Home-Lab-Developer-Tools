@@ -60,7 +60,8 @@ export function register(server: McpServer): void {
               new Error(
                 `${SERVICE_NAME} returned an HTTP error. Check authentication -- ` +
                   `set HOMELAB_GRAFANA_TOKEN (API key) or HOMELAB_GRAFANA_USER/HOMELAB_GRAFANA_PASSWORD. ` +
-                  `Also verify the dashboard UID "${args.dashboard}" exists.`,
+                  `Also verify the dashboard UID "${args.dashboard}" exists, and that port ${port} is Grafana ` +
+                  `(AdGuard Home also defaults to 3000; set HOMELAB_GRAFANA_PORT if needed).`,
               ),
             );
           }

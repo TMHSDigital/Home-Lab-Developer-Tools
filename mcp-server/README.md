@@ -86,7 +86,7 @@ Set environment variables:
 | `HOMELAB_SPEEDTEST_PORT` | `8765` | Speedtest Tracker port override |
 | `HOMELAB_ADGUARD_USER` | `admin` | AdGuard Home username |
 | `HOMELAB_ADGUARD_PASSWORD` | `admin` | AdGuard Home password |
-| `HOMELAB_ADGUARD_PORT` | `3000` | AdGuard Home port override |
+| `HOMELAB_ADGUARD_PORT` | `3000` | AdGuard Home web UI port. AdGuard and Grafana both default to 3000; if both run on the same host, set this (or `HOMELAB_GRAFANA_PORT`) to the port each actually uses |
 | `HOMELAB_NPM_EMAIL` | `admin@example.com` | NPM admin email |
 | `HOMELAB_NPM_PASSWORD` | `changeme` | NPM admin password |
 | `HOMELAB_NPM_PORT` | `81` | NPM admin API port override |

@@ -45,8 +45,10 @@ export function register(server: McpServer): void {
           if (error.exitCode === 22) {
             return errorResponse(
               new Error(
-                `${SERVICE_NAME} returned an HTTP error. Check authentication -- ` +
-                  `set HOMELAB_ADGUARD_USER and HOMELAB_ADGUARD_PASSWORD.`,
+                `${SERVICE_NAME} on port ${port} returned an HTTP error. Check authentication -- ` +
+                  `set HOMELAB_ADGUARD_USER and HOMELAB_ADGUARD_PASSWORD. Also check the port: ` +
+                  `AdGuard Home and Grafana both default to 3000, so if Grafana uses it, ` +
+                  `set HOMELAB_ADGUARD_PORT to the AdGuard web UI port.`,
               ),
             );
           }
