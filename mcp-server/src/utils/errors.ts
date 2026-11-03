@@ -16,9 +16,10 @@ export class SSHConnectionError extends SSHError {
 }
 
 export class SSHAuthError extends SSHError {
-  constructor() {
+  constructor(message?: string) {
     super(
-      "SSH authentication failed. Check your key path (HOMELAB_PI_KEY_PATH) and username (HOMELAB_PI_USER).",
+      message ??
+        "SSH authentication failed. Check your key path (HOMELAB_PI_KEY_PATH) and username (HOMELAB_PI_USER).",
     );
     this.name = "SSHAuthError";
   }

@@ -1,4 +1,6 @@
 import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import { Client } from "ssh2";
 import {
   SSHError,
@@ -89,6 +91,34 @@ export function listNodes(): { name: string; host: string }[] {
   return nodes;
 }
 
+/**
+ * Expand a leading "~" to the user's home directory. MCP clients and CI
+ * runners pass env values literally (no shell), so "~/.ssh/id_ed25519"
+ * would otherwise be treated as a relative path.
+ */
+export function expandHome(p: string): string {
+  if (p === "~") return homedir();
+  if (p.startsWith("~/") || p.startsWith("~\\")) {
+    return join(homedir(), p.slice(2));
+  }
+  return p;
+}
+
+/** Read the private key, mapping file errors to a clear SSHAuthError. */
+export function loadPrivateKey(keyPath: string): Buffer | undefined {
+  if (!keyPath) return undefined;
+  const resolved = expandHome(keyPath);
+  try {
+    return readFileSync(resolved);
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    throw new SSHAuthError(
+      `Cannot read SSH private key at "${resolved}" (${reason}). ` +
+        "Check HOMELAB_PI_KEY_PATH (or keyPath in HOMELAB_NODES).",
+    );
+  }
+}
+
 export async function execSSH(
   command: string,
   node?: string,
@@ -101,6 +131,9 @@ export async function execSSH(
   }
 
   const { host, username, keyPath } = getNodeConfig(node);
+  // Read the key before arming the timer so a bad path fails fast and
+  // does not leave a pending timeout behind.
+  const privateKey = loadPrivateKey(keyPath);
 
   return new Promise((resolve, reject) => {
     const conn = new Client();
@@ -167,7 +200,7 @@ export async function execSSH(
         host,
         port: 22,
         username,
-        privateKey: keyPath ? readFileSync(keyPath) : undefined,
+        privateKey,
         agent: process.env.SSH_AUTH_SOCK,
         readyTimeout: CONNECT_TIMEOUT_MS,
       });

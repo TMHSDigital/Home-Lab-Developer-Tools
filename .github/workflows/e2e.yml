@@ -42,7 +42,7 @@ jobs:
           HOMELAB_TEST_PI: "true"
           HOMELAB_PI_HOST: ${{ secrets.PI_HOST }}
           HOMELAB_PI_USER: ${{ secrets.PI_USER }}
-          HOMELAB_PI_KEY_PATH: ~/.ssh/pi_key
+          HOMELAB_PI_KEY_PATH: /home/runner/.ssh/pi_key
 
       - name: Clean up
         if: always()
