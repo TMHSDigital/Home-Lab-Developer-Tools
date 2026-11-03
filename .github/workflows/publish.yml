@@ -1,5 +1,5 @@
 ---
-name: Publish to npm (manual release fallback)
+name: Publish to npm (trusted publishing)
 
 on:
   release:

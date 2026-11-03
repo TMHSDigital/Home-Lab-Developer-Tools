@@ -9,7 +9,7 @@ on:
 
 permissions:
   contents: write
-  id-token: write
+  actions: write
 
 jobs:
   tag-release-publish:
@@ -57,26 +57,14 @@ jobs:
             --generate-notes \
             --latest
 
-      - name: Setup Node.js
+      # npm trusted publishing (OIDC) is bound to publish.yml, so publishing
+      # must run there. Releases created with GITHUB_TOKEN do not trigger
+      # other workflows, but workflow_dispatch does.
+      - name: Dispatch npm publish
         if: steps.version.outputs.changed == 'true' && steps.check-tag.outputs.exists == 'false'
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-          cache: npm
-          cache-dependency-path: mcp-server/package-lock.json
-
-      - name: Install, build, test
-        if: steps.version.outputs.changed == 'true' && steps.check-tag.outputs.exists == 'false'
-        working-directory: mcp-server
-        run: |
-          npm ci
-          npm run build
-          npm test
-
-      - name: Publish to npm
-        if: steps.version.outputs.changed == 'true' && steps.check-tag.outputs.exists == 'false'
-        working-directory: mcp-server
-        run: npm publish --provenance --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run publish.yml \
+            --ref main \
+            -f tag="v${{ steps.version.outputs.current }}"

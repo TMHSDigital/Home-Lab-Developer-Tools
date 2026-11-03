@@ -218,8 +218,8 @@ Checklist before pushing a release:
 Publishing pipeline (fully automated):
 
 1. Push version bump in `mcp-server/package.json` to `main`
-2. `auto-tag.yml` detects the change, creates git tag `vX.Y.Z`, creates GitHub Release, then builds, tests, and publishes to npm with provenance -- all in one workflow
-3. `publish.yml` exists as a manual fallback only
+2. `auto-tag.yml` detects the change, creates git tag `vX.Y.Z`, creates GitHub Release, then dispatches `publish.yml`
+3. `publish.yml` builds, tests, and publishes to npm via trusted publishing (OIDC, no `NPM_TOKEN`); the npm trusted publisher is bound to this filename, so publishing must stay in `publish.yml`
 4. Never create tags, releases, or npm publishes manually
 
 ## Home Lab Context
