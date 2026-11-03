@@ -10,18 +10,41 @@ interface CheckResult {
   detail: string;
 }
 
-async function runCheck(
-  name: string,
-  command: string,
-  node?: string,
-): Promise<CheckResult> {
-  try {
-    const output = await execSSH(command, node);
-    return { name, status: "pass", detail: output.split("\n")[0] };
-  } catch (error) {
-    const reason = error instanceof Error ? error.message.split("\n")[0] : String(error);
-    return { name, status: "fail", detail: reason || "not available" };
+/** Checks run on the node in a single SSH round trip. Commands are constants. */
+const CHECKS: Array<[name: string, command: string]> = [
+  ["Docker", "docker --version"],
+  ["Docker Compose", "docker compose version"],
+  ["curl", "command -v curl"],
+  ["restic", "command -v restic"],
+  ["certbot", "command -v certbot"],
+  ["systemd", "systemctl --version"],
+];
+
+const MARK = "@@CHECK";
+
+export function buildHealthCheckScript(): string {
+  return CHECKS.map(
+    ([name, cmd]) =>
+      `if out=$( { ${cmd}; } 2>&1 ); then s=pass; else s=fail; fi; ` +
+      `printf '%s|%s|%s|%s\\n' '${MARK}' "$s" '${name}' "$(printf '%s' "$out" | head -1)"`,
+  ).join("; ") + "; true";
+}
+
+export function parseHealthCheckOutput(output: string): CheckResult[] {
+  const results: CheckResult[] = [];
+  for (const line of output.split("\n")) {
+    if (!line.startsWith(`${MARK}|`)) continue;
+    const rest = line.slice(MARK.length + 1);
+    const [status, name, ...detail] = rest.split("|");
+    if (status !== "pass" && status !== "fail") continue;
+    const text = detail.join("|").trim();
+    results.push({
+      name,
+      status,
+      detail: text || (status === "pass" ? "ok" : "not available"),
+    });
   }
+  return results;
 }
 
 export function register(server: McpServer): void {
@@ -30,44 +53,41 @@ export function register(server: McpServer): void {
     "Comprehensive self-test: SSH connectivity, Docker, required tools",
     inputSchema,
     async (args) => {
+      let output: string;
       try {
-        const checks: CheckResult[] = [];
-
-        const ssh = await runCheck("SSH connectivity", "echo ok", args.node);
-        checks.push(ssh);
-        if (ssh.status === "fail") {
-          // Every other check depends on SSH; report the cause and stop.
-          return {
-            content: [{
-              type: "text" as const,
-              text: `[FAIL] SSH connectivity: ${ssh.detail}\n\nRemaining checks skipped.`,
-            }],
-            isError: true,
-          };
-        }
-        checks.push(await runCheck("Docker", "docker --version", args.node));
-        checks.push(
-          await runCheck("Docker Compose", "docker compose version", args.node),
-        );
-        checks.push(await runCheck("curl", "command -v curl", args.node));
-        checks.push(await runCheck("restic", "command -v restic", args.node));
-        checks.push(await runCheck("certbot", "command -v certbot", args.node));
-        checks.push(
-          await runCheck("systemd", "systemctl --version | head -1", args.node),
-        );
-
-        const passed = checks.filter((c) => c.status === "pass").length;
-        const lines = checks.map(
-          (c) => `[${c.status === "pass" ? "PASS" : "FAIL"}] ${c.name}: ${c.detail}`,
-        );
-        lines.push("", `${passed}/${checks.length} checks passed`);
-
-        return {
-          content: [{ type: "text" as const, text: lines.join("\n") }],
-        };
+        output = await execSSH(buildHealthCheckScript(), args.node);
       } catch (error) {
-        return errorResponse(error);
+        // Every check depends on SSH; report the cause and stop.
+        const reason = error instanceof Error ? error.message.split("\n")[0] : String(error);
+        const base = errorResponse(error);
+        return {
+          ...base,
+          content: [{
+            type: "text" as const,
+            text: `[FAIL] SSH connectivity: ${reason}\n\nRemaining checks skipped.`,
+          }],
+        };
       }
+
+      const parsed = parseHealthCheckOutput(output);
+      if (parsed.length === 0) {
+        // For example dry-run mode: show what would have run.
+        return { content: [{ type: "text" as const, text: output }] };
+      }
+
+      const checks: CheckResult[] = [
+        { name: "SSH connectivity", status: "pass", detail: "ok" },
+        ...parsed,
+      ];
+      const passed = checks.filter((c) => c.status === "pass").length;
+      const lines = checks.map(
+        (c) => `[${c.status === "pass" ? "PASS" : "FAIL"}] ${c.name}: ${c.detail}`,
+      );
+      lines.push("", `${passed}/${checks.length} checks passed`);
+
+      return {
+        content: [{ type: "text" as const, text: lines.join("\n") }],
+      };
     },
   );
 }

@@ -30,15 +30,17 @@ describe("integration tests (mocked SSH)", () => {
   });
 
   describe("healthCheck", () => {
-    it("returns pass/fail checklist", async () => {
-      mockExecSSH
-        .mockResolvedValueOnce("ok")
-        .mockResolvedValueOnce("Docker version 24.0.7")
-        .mockResolvedValueOnce("Docker Compose version v2.23.0")
-        .mockResolvedValueOnce("/usr/bin/curl")
-        .mockResolvedValueOnce("/usr/bin/restic")
-        .mockRejectedValueOnce(new Error("not found"))
-        .mockResolvedValueOnce("systemd 252");
+    it("returns pass/fail checklist from a single round trip", async () => {
+      mockExecSSH.mockResolvedValueOnce(
+        [
+          "@@CHECK|pass|Docker|Docker version 24.0.7",
+          "@@CHECK|pass|Docker Compose|Docker Compose version v2.23.0",
+          "@@CHECK|pass|curl|/usr/bin/curl",
+          "@@CHECK|pass|restic|/usr/bin/restic",
+          "@@CHECK|fail|certbot|",
+          "@@CHECK|pass|systemd|systemd 252 (252.22-1)",
+        ].join("\n"),
+      );
 
       const { register } = await import("../healthCheck.js");
       const handler = captureHandler(register);
@@ -46,56 +48,67 @@ describe("integration tests (mocked SSH)", () => {
 
       const text = result.content[0].text;
       expect(text).toContain("[PASS] SSH connectivity");
-      expect(text).toContain("[PASS] Docker");
-      expect(text).toContain("[FAIL] certbot");
+      expect(text).toContain("[PASS] Docker: Docker version 24.0.7");
+      expect(text).toContain("[FAIL] certbot: not available");
       expect(text).toContain("6/7 checks passed");
+      expect(mockExecSSH).toHaveBeenCalledTimes(1);
     });
 
     it("passes node parameter to execSSH", async () => {
-      mockExecSSH.mockResolvedValue("ok");
+      mockExecSSH.mockResolvedValue("@@CHECK|pass|Docker|x");
 
       const { register } = await import("../healthCheck.js");
       const handler = captureHandler(register);
       await handler({ node: "nas" });
 
+      expect(mockExecSSH).toHaveBeenCalled();
       for (const call of mockExecSSH.mock.calls) {
         expect(call[1]).toBe("nas");
       }
     });
+
+    it("builds a script that passes the command guard and covers every check", async () => {
+      const { buildHealthCheckScript, parseHealthCheckOutput } = await import("../healthCheck.js");
+      const { assertCommandSafe } = await vi.importActual<typeof import("../../utils/ssh-api.js")>(
+        "../../utils/ssh-api.js",
+      );
+      const script = buildHealthCheckScript();
+      expect(() => assertCommandSafe(script)).not.toThrow();
+      for (const name of ["Docker", "Docker Compose", "curl", "restic", "certbot", "systemd"]) {
+        expect(script).toContain(`'${name}'`);
+      }
+      expect(parseHealthCheckOutput("noise\n@@CHECK|pass|curl|a|b")).toEqual([
+        { name: "curl", status: "pass", detail: "a|b" },
+      ]);
+    });
   });
 
   describe("diagnostics", () => {
-    it("returns formatted diagnostic bundle", async () => {
-      mockExecSSH.mockResolvedValue("mock output");
+    it("returns the bundle from a single round trip", async () => {
+      mockExecSSH.mockResolvedValueOnce("=== OS ===\nDebian GNU/Linux 12\n\n=== Kernel ===\nLinux");
 
       const { register } = await import("../diagnostics.js");
       const handler = captureHandler(register);
-      const result = await handler({});
-
-      const text = result.content[0].text;
-      expect(text).toContain("=== OS ===");
-      expect(text).toContain("=== Kernel ===");
-      expect(text).toContain("=== Docker ===");
-      expect(text).toContain("=== Memory ===");
-      expect(text).toContain("mock output");
-    });
-
-    it("handles individual section failures gracefully", async () => {
-      mockExecSSH
-        .mockResolvedValueOnce("ok") // connectivity probe
-        .mockResolvedValueOnce("Debian GNU/Linux 12")
-        .mockRejectedValueOnce(new Error("fail"))
-        .mockResolvedValue("ok");
-
-      const { register } = await import("../diagnostics.js");
-      const handler = captureHandler(register);
-      const result = await handler({});
+      const result = await handler({ node: "nas" });
 
       const text = result.content[0].text;
       expect(text).toContain("=== OS ===");
       expect(text).toContain("Debian GNU/Linux 12");
-      expect(text).toContain("(unavailable: fail)");
-      expect(result.isError).toBeUndefined();
+      expect(mockExecSSH).toHaveBeenCalledTimes(1);
+      expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+    });
+
+    it("builds a script with every section that passes the command guard", async () => {
+      const { buildDiagnosticsScript } = await import("../diagnostics.js");
+      const { assertCommandSafe } = await vi.importActual<typeof import("../../utils/ssh-api.js")>(
+        "../../utils/ssh-api.js",
+      );
+      const script = buildDiagnosticsScript();
+      expect(() => assertCommandSafe(script)).not.toThrow();
+      for (const label of ["OS", "Kernel", "Docker", "Containers", "Memory", "Disk", "Uptime", "Node.js", "Network"]) {
+        expect(script).toContain(`echo '=== ${label} ==='`);
+      }
+      expect(script).toContain("(unavailable: ");
     });
 
     it("returns an error with the cause when the node is unreachable", async () => {

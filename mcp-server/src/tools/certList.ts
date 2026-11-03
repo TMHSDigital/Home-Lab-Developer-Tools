@@ -5,6 +5,8 @@ import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = { ...nodeParam };
 
+const CERTBOT_MISSING = "__CERTBOT_NOT_INSTALLED__";
+
 export function register(server: McpServer): void {
   server.tool(
     "homelab_certList",
@@ -14,16 +16,17 @@ export function register(server: McpServer): void {
       const sections: string[] = [];
 
       try {
-        const certbotCheck = await execSSH(
-          "command -v certbot >/dev/null 2>&1 && echo 'installed' || echo 'missing'",
+        // One round trip: check for certbot and list certificates together.
+        const certbotOutput = await execSSH(
+          `if command -v certbot >/dev/null 2>&1; then sudo certbot certificates 2>&1; ` +
+            `else echo '${CERTBOT_MISSING}'; fi`,
           args.node,
         );
 
-        if (certbotCheck.trim() === "installed") {
-          const certbotOutput = await execSSH("sudo certbot certificates 2>&1", args.node);
-          sections.push("=== Certbot Certificates ===\n" + certbotOutput);
-        } else {
+        if (certbotOutput.trim() === CERTBOT_MISSING) {
           sections.push("=== Certbot ===\nNot installed. Skipping.");
+        } else {
+          sections.push("=== Certbot Certificates ===\n" + certbotOutput);
         }
       } catch (error) {
         if (!(error instanceof CommandFailedError)) {
