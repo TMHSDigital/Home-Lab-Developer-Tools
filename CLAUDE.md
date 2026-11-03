@@ -85,7 +85,7 @@ Home-Lab-Developer-Tools/
 
 ## MCP Tools (50)
 
-All tools connect to the Pi (or any registered node) via SSH. All tools accept an optional `node` parameter to target a specific node from the `HOMELAB_NODES` registry.
+All tools connect to the Pi (or any registered node) via SSH. All tools except `homelab_nodeList` accept a `node` parameter to target a specific node from the `HOMELAB_NODES` registry (optional everywhere except `homelab_nodeExec` and `homelab_nodeStatus`, where it is required).
 
 | Tool | Description |
 |------|-------------|
@@ -139,6 +139,8 @@ All tools connect to the Pi (or any registered node) via SSH. All tools accept a
 | `homelab_healthCheck` | Comprehensive self-test (SSH, Docker, curl, restic, certbot, systemd) |
 | `homelab_diagnostics` | Collect debug info bundle (OS, kernel, Docker, memory, disk, network) |
 | `homelab_sshTest` | Test SSH connectivity |
+
+The server also registers one MCP resource (`homelab://nodes`, node names and hosts only) and three prompts (`morning-health-check`, `pre-reboot-checklist`, `investigate-container`) in `mcp-server/src/resources.ts` and `mcp-server/src/prompts.ts`. Prompts must never perform state-changing actions on their own.
 
 ## Development
 

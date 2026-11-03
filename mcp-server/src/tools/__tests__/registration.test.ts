@@ -66,7 +66,9 @@ describe("tool registration", () => {
     for (const r of registered) {
       expect(index).toContain(`from "./tools/${r.file}.js"`);
     }
-    const calls = index.match(/^\s*register[A-Za-z0-9]+\(server\);/gm) ?? [];
+    const calls = (index.match(/^\s*register[A-Za-z0-9]+\(server\);/gm) ?? []).filter(
+      (c) => !/register(Resources|Prompts)\(/.test(c),
+    );
     expect(calls.length).toBe(registered.length);
   });
 

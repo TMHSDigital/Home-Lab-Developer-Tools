@@ -101,6 +101,17 @@ Set environment variables:
 | `HOMELAB_NTFY_TOPICS` | (unset) | Default topic list (comma-separated) for `homelab_ntfyTopics` when no `topic` is passed |
 | `HOMELAB_SSH_TIMEOUT_MS` | `30000` | Default timeout (connect + command) for tools without their own budget. Long-running tools (apt upgrade, compose pull, restic backup/restore, image scans) use longer built-in timeouts |
 
+## Resources and Prompts
+
+Besides tools, the server exposes MCP resources and prompts, so any MCP client gets guided workflows.
+
+| Kind | Name | Description |
+|------|------|-------------|
+| Resource | `homelab://nodes` | Managed nodes (name and host only) from `HOMELAB_PI_HOST` and `HOMELAB_NODES` |
+| Prompt | `morning-health-check` | Read-only daily check: hardware, containers, active alerts, backups, disk. Optional `node` |
+| Prompt | `pre-reboot-checklist` | Gathers state, backups and pending updates before a reboot; never reboots on its own. Optional `node` |
+| Prompt | `investigate-container` | Status, logs and error search for one container with a proposed fix. Requires `service`, optional `node` |
+
 ## Usage with Cursor
 
 Add to `.cursor/mcp.json`:
