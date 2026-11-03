@@ -17,6 +17,7 @@ const inputSchema = {
     .number()
     .int()
     .positive()
+    .max(5000)
     .optional()
     .default(100)
     .describe("Maximum matching lines to return"),

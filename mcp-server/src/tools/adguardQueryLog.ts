@@ -17,6 +17,7 @@ const inputSchema = {
     .number()
     .int()
     .positive()
+    .max(500)
     .optional()
     .default(25)
     .describe("Number of recent queries to return"),

@@ -9,6 +9,7 @@ const inputSchema = {
     .number()
     .int()
     .positive()
+    .max(100)
     .optional()
     .default(5)
     .describe("Number of recent snapshots to show"),

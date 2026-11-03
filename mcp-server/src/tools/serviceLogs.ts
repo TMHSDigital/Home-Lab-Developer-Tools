@@ -10,6 +10,7 @@ const inputSchema = {
     .number()
     .int()
     .positive()
+    .max(5000)
     .optional()
     .default(50)
     .describe("Number of recent log lines to return"),

@@ -93,7 +93,8 @@ Set environment variables:
 | `HOMELAB_NTFY_PORT` | `8080` | Ntfy server port override |
 | `HOMELAB_NODES` | (empty) | JSON object mapping node names to SSH config for multi-node support |
 | `HOMELAB_ANSIBLE_INVENTORY` | `/etc/ansible/hosts` | Ansible inventory file path for node discovery |
-| `HOMELAB_DRY_RUN` | (unset) | When set to any truthy value, `execSSH` prints the command without connecting |
+| `HOMELAB_DRY_RUN` | (unset) | When set to `true`, `1`, `yes`, or `on`, `execSSH` prints the command without connecting |
+| `HOMELAB_MAX_OUTPUT_BYTES` | `1048576` | Max bytes of command output kept per call; longer output is truncated to the last N bytes with a marker |
 | `HOMELAB_ALLOW_DANGEROUS_COMMANDS` | (unset) | Set to `true` to bypass the runtime command safety guard |
 | `HOMELAB_SSH_TIMEOUT_MS` | `30000` | Default timeout (connect + command) for tools without their own budget. Long-running tools (apt upgrade, compose pull, restic backup/restore, image scans) use longer built-in timeouts |
 

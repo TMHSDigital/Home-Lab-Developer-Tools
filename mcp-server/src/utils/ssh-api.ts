@@ -145,6 +145,66 @@ export function loadPrivateKey(keyPath: string): Buffer | undefined {
   }
 }
 
+/** HOMELAB_DRY_RUN is enabled by "true", "1", "yes" or "on" (case-insensitive). */
+export function isDryRun(): boolean {
+  const raw = (process.env.HOMELAB_DRY_RUN ?? "").trim().toLowerCase();
+  return raw === "true" || raw === "1" || raw === "yes" || raw === "on";
+}
+
+const DEFAULT_MAX_OUTPUT_BYTES = 1024 * 1024;
+
+/** Max bytes of stdout/stderr kept per command (HOMELAB_MAX_OUTPUT_BYTES, default 1 MiB). */
+export function maxOutputBytes(): number {
+  const n = Number(process.env.HOMELAB_MAX_OUTPUT_BYTES);
+  return Number.isFinite(n) && n > 0 ? n : DEFAULT_MAX_OUTPUT_BYTES;
+}
+
+/**
+ * Collects raw output chunks and keeps only the last `maxBytes` bytes.
+ * Decoding happens once at the end so multibyte UTF-8 characters split
+ * across chunks are not corrupted.
+ */
+export class TailBuffer {
+  private chunks: Buffer[] = [];
+  private size = 0;
+  private total = 0;
+
+  constructor(private readonly maxBytes: number) {}
+
+  push(chunk: Buffer): void {
+    this.chunks.push(chunk);
+    this.size += chunk.length;
+    this.total += chunk.length;
+    while (this.size > this.maxBytes && this.chunks.length > 0) {
+      const excess = this.size - this.maxBytes;
+      const first = this.chunks[0];
+      if (first.length <= excess) {
+        this.chunks.shift();
+        this.size -= first.length;
+      } else {
+        this.chunks[0] = first.subarray(excess);
+        this.size -= excess;
+      }
+    }
+  }
+
+  get truncated(): boolean {
+    return this.total > this.size;
+  }
+
+  toString(): string {
+    let buf = Buffer.concat(this.chunks);
+    if (this.truncated) {
+      // Skip UTF-8 continuation bytes left over from the cut.
+      let start = 0;
+      while (start < buf.length && start < 4 && (buf[start] & 0xc0) === 0x80) start++;
+      buf = buf.subarray(start);
+      return `[output truncated: showing last ${buf.length} of ${this.total} bytes]\n` + buf.toString("utf8");
+    }
+    return buf.toString("utf8");
+  }
+}
+
 export async function execSSH(
   command: string,
   node?: string,
@@ -153,7 +213,7 @@ export async function execSSH(
   const timeoutMs = options.timeoutMs ?? defaultExecTimeoutMs();
   assertCommandSafe(command);
 
-  if (process.env.HOMELAB_DRY_RUN && process.env.HOMELAB_DRY_RUN !== "false") {
+  if (isDryRun()) {
     const cfg = getNodeConfig(node);
     return `[dry-run] would execute on ${cfg.host}: ${command}`;
   }
@@ -165,8 +225,9 @@ export async function execSSH(
 
   return new Promise((resolve, reject) => {
     const conn = new Client();
-    let stdout = "";
-    let stderr = "";
+    const maxBytes = maxOutputBytes();
+    const stdout = new TailBuffer(maxBytes);
+    const stderr = new TailBuffer(maxBytes);
     let timedOut = false;
     let started = false;
     let activeStream: { signal?: (name: string) => unknown; close?: () => unknown } | null = null;
@@ -203,22 +264,32 @@ export async function execSSH(
           activeStream = stream;
 
           stream
-            .on("close", (code: number) => {
+            .on("close", (code: number | null, signal?: string | null) => {
               clearTimeout(timer);
               conn.end();
               if (timedOut) return;
 
-              if (code !== 0 && code !== null) {
-                reject(new CommandFailedError(command, code, stderr));
+              if (signal) {
+                // Killed by a signal (for example the OOM killer): partial
+                // output must not be reported as success.
+                reject(
+                  new CommandFailedError(
+                    command,
+                    -1,
+                    `${stderr.toString().trim()}\nRemote command terminated by signal ${signal}`.trim(),
+                  ),
+                );
+              } else if (code !== 0 && code !== null && code !== undefined) {
+                reject(new CommandFailedError(command, code, stderr.toString()));
               } else {
-                resolve(stdout.trim());
+                resolve(stdout.toString().trim());
               }
             })
             .on("data", (data: Buffer) => {
-              stdout += data.toString();
+              stdout.push(data);
             })
             .stderr.on("data", (data: Buffer) => {
-              stderr += data.toString();
+              stderr.push(data);
             });
         });
       })
