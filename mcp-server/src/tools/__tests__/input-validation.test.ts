@@ -1,12 +1,115 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
+import { register as adguardFilters } from "../adguardFilters.js";
+import { register as adguardQueryLog } from "../adguardQueryLog.js";
+import { register as adguardStats } from "../adguardStats.js";
+import { register as alertList } from "../alertList.js";
+import { register as aptHistory } from "../aptHistory.js";
+import { register as aptUpdate } from "../aptUpdate.js";
+import { register as aptUpgradable } from "../aptUpgradable.js";
+import { register as backupDiff } from "../backupDiff.js";
+import { register as backupList } from "../backupList.js";
+import { register as backupRestore } from "../backupRestore.js";
+import { register as backupRun } from "../backupRun.js";
+import { register as backupStatus } from "../backupStatus.js";
+import { register as certCheck } from "../certCheck.js";
+import { register as certList } from "../certList.js";
+import { register as certRenew } from "../certRenew.js";
+import { register as composeDown } from "../composeDown.js";
+import { register as composeUp } from "../composeUp.js";
+import { register as containerScan } from "../containerScan.js";
+import { register as diagnostics } from "../diagnostics.js";
+import { register as diskUsage } from "../diskUsage.js";
+import { register as fail2banStatus } from "../fail2banStatus.js";
+import { register as grafanaSnapshot } from "../grafanaSnapshot.js";
+import { register as healthCheck } from "../healthCheck.js";
+import { register as inventorySync } from "../inventorySync.js";
+import { register as journalLogs } from "../journalLogs.js";
+import { register as kernelInfo } from "../kernelInfo.js";
+import { register as logSearch } from "../logSearch.js";
+import { register as nodeExec } from "../nodeExec.js";
+import { register as nodeList } from "../nodeList.js";
+import { register as nodeStatus } from "../nodeStatus.js";
+import { register as npmCerts } from "../npmCerts.js";
+import { register as npmProxyHosts } from "../npmProxyHosts.js";
+import { register as ntfySend } from "../ntfySend.js";
+import { register as ntfyTopics } from "../ntfyTopics.js";
+import { register as openPorts } from "../openPorts.js";
+import { register as piReboot } from "../piReboot.js";
+import { register as prometheusQuery } from "../prometheusQuery.js";
+import { register as serviceLogs } from "../serviceLogs.js";
+import { register as serviceRestart } from "../serviceRestart.js";
+import { register as speedtestResults } from "../speedtestResults.js";
+import { register as systemdServices } from "../systemdServices.js";
+import { register as ufwStatus } from "../ufwStatus.js";
+import { register as volumeBackup } from "../volumeBackup.js";
 
+/**
+ * Schemas are captured from each tool's real register() call, so these
+ * tests fail when a tool's actual input schema changes.
+ */
+const REGISTRARS: Record<string, (server: never) => void> = {
+  adguardFilters,
+  adguardQueryLog,
+  adguardStats,
+  alertList,
+  aptHistory,
+  aptUpdate,
+  aptUpgradable,
+  backupDiff,
+  backupList,
+  backupRestore,
+  backupRun,
+  backupStatus,
+  certCheck,
+  certList,
+  certRenew,
+  composeDown,
+  composeUp,
+  containerScan,
+  diagnostics,
+  diskUsage,
+  fail2banStatus,
+  grafanaSnapshot,
+  healthCheck,
+  inventorySync,
+  journalLogs,
+  kernelInfo,
+  logSearch,
+  nodeExec,
+  nodeList,
+  nodeStatus,
+  npmCerts,
+  npmProxyHosts,
+  ntfySend,
+  ntfyTopics,
+  openPorts,
+  piReboot,
+  prometheusQuery,
+  serviceLogs,
+  serviceRestart,
+  speedtestResults,
+  systemdServices,
+  ufwStatus,
+  volumeBackup,
+};
+
+function schemaOf(tool: string) {
+  const register = REGISTRARS[tool];
+  if (!register) throw new Error(`unknown tool ${tool}`);
+  let shape: z.ZodRawShape | undefined;
+  const fakeServer = {
+    tool: (_name: string, _desc: string, schema: z.ZodRawShape) => {
+      shape = schema;
+    },
+  };
+  register(fakeServer as never);
+  if (!shape) throw new Error(`${tool} did not register a schema`);
+  return z.object(shape);
+}
 describe("input validation schemas", () => {
   describe("serviceLogs", () => {
-    const schema = z.object({
-      service: z.string().min(1),
-      lines: z.number().int().positive().optional().default(50),
-    });
+    const schema = schemaOf("serviceLogs");
 
     it("rejects empty service name", () => {
       expect(() => schema.parse({ service: "" })).toThrow();
@@ -29,10 +132,7 @@ describe("input validation schemas", () => {
   });
 
   describe("serviceRestart", () => {
-    const schema = z.object({
-      service: z.string().min(1),
-      confirm: z.boolean(),
-    });
+    const schema = schemaOf("serviceRestart");
 
     it("rejects empty service name", () => {
       expect(() => schema.parse({ service: "", confirm: true })).toThrow();
@@ -58,9 +158,7 @@ describe("input validation schemas", () => {
   });
 
   describe("piReboot", () => {
-    const schema = z.object({
-      confirm: z.boolean(),
-    });
+    const schema = schemaOf("piReboot");
 
     it("rejects missing confirm", () => {
       expect(() => schema.parse({})).toThrow();
@@ -77,10 +175,7 @@ describe("input validation schemas", () => {
   });
 
   describe("diskUsage", () => {
-    const schema = z.object({
-      path: z.string().optional().default("/"),
-      depth: z.number().int().positive().optional().default(1),
-    });
+    const schema = schemaOf("diskUsage");
 
     it("uses defaults when no args provided", () => {
       const result = schema.parse({});
@@ -100,9 +195,7 @@ describe("input validation schemas", () => {
   });
 
   describe("backupRun", () => {
-    const schema = z.object({
-      confirm: z.boolean(),
-    });
+    const schema = schemaOf("backupRun");
 
     it("rejects missing confirm", () => {
       expect(() => schema.parse({})).toThrow();
@@ -115,9 +208,7 @@ describe("input validation schemas", () => {
   });
 
   describe("aptUpdate", () => {
-    const schema = z.object({
-      upgrade: z.boolean().optional().default(false),
-    });
+    const schema = schemaOf("aptUpdate");
 
     it("defaults upgrade to false", () => {
       const result = schema.parse({});
@@ -131,9 +222,7 @@ describe("input validation schemas", () => {
   });
 
   describe("backupStatus", () => {
-    const schema = z.object({
-      count: z.number().int().positive().optional().default(5),
-    });
+    const schema = schemaOf("backupStatus");
 
     it("defaults count to 5", () => {
       const result = schema.parse({});
@@ -151,10 +240,7 @@ describe("input validation schemas", () => {
   });
 
   describe("composeUp", () => {
-    const schema = z.object({
-      stacks: z.array(z.string()).optional(),
-      confirm: z.boolean(),
-    });
+    const schema = schemaOf("composeUp");
 
     it("rejects missing confirm", () => {
       expect(() => schema.parse({})).toThrow();
@@ -181,11 +267,7 @@ describe("input validation schemas", () => {
   });
 
   describe("composeDown", () => {
-    const schema = z.object({
-      stacks: z.array(z.string()).optional(),
-      removeVolumes: z.boolean().optional().default(false),
-      confirm: z.boolean(),
-    });
+    const schema = schemaOf("composeDown");
 
     it("rejects missing confirm", () => {
       expect(() => schema.parse({})).toThrow();
@@ -212,10 +294,7 @@ describe("input validation schemas", () => {
   });
 
   describe("prometheusQuery", () => {
-    const schema = z.object({
-      query: z.string().min(1),
-      time: z.string().optional(),
-    });
+    const schema = schemaOf("prometheusQuery");
 
     it("rejects empty query", () => {
       expect(() => schema.parse({ query: "" })).toThrow();
@@ -234,9 +313,7 @@ describe("input validation schemas", () => {
   });
 
   describe("grafanaSnapshot", () => {
-    const schema = z.object({
-      dashboard: z.string().min(1),
-    });
+    const schema = schemaOf("grafanaSnapshot");
 
     it("rejects empty dashboard UID", () => {
       expect(() => schema.parse({ dashboard: "" })).toThrow();
@@ -249,9 +326,7 @@ describe("input validation schemas", () => {
   });
 
   describe("alertList", () => {
-    const schema = z.object({
-      state: z.enum(["active", "suppressed", "unprocessed"]).optional(),
-    });
+    const schema = schemaOf("alertList");
 
     it("accepts no state filter", () => {
       const result = schema.parse({});
@@ -269,9 +344,7 @@ describe("input validation schemas", () => {
   });
 
   describe("speedtestResults", () => {
-    const schema = z.object({
-      count: z.number().int().positive().optional().default(5),
-    });
+    const schema = schemaOf("speedtestResults");
 
     it("defaults count to 5", () => {
       const result = schema.parse({});
@@ -293,10 +366,7 @@ describe("input validation schemas", () => {
   });
 
   describe("adguardQueryLog", () => {
-    const schema = z.object({
-      search: z.string().optional(),
-      count: z.number().int().positive().optional().default(25),
-    });
+    const schema = schemaOf("adguardQueryLog");
 
     it("defaults count to 25", () => {
       const result = schema.parse({});
@@ -320,7 +390,7 @@ describe("input validation schemas", () => {
   });
 
   describe("adguardStats (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("adguardStats");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -329,7 +399,7 @@ describe("input validation schemas", () => {
   });
 
   describe("adguardFilters (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("adguardFilters");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -338,7 +408,7 @@ describe("input validation schemas", () => {
   });
 
   describe("npmProxyHosts (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("npmProxyHosts");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -347,7 +417,7 @@ describe("input validation schemas", () => {
   });
 
   describe("npmCerts (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("npmCerts");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -356,11 +426,7 @@ describe("input validation schemas", () => {
   });
 
   describe("backupList", () => {
-    const schema = z.object({
-      path: z.string().optional(),
-      tag: z.string().optional(),
-      host: z.string().optional(),
-    });
+    const schema = schemaOf("backupList");
 
     it("accepts no filters", () => {
       const result = schema.parse({});
@@ -397,12 +463,7 @@ describe("input validation schemas", () => {
   });
 
   describe("backupRestore", () => {
-    const schema = z.object({
-      snapshot: z.string().min(1),
-      target: z.string().min(1),
-      include: z.string().optional(),
-      confirm: z.boolean(),
-    });
+    const schema = schemaOf("backupRestore");
 
     it("rejects empty snapshot", () => {
       expect(() =>
@@ -455,10 +516,7 @@ describe("input validation schemas", () => {
   });
 
   describe("backupDiff", () => {
-    const schema = z.object({
-      snapshotA: z.string().min(1),
-      snapshotB: z.string().min(1),
-    });
+    const schema = schemaOf("backupDiff");
 
     it("rejects empty snapshotA", () => {
       expect(() =>
@@ -483,10 +541,7 @@ describe("input validation schemas", () => {
   });
 
   describe("volumeBackup", () => {
-    const schema = z.object({
-      volume: z.string().min(1),
-      confirm: z.boolean(),
-    });
+    const schema = schemaOf("volumeBackup");
 
     it("rejects empty volume name", () => {
       expect(() =>
@@ -517,7 +572,7 @@ describe("input validation schemas", () => {
   });
 
   describe("ufwStatus (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("ufwStatus");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -526,9 +581,7 @@ describe("input validation schemas", () => {
   });
 
   describe("fail2banStatus", () => {
-    const schema = z.object({
-      jail: z.string().optional(),
-    });
+    const schema = schemaOf("fail2banStatus");
 
     it("accepts no jail filter", () => {
       const result = schema.parse({});
@@ -542,7 +595,7 @@ describe("input validation schemas", () => {
   });
 
   describe("openPorts (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("openPorts");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -551,9 +604,7 @@ describe("input validation schemas", () => {
   });
 
   describe("containerScan", () => {
-    const schema = z.object({
-      image: z.string().optional(),
-    });
+    const schema = schemaOf("containerScan");
 
     it("accepts no image (scan all)", () => {
       const result = schema.parse({});
@@ -567,12 +618,7 @@ describe("input validation schemas", () => {
   });
 
   describe("journalLogs", () => {
-    const schema = z.object({
-      unit: z.string().optional(),
-      priority: z.number().int().min(0).max(7).optional(),
-      since: z.string().optional(),
-      lines: z.number().int().positive().optional().default(50),
-    });
+    const schema = schemaOf("journalLogs");
 
     it("accepts empty input with defaults", () => {
       const result = schema.parse({});
@@ -595,11 +641,7 @@ describe("input validation schemas", () => {
   });
 
   describe("logSearch", () => {
-    const schema = z.object({
-      pattern: z.string().min(1),
-      service: z.string().optional(),
-      lines: z.number().int().positive().optional().default(100),
-    });
+    const schema = schemaOf("logSearch");
 
     it("requires pattern", () => {
       expect(() => schema.parse({})).toThrow();
@@ -623,13 +665,7 @@ describe("input validation schemas", () => {
   });
 
   describe("ntfySend", () => {
-    const schema = z.object({
-      topic: z.string().min(1),
-      message: z.string().min(1),
-      title: z.string().optional(),
-      priority: z.enum(["min", "low", "default", "high", "urgent"]).optional(),
-      tags: z.string().optional(),
-    });
+    const schema = schemaOf("ntfySend");
 
     it("requires topic and message", () => {
       expect(() => schema.parse({})).toThrow();
@@ -661,10 +697,7 @@ describe("input validation schemas", () => {
   });
 
   describe("ntfyTopics", () => {
-    const schema = z.object({
-      topic: z.string().optional(),
-      since: z.string().optional().default("1h"),
-    });
+    const schema = schemaOf("ntfyTopics");
 
     it("accepts empty input with defaults", () => {
       const result = schema.parse({});
@@ -680,7 +713,7 @@ describe("input validation schemas", () => {
   });
 
   describe("aptUpgradable (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("aptUpgradable");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -689,9 +722,7 @@ describe("input validation schemas", () => {
   });
 
   describe("aptHistory", () => {
-    const schema = z.object({
-      lines: z.number().int().positive().optional().default(50),
-    });
+    const schema = schemaOf("aptHistory");
 
     it("accepts empty input with default", () => {
       const result = schema.parse({});
@@ -710,7 +741,7 @@ describe("input validation schemas", () => {
   });
 
   describe("kernelInfo (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("kernelInfo");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -719,10 +750,7 @@ describe("input validation schemas", () => {
   });
 
   describe("systemdServices", () => {
-    const schema = z.object({
-      unit: z.string().optional(),
-      type: z.enum(["service", "timer", "socket", "mount"]).optional(),
-    });
+    const schema = schemaOf("systemdServices");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -746,9 +774,7 @@ describe("input validation schemas", () => {
   });
 
   describe("certCheck", () => {
-    const schema = z.object({
-      domain: z.string().min(1),
-    });
+    const schema = schemaOf("certCheck");
 
     it("requires domain", () => {
       expect(() => schema.parse({})).toThrow();
@@ -770,10 +796,7 @@ describe("input validation schemas", () => {
   });
 
   describe("certRenew", () => {
-    const schema = z.object({
-      domain: z.string().optional(),
-      confirm: z.boolean(),
-    });
+    const schema = schemaOf("certRenew");
 
     it("requires confirm", () => {
       expect(() => schema.parse({})).toThrow();
@@ -798,7 +821,7 @@ describe("input validation schemas", () => {
   });
 
   describe("certList (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("certList");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -807,7 +830,7 @@ describe("input validation schemas", () => {
   });
 
   describe("nodeList (no params)", () => {
-    const schema = z.object({});
+    const schema = schemaOf("nodeList");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -816,11 +839,7 @@ describe("input validation schemas", () => {
   });
 
   describe("nodeExec", () => {
-    const schema = z.object({
-      node: z.string().min(1),
-      command: z.string().min(1),
-      confirm: z.boolean(),
-    });
+    const schema = schemaOf("nodeExec");
 
     it("requires all three fields", () => {
       expect(() => schema.parse({})).toThrow();
@@ -855,9 +874,7 @@ describe("input validation schemas", () => {
   });
 
   describe("nodeStatus", () => {
-    const schema = z.object({
-      node: z.string().min(1),
-    });
+    const schema = schemaOf("nodeStatus");
 
     it("requires node", () => {
       expect(() => schema.parse({})).toThrow();
@@ -874,9 +891,7 @@ describe("input validation schemas", () => {
   });
 
   describe("inventorySync", () => {
-    const schema = z.object({
-      source: z.enum(["ansible", "tailscale"]),
-    });
+    const schema = schemaOf("inventorySync");
 
     it("requires source", () => {
       expect(() => schema.parse({})).toThrow();
@@ -898,9 +913,7 @@ describe("input validation schemas", () => {
   });
 
   describe("healthCheck", () => {
-    const schema = z.object({
-      node: z.string().optional(),
-    });
+    const schema = schemaOf("healthCheck");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
@@ -914,9 +927,7 @@ describe("input validation schemas", () => {
   });
 
   describe("diagnostics", () => {
-    const schema = z.object({
-      node: z.string().optional(),
-    });
+    const schema = schemaOf("diagnostics");
 
     it("accepts empty input", () => {
       const result = schema.parse({});
