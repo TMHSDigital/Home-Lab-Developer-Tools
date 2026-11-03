@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
+import { SERVICES, servicePort, getNpmToken } from "../utils/service-http.js";
 import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = { ...nodeParam };
@@ -37,19 +38,8 @@ export function register(server: McpServer): void {
       }
 
       try {
-        const npmPort = process.env.HOMELAB_NPM_PORT
-          ? parseInt(process.env.HOMELAB_NPM_PORT, 10)
-          : 81;
-        const email = process.env.HOMELAB_NPM_EMAIL || "admin@example.com";
-        const password = process.env.HOMELAB_NPM_PASSWORD || "changeme";
-        const payload = JSON.stringify({ identity: email, secret: password });
-
-        const tokenOutput = await execSSH(
-          `curl -sf -X POST -H 'Content-Type: application/json' ` +
-            `-d '${payload}' 'http://localhost:${npmPort}/api/tokens'`,
-          args.node,
-        );
-        const token = JSON.parse(tokenOutput).token;
+        const npmPort = servicePort(SERVICES.npm, args.node);
+        const token = await getNpmToken(npmPort, args.node);
 
         const certsOutput = await execSSH(
           `curl -sf -H 'Authorization: Bearer ${token}' ` +

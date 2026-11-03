@@ -1,11 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse } from "../utils/ssh-api.js";
-import { CommandFailedError } from "../utils/errors.js";
+import { execSSH } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { SERVICES, servicePort, curlErrorResponse } from "../utils/service-http.js";
 
-const DEFAULT_PORT = 9090;
-const SERVICE_NAME = "Prometheus";
+const SERVICE = SERVICES.prometheus;
 
 const inputSchema = {
   ...nodeParam,
@@ -16,19 +15,15 @@ const inputSchema = {
     .describe("Evaluation timestamp (RFC3339 or Unix). Defaults to current time"),
 };
 
-function getPort(): number {
-  const override = process.env.HOMELAB_PROMETHEUS_PORT;
-  return override ? parseInt(override, 10) : DEFAULT_PORT;
-}
-
 export function register(server: McpServer): void {
   server.tool(
     "homelab_prometheusQuery",
     "Run a PromQL query against Prometheus and return the result",
     inputSchema,
     async (args) => {
-      const port = getPort();
+      let port = SERVICE.defaultPort;
       try {
+        port = servicePort(SERVICE, args.node);
         const encoded = encodeURIComponent(args.query);
         const timeParam = args.time ? `&time=${encodeURIComponent(args.time)}` : "";
         const output = await execSSH(
@@ -38,17 +33,9 @@ export function register(server: McpServer): void {
 
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
-        if (error instanceof CommandFailedError) {
-          if (error.exitCode === 7) {
-            return errorResponse(
-              new Error(
-                `Could not reach ${SERVICE_NAME} on port ${port}. Is it running? ` +
-                  `Set HOMELAB_PROMETHEUS_PORT if using a non-default port.`,
-              ),
-            );
-          }
-        }
-        return errorResponse(error);
+        return curlErrorResponse(error, SERVICE, port, {
+          httpError: `${SERVICE.name} on port ${port} returned an HTTP error. Check the PromQL expression and time value.`,
+        });
       }
     },
   );

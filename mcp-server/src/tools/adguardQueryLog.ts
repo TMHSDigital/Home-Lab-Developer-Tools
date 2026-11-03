@@ -1,11 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse } from "../utils/ssh-api.js";
-import { CommandFailedError } from "../utils/errors.js";
+import { execSSH } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { SERVICES, servicePort, adguardAuth, curlErrorResponse } from "../utils/service-http.js";
 
-const DEFAULT_PORT = 3000;
-const SERVICE_NAME = "AdGuard Home";
+const SERVICE = SERVICES.adguard;
 
 const inputSchema = {
   ...nodeParam,
@@ -23,26 +22,16 @@ const inputSchema = {
     .describe("Number of recent queries to return"),
 };
 
-function getPort(): number {
-  const override = process.env.HOMELAB_ADGUARD_PORT;
-  return override ? parseInt(override, 10) : DEFAULT_PORT;
-}
-
-function buildAuth(): string {
-  const user = process.env.HOMELAB_ADGUARD_USER || "admin";
-  const password = process.env.HOMELAB_ADGUARD_PASSWORD || "admin";
-  return `-u '${user}:${password}'`;
-}
-
 export function register(server: McpServer): void {
   server.tool(
     "homelab_adguardQueryLog",
     "Search the AdGuard Home DNS query log",
     inputSchema,
     async (args) => {
-      const port = getPort();
+      let port = SERVICE.defaultPort;
       try {
-        const auth = buildAuth();
+        port = servicePort(SERVICE, args.node);
+        const auth = adguardAuth(args.node);
         const params: string[] = [`limit=${args.count}`];
         if (args.search) {
           params.push(`search=${encodeURIComponent(args.search)}`);
@@ -55,27 +44,7 @@ export function register(server: McpServer): void {
 
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
-        if (error instanceof CommandFailedError) {
-          if (error.exitCode === 7) {
-            return errorResponse(
-              new Error(
-                `Could not connect to ${SERVICE_NAME} on port ${port}. Is it running? ` +
-                  `Set HOMELAB_ADGUARD_PORT if using a non-default port.`,
-              ),
-            );
-          }
-          if (error.exitCode === 22) {
-            return errorResponse(
-              new Error(
-                `${SERVICE_NAME} on port ${port} returned an HTTP error. Check authentication -- ` +
-                  `set HOMELAB_ADGUARD_USER and HOMELAB_ADGUARD_PASSWORD. Also check the port: ` +
-                  `AdGuard Home and Grafana both default to 3000, so if Grafana uses it, ` +
-                  `set HOMELAB_ADGUARD_PORT to the AdGuard web UI port.`,
-              ),
-            );
-          }
-        }
-        return errorResponse(error);
+        return curlErrorResponse(error, SERVICE, port);
       }
     },
   );

@@ -1,11 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse } from "../utils/ssh-api.js";
-import { CommandFailedError } from "../utils/errors.js";
+import { execSSH } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { SERVICES, servicePort, curlErrorResponse } from "../utils/service-http.js";
 
-const DEFAULT_PORT = 9093;
-const SERVICE_NAME = "Alertmanager";
+const SERVICE = SERVICES.alertmanager;
 
 const inputSchema = {
   ...nodeParam,
@@ -25,19 +24,15 @@ export const STATE_FILTERS: Record<"active" | "suppressed" | "unprocessed", stri
   unprocessed: "active=false&silenced=false&inhibited=false&unprocessed=true",
 };
 
-function getPort(): number {
-  const override = process.env.HOMELAB_ALERTMANAGER_PORT;
-  return override ? parseInt(override, 10) : DEFAULT_PORT;
-}
-
 export function register(server: McpServer): void {
   server.tool(
     "homelab_alertList",
     "List alerts from Alertmanager, optionally filtered by state",
     inputSchema,
     async (args) => {
-      const port = getPort();
+      let port = SERVICE.defaultPort;
       try {
+        port = servicePort(SERVICE, args.node);
         const stateParam = args.state ? `?${STATE_FILTERS[args.state]}` : "";
         const output = await execSSH(
           `curl -sf 'http://localhost:${port}/api/v2/alerts${stateParam}'`,
@@ -46,17 +41,7 @@ export function register(server: McpServer): void {
 
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
-        if (error instanceof CommandFailedError) {
-          if (error.exitCode === 7) {
-            return errorResponse(
-              new Error(
-                `Could not connect to ${SERVICE_NAME} on port ${port}. Is it running? ` +
-                  `Set HOMELAB_ALERTMANAGER_PORT if using a non-default port.`,
-              ),
-            );
-          }
-        }
-        return errorResponse(error);
+        return curlErrorResponse(error, SERVICE, port);
       }
     },
   );

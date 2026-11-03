@@ -1,11 +1,10 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse } from "../utils/ssh-api.js";
-import { CommandFailedError } from "../utils/errors.js";
+import { execSSH } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { SERVICES, servicePort, curlErrorResponse } from "../utils/service-http.js";
 
-const DEFAULT_PORT = 8080;
-const SERVICE_NAME = "Ntfy";
+const SERVICE = SERVICES.ntfy;
 
 const inputSchema = {
   ...nodeParam,
@@ -31,19 +30,15 @@ const inputSchema = {
     .describe("Comma-separated tags/emojis (e.g. 'warning,server')"),
 };
 
-function getPort(): number {
-  const override = process.env.HOMELAB_NTFY_PORT;
-  return override ? parseInt(override, 10) : DEFAULT_PORT;
-}
-
 export function register(server: McpServer): void {
   server.tool(
     "homelab_ntfySend",
     "Send a push notification via Ntfy",
     inputSchema,
     async (args) => {
-      const port = getPort();
+      let port = SERVICE.defaultPort;
       try {
+        port = servicePort(SERVICE, args.node);
         const headers: string[] = [];
         if (args.title) headers.push(`-H 'Title: ${args.title}'`);
         if (args.priority) headers.push(`-H 'Priority: ${args.priority}'`);
@@ -53,17 +48,7 @@ export function register(server: McpServer): void {
         const output = await execSSH(cmd, args.node);
         return { content: [{ type: "text" as const, text: output || `Notification sent to topic '${args.topic}'.` }] };
       } catch (error) {
-        if (error instanceof CommandFailedError) {
-          if (error.exitCode === 7) {
-            return errorResponse(
-              new Error(
-                `Could not connect to ${SERVICE_NAME} on port ${port}. Is it running? ` +
-                  `Set HOMELAB_NTFY_PORT if using a non-default port.`,
-              ),
-            );
-          }
-        }
-        return errorResponse(error);
+        return curlErrorResponse(error, SERVICE, port);
       }
     },
   );
