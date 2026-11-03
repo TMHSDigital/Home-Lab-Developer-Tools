@@ -12,6 +12,7 @@ vi.mock("../../utils/ssh-api.js", () => ({
     isError: true,
   })),
   checkSSHAvailable: vi.fn(),
+  TIMEOUTS: { long: 1_800_000, backup: 3_600_000, medium: 300_000 },
   listNodes: vi.fn(() => [
     { name: "default", host: "raspberrypi.local" },
     { name: "nas", host: "nas.local" },
@@ -20,6 +21,7 @@ vi.mock("../../utils/ssh-api.js", () => ({
 }));
 
 import { execSSH, listNodes } from "../../utils/ssh-api.js";
+import { CommandFailedError } from "../../utils/errors.js";
 
 const mockExecSSH = vi.mocked(execSSH);
 const mockListNodes = vi.mocked(listNodes);
@@ -121,6 +123,55 @@ describe("integration tests (mocked SSH)", () => {
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain('Unknown node "typo"');
       expect(mockExecSSH).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("backup error reporting", () => {
+    it("backupRun returns isError when the backup script fails", async () => {
+      mockExecSSH.mockRejectedValueOnce(
+        new CommandFailedError("backup", 1, "Fatal: unable to create lock in backend"),
+      );
+
+      const { register } = await import("../backupRun.js");
+      const handler = captureHandler(register);
+      const result = await handler({ confirm: true });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("unable to create lock");
+      const cmd = mockExecSSH.mock.calls[0][0] as string;
+      expect(cmd).toContain("sudo test -x /opt/backup/backup.sh");
+      expect(cmd).not.toContain("|| echo");
+    });
+
+    it("backupStatus reports a missing repo as an error", async () => {
+      mockExecSSH.mockRejectedValueOnce(
+        new CommandFailedError(
+          "restic",
+          1,
+          "Fatal: unable to open config file: stat /mnt/backup/restic/config: no such file or directory\nIs there a repository at the following location?",
+        ),
+      );
+
+      const { register } = await import("../backupStatus.js");
+      const handler = captureHandler(register);
+      const result = await handler({ count: 5 });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("No restic repository found at /mnt/backup/restic");
+    });
+
+    it("backupList surfaces other restic errors unchanged", async () => {
+      mockExecSSH.mockRejectedValueOnce(
+        new CommandFailedError("restic", 1, "Fatal: wrong password or no key found"),
+      );
+
+      const { register } = await import("../backupList.js");
+      const handler = captureHandler(register);
+      const result = await handler({});
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("wrong password");
+      expect(mockExecSSH.mock.calls[0][0]).not.toContain("2>/dev/null");
     });
   });
 

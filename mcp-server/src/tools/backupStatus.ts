@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { execSSH } from "../utils/ssh-api.js";
+import { resticErrorResponse } from "../utils/restic.js";
 import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
@@ -21,16 +22,16 @@ export function register(server: McpServer): void {
     "Check the latest restic backup snapshots on the Pi",
     inputSchema,
     async (args) => {
+      const repo = process.env.HOMELAB_BACKUP_REPO || "/mnt/backup/restic";
       try {
-        const repo = process.env.HOMELAB_BACKUP_REPO || "/mnt/backup/restic";
         const output = await execSSH(
-          `sudo restic -r ${repo} snapshots --latest ${args.count} 2>/dev/null || echo "No backup repo found at ${repo} or restic not configured"`,
+          `sudo restic -r ${repo} snapshots --latest ${args.count}`,
           args.node,
         );
 
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
-        return errorResponse(error);
+        return resticErrorResponse(error, repo);
       }
     },
   );
