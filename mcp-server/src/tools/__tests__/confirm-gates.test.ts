@@ -26,6 +26,7 @@ import * as serviceRestart from "../serviceRestart.js";
 import * as composeUp from "../composeUp.js";
 import * as composeDown from "../composeDown.js";
 import * as aptUpdate from "../aptUpdate.js";
+import * as adguardFilterToggle from "../adguardFilterToggle.js";
 
 const MODULES: Record<string, { register: (server: never) => void }> = {
   piReboot,
@@ -38,6 +39,7 @@ const MODULES: Record<string, { register: (server: never) => void }> = {
   composeUp,
   composeDown,
   aptUpdate,
+  adguardFilterToggle,
 };
 
 const mockExecSSH = vi.mocked(execSSH);
@@ -59,6 +61,7 @@ const GATED: Array<[tool: string, file: string, args: Record<string, unknown>, e
   ["homelab_composeUp", "composeUp", {}, "up -d --remove-orphans"],
   ["homelab_composeDown", "composeDown", {}, "down"],
   ["homelab_aptUpdate", "aptUpdate", { upgrade: true }, "apt-get upgrade -y"],
+  ["homelab_adguardFilterToggle", "adguardFilterToggle", { url: "https://l.example/a.txt", enabled: false }, "/control/filtering/status"],
 ];
 
 type Handler = (args: Record<string, unknown>) => Promise<{ content: { text: string }[] }>;

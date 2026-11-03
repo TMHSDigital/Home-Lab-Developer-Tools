@@ -22,6 +22,11 @@ import { register as npmProxyHosts } from "../npmProxyHosts.js";
 import { register as certCheck } from "../certCheck.js";
 import { register as inventorySync } from "../inventorySync.js";
 import { register as composePs } from "../composePs.js";
+import {
+  register as adguardFilterToggle,
+  buildSetUrlPayload,
+  shellQuote,
+} from "../adguardFilterToggle.js";
 
 const mockExecSSH = vi.mocked(execSSH);
 const ENV_KEYS = ["HOMELAB_GRAFANA_TOKEN", "HOMELAB_ADGUARD_PORT", "HOMELAB_COMPOSE_FILES"];
@@ -156,6 +161,66 @@ describe("inventorySync", () => {
     expect((await h({ source: "ansible" })).content[0].text).toContain("=== Ansible Inventory (/etc/ansible/hosts) ===");
     mockExecSSH.mockResolvedValueOnce("100.64.0.1 pi1");
     expect((await h({ source: "tailscale" })).content[0].text).toContain("=== Tailscale Peers ===");
+  });
+});
+
+describe("adguardFilterToggle", () => {
+  const status = JSON.stringify({
+    filters: [
+      { url: "https://lists.example/ads.txt", name: "Ads", enabled: true },
+      { url: "https://lists.example/old.txt", name: "Old", enabled: false },
+    ],
+    whitelist_filters: [{ url: "https://lists.example/allow.txt", name: "Allow", enabled: true }],
+  });
+
+  it("looks the filter up by URL and posts set_url with the new state", async () => {
+    mockExecSSH.mockResolvedValueOnce(status).mockResolvedValueOnce("OK");
+    const result = await handlerOf(adguardFilterToggle)({
+      url: "https://lists.example/ads.txt",
+      enabled: false,
+      confirm: true,
+    });
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toContain('Filter "Ads" (https://lists.example/ads.txt) disabled.');
+    expect(cmd(0)).toContain("/control/filtering/status");
+    expect(cmd(1)).toContain("/control/filtering/set_url");
+    expect(cmd(1)).toContain('"enabled":false');
+    expect(cmd(1)).toContain('"whitelist":false');
+  });
+
+  it("handles allowlist filters", async () => {
+    mockExecSSH.mockResolvedValueOnce(status).mockResolvedValueOnce("OK");
+    await handlerOf(adguardFilterToggle)({ url: "https://lists.example/allow.txt", enabled: false, confirm: true });
+    expect(cmd(1)).toContain('"whitelist":true');
+  });
+
+  it("does nothing when the filter is already in the requested state", async () => {
+    mockExecSSH.mockResolvedValueOnce(status);
+    const result = await handlerOf(adguardFilterToggle)({
+      url: "https://lists.example/old.txt",
+      enabled: false,
+      confirm: true,
+    });
+    expect(result.content[0].text).toContain("already disabled");
+    expect(mockExecSSH).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports an unknown URL", async () => {
+    mockExecSSH.mockResolvedValueOnce(status);
+    const result = await handlerOf(adguardFilterToggle)({
+      url: "https://lists.example/missing.txt",
+      enabled: true,
+      confirm: true,
+    });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("homelab_adguardFilters");
+    expect(mockExecSSH).toHaveBeenCalledTimes(1);
+  });
+
+  it("quotes the payload so filter names with quotes stay intact", () => {
+    const payload = buildSetUrlPayload({ url: "u", name: "Bob's list", enabled: true }, false, false);
+    expect(shellQuote(payload)).toBe(`'${payload.replace(/'/g, "'\\''")}'`);
+    expect(shellQuote("a'b")).toBe("'a'\\''b'");
   });
 });
 

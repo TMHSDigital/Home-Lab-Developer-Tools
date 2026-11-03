@@ -6,7 +6,7 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 50 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 51 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
@@ -83,7 +83,7 @@ Home-Lab-Developer-Tools/
 | resource-limits | compose*.yml | Flag containers without memory or CPU limits |
 | inventory-consistency | hosts, inventory*, .env* | Flag nodes in config missing from HOMELAB_NODES registry |
 
-## MCP Tools (50)
+## MCP Tools (51)
 
 All tools connect to the Pi (or any registered node) via SSH. All tools except `homelab_nodeList` accept a `node` parameter to target a specific node from the `HOMELAB_NODES` registry (optional everywhere except `homelab_nodeExec` and `homelab_nodeStatus`, where it is required).
 
@@ -108,6 +108,7 @@ All tools connect to the Pi (or any registered node) via SSH. All tools except `
 | `homelab_adguardStats` | AdGuard Home DNS statistics and top blocked domains |
 | `homelab_adguardFilters` | List AdGuard filter/blocklists and status |
 | `homelab_adguardQueryLog` | Search the AdGuard DNS query log |
+| `homelab_adguardFilterToggle` | Enable or disable an AdGuard filter list by URL (requires confirm=true) |
 | `homelab_npmProxyHosts` | List NPM proxy host configurations |
 | `homelab_npmCerts` | List SSL certificates and expiry dates |
 | `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
@@ -183,7 +184,7 @@ npm install -g @tmhs/homelab-mcp
 
 ## Security
 
-- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, and `homelab_aptUpdate` when `upgrade=true`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`.
+- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, `homelab_adguardFilterToggle`, and `homelab_aptUpdate` when `upgrade=true`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`.
 - `execSSH()` runs `assertCommandSafe()` before opening any SSH connection. This blocks catastrophic patterns (`rm -rf /`, `mkfs` on block devices, fork bombs, `poweroff`, etc.). Override with `HOMELAB_ALLOW_DANGEROUS_COMMANDS=true`.
 - `HOMELAB_DRY_RUN=true` makes `execSSH` return a description string instead of connecting. The command guard still runs in dry-run mode.
 - No personal SSH usernames, hostnames, or key names in code or docs. Use `pi` / `raspberrypi.local` / `~/.ssh/id_ed25519` as generic defaults.

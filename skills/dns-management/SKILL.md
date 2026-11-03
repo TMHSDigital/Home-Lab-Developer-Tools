@@ -5,6 +5,7 @@ tools:
   - homelab_adguardStats
   - homelab_adguardFilters
   - homelab_adguardQueryLog
+  - homelab_adguardFilterToggle
 standards-version: 1.10.0
 ---
 
@@ -42,7 +43,8 @@ Optional:
    - Call `homelab_adguardStats` to get query counts, blocked counts, top blocked domains, and top clients
 4. **For managing filter lists:**
    - Call `homelab_adguardFilters` to see all configured blocklists and their status
-   - Guide the user through adding/removing/toggling lists via the AdGuard API
+   - Enable or disable an existing list with `homelab_adguardFilterToggle` (`url` exactly as listed, `enabled`, and `confirm: true` after the user approves)
+   - Guide the user through adding or removing lists in the AdGuard web UI
 5. **For investigating DNS issues:**
    - Call `homelab_adguardQueryLog` with the domain or client IP as the search filter
    - Check if the domain is being blocked by a filter list
@@ -108,7 +110,8 @@ Popular blocklists:
 |-------------------------------|-------------------------------------------------|
 | `homelab_sshTest`             | Validate connectivity before operations         |
 | `homelab_adguardStats`        | Get DNS query statistics and top blocked domains|
-| `homelab_adguardFilters`      | List and manage filter/blocklists               |
+| `homelab_adguardFilters`      | List filter/blocklists and their status         |
+| `homelab_adguardFilterToggle` | Enable or disable a filter list (confirm=true)  |
 | `homelab_adguardQueryLog`     | Search DNS queries for troubleshooting          |
 | `homelab_serviceHealth`       | Check AdGuard container health                  |
 | `homelab_serviceLogs`         | Debug AdGuard startup or config issues          |

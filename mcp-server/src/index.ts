@@ -26,6 +26,7 @@ import { register as registerSpeedtestResults } from "./tools/speedtestResults.j
 import { register as registerAdguardStats } from "./tools/adguardStats.js";
 import { register as registerAdguardFilters } from "./tools/adguardFilters.js";
 import { register as registerAdguardQueryLog } from "./tools/adguardQueryLog.js";
+import { register as registerAdguardFilterToggle } from "./tools/adguardFilterToggle.js";
 import { register as registerNpmProxyHosts } from "./tools/npmProxyHosts.js";
 import { register as registerNpmCerts } from "./tools/npmCerts.js";
 import { register as registerBackupList } from "./tools/backupList.js";
@@ -84,6 +85,7 @@ registerSpeedtestResults(server);
 registerAdguardStats(server);
 registerAdguardFilters(server);
 registerAdguardQueryLog(server);
+registerAdguardFilterToggle(server);
 registerNpmProxyHosts(server);
 registerNpmCerts(server);
 registerBackupList(server);

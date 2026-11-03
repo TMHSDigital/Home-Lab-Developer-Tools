@@ -47,6 +47,7 @@
   {"name": "homelab_adguardStats", "description": "AdGuard Home DNS statistics and query counts", "category": "AdGuard Home"},
   {"name": "homelab_adguardFilters", "description": "List AdGuard Home filter lists", "category": "AdGuard Home"},
   {"name": "homelab_adguardQueryLog", "description": "Search the AdGuard Home DNS query log", "category": "AdGuard Home"},
+  {"name": "homelab_adguardFilterToggle", "description": "Enable or disable an AdGuard Home filter list by URL (requires confirm=true)", "category": "AdGuard Home"},
   {"name": "homelab_ntfySend", "description": "Send a push notification via Ntfy", "category": "Notifications"},
   {"name": "homelab_ntfyTopics", "description": "List Ntfy topics and recent messages", "category": "Notifications"}
 ]

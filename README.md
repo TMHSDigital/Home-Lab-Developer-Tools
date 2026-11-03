@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 50 MCP tools</strong>
+  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 51 MCP tools</strong>
 </p>
 
 ---
@@ -43,7 +43,7 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
 | **22 Skills** (SKILL.md) | Yes | Yes | Yes | - |
 | **11 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **50 MCP tools** | Yes | Yes | Yes | Yes |
+| **51 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -131,7 +131,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-50-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-51-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2020-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -156,7 +156,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>50 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>51 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -196,13 +196,14 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_alertList` | List alerts from Alertmanager by state |
 | `homelab_speedtestResults` | Get recent Speedtest Tracker results |
 
-**DNS / Proxy** (5)
+**DNS / Proxy** (6)
 
 | Tool | What It Does |
 |---|---|
 | `homelab_adguardStats` | AdGuard Home DNS statistics and top blocked domains |
 | `homelab_adguardFilters` | List AdGuard filter/blocklists and status |
 | `homelab_adguardQueryLog` | Search the AdGuard DNS query log |
+| `homelab_adguardFilterToggle` | Enable or disable an AdGuard filter list by URL (requires confirm=true) |
 | `homelab_npmProxyHosts` | List NPM proxy host configurations |
 | `homelab_npmCerts` | List SSL certificates and expiry dates |
 

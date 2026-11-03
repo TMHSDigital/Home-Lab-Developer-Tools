@@ -6,7 +6,7 @@ Guidance for AI coding agents working on the Home Lab Developer Tools repository
 
 ## Repository overview
 
-A Cursor IDE plugin for home lab and Raspberry Pi workflows. 22 skills and 11 rules covering Docker Compose, monitoring, DNS, networking, backups, security, and administration via SSH. Includes a companion MCP server (`@tmhs/homelab-mcp`) with 50 tools for live infrastructure management.
+A Cursor IDE plugin for home lab and Raspberry Pi workflows. 22 skills and 11 rules covering Docker Compose, monitoring, DNS, networking, backups, security, and administration via SSH. Includes a companion MCP server (`@tmhs/homelab-mcp`) with 51 tools for live infrastructure management.
 
 **Docs site:** https://tmhsdigital.github.io/Home-Lab-Developer-Tools/
 
@@ -20,7 +20,7 @@ Home-Lab-Developer-Tools/
   mcp-server/                  # Companion MCP server (Node.js/TypeScript)
     src/                       # Server source code
     dist/                      # Compiled output
-  mcp-tools.json               # MCP tool catalog (50 tools, manually maintained)
+  mcp-tools.json               # MCP tool catalog (51 tools, manually maintained)
   site.json                    # GitHub Pages branding/config
   docs/                        # Generated GitHub Pages site (do not edit manually)
   assets/                      # Logo and images

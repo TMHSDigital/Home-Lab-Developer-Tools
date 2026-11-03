@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
 import { register as adguardFilters } from "../adguardFilters.js";
+import { register as adguardFilterToggle } from "../adguardFilterToggle.js";
 import { register as adguardQueryLog } from "../adguardQueryLog.js";
 import { register as adguardStats } from "../adguardStats.js";
 import { register as alertList } from "../alertList.js";
@@ -50,6 +51,7 @@ import { register as volumeBackup } from "../volumeBackup.js";
  */
 const REGISTRARS: Record<string, (server: never) => void> = {
   adguardFilters,
+  adguardFilterToggle,
   adguardQueryLog,
   adguardStats,
   alertList,
@@ -395,6 +397,27 @@ describe("input validation schemas", () => {
     it("accepts empty input", () => {
       const result = schema.parse({});
       expect(result).toEqual({});
+    });
+  });
+
+  describe("adguardFilterToggle", () => {
+    const schema = schemaOf("adguardFilterToggle");
+
+    it("requires url, enabled and confirm", () => {
+      expect(() => schema.parse({ enabled: true, confirm: true })).toThrow();
+      expect(() => schema.parse({ url: "https://l.example/a.txt", confirm: true })).toThrow();
+      expect(() => schema.parse({ url: "https://l.example/a.txt", enabled: true })).toThrow();
+    });
+
+    it("rejects an empty url and non-boolean enabled", () => {
+      expect(() => schema.parse({ url: "", enabled: true, confirm: true })).toThrow();
+      expect(() => schema.parse({ url: "u", enabled: "yes", confirm: true })).toThrow();
+    });
+
+    it("accepts a full request", () => {
+      const result = schema.parse({ url: "https://l.example/a.txt", enabled: false, confirm: true, node: "nas" });
+      expect(result.enabled).toBe(false);
+      expect(result.node).toBe("nas");
     });
   });
 
