@@ -96,6 +96,7 @@ Set environment variables:
 | `HOMELAB_DRY_RUN` | (unset) | When set to `true`, `1`, `yes`, or `on`, `execSSH` prints the command without connecting |
 | `HOMELAB_MAX_OUTPUT_BYTES` | `1048576` | Max bytes of command output kept per call; longer output is truncated to the last N bytes with a marker |
 | `HOMELAB_ALLOW_DANGEROUS_COMMANDS` | (unset) | Set to `true` to bypass the runtime command safety guard |
+| `HOMELAB_UPTIME_KUMA_SLUG` | `default` | Status page slug used by `homelab_uptimeKumaStatus` when no `slug` is passed |
 | `HOMELAB_NTFY_TOPICS` | (unset) | Default topic list (comma-separated) for `homelab_ntfyTopics` when no `topic` is passed |
 | `HOMELAB_SSH_TIMEOUT_MS` | `30000` | Default timeout (connect + command) for tools without their own budget. Long-running tools (apt upgrade, compose pull, restic backup/restore, image scans) use longer built-in timeouts |
 

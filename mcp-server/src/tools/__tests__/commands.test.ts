@@ -2,6 +2,29 @@ import { describe, it, expect, afterEach } from "vitest";
 import { buildAptHistoryCommand } from "../aptHistory.js";
 import { STATE_FILTERS } from "../alertList.js";
 import { resolveTopics, TOPIC_LIST_RE } from "../ntfyTopics.js";
+import { resolveSlug, SLUG_RE } from "../uptimeKumaStatus.js";
+
+describe("uptimeKumaStatus slug", () => {
+  const saved = process.env.HOMELAB_UPTIME_KUMA_SLUG;
+  afterEach(() => {
+    if (saved === undefined) delete process.env.HOMELAB_UPTIME_KUMA_SLUG;
+    else process.env.HOMELAB_UPTIME_KUMA_SLUG = saved;
+  });
+
+  it("prefers the argument, then the env var, then 'default'", () => {
+    delete process.env.HOMELAB_UPTIME_KUMA_SLUG;
+    expect(resolveSlug()).toBe("default");
+    process.env.HOMELAB_UPTIME_KUMA_SLUG = "homelab";
+    expect(resolveSlug()).toBe("homelab");
+    expect(resolveSlug("ops-page")).toBe("ops-page");
+  });
+
+  it("only accepts lowercase letters, digits and dashes", () => {
+    expect(SLUG_RE.test("my-page-2")).toBe(true);
+    expect(SLUG_RE.test("My Page")).toBe(false);
+    expect(SLUG_RE.test("a/b")).toBe(false);
+  });
+});
 
 describe("ntfyTopics topic resolution", () => {
   const saved = process.env.HOMELAB_NTFY_TOPICS;
