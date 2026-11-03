@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { confirmCancelled } from "../utils/confirm-param.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -9,15 +10,25 @@ const inputSchema = {
     .boolean()
     .optional()
     .default(false)
-    .describe("Also run apt upgrade after update (default: false, just lists upgradable)"),
+    .describe("Also run apt upgrade after update (default: false, just lists upgradable). Requires confirm=true"),
+  confirm: z
+    .boolean()
+    .optional()
+    .describe("Safety gate. Must be true when upgrade is true; not needed to only list updates."),
 };
 
 export function register(server: McpServer): void {
   server.tool(
     "homelab_aptUpdate",
-    "Run apt update on the Pi and list upgradable packages",
+    "Run apt update on the Pi and list upgradable packages; optionally upgrade (requires confirm=true)",
     inputSchema,
     async (args) => {
+      if (args.upgrade && args.confirm !== true) {
+        // Upgrading changes system state (packages, services, possibly the
+        // kernel), so it uses the same confirm gate as other mutating tools.
+        return confirmCancelled("Package upgrade");
+      }
+
       try {
         let cmd = "sudo apt-get update -qq 2>&1 && apt list --upgradable 2>/dev/null";
         if (args.upgrade) {

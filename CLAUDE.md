@@ -181,7 +181,7 @@ npm install -g @tmhs/homelab-mcp
 
 ## Security
 
-- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`.
+- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, and `homelab_aptUpdate` when `upgrade=true`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`.
 - `execSSH()` runs `assertCommandSafe()` before opening any SSH connection. This blocks catastrophic patterns (`rm -rf /`, `mkfs` on block devices, fork bombs, `poweroff`, etc.). Override with `HOMELAB_ALLOW_DANGEROUS_COMMANDS=true`.
 - `HOMELAB_DRY_RUN=true` makes `execSSH` return a description string instead of connecting. The command guard still runs in dry-run mode.
 - No personal SSH usernames, hostnames, or key names in code or docs. Use `pi` / `raspberrypi.local` / `~/.ssh/id_ed25519` as generic defaults.

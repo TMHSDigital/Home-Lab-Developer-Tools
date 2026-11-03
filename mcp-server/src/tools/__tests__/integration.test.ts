@@ -243,6 +243,28 @@ describe("integration tests (mocked SSH)", () => {
       expect(mockExecSSH).not.toHaveBeenCalled();
     });
 
+    it("aptUpdate upgrade blocks without confirm=true", async () => {
+      const { register } = await import("../aptUpdate.js");
+      const handler = captureHandler(register);
+      for (const args of [{ upgrade: true }, { upgrade: true, confirm: false }]) {
+        const result = await handler(args);
+        expect(result.content[0].text).toContain("cancelled");
+      }
+      expect(mockExecSSH).not.toHaveBeenCalled();
+    });
+
+    it("aptUpdate runs upgrade with confirm=true and lists without it", async () => {
+      mockExecSSH.mockResolvedValue("ok");
+      const { register } = await import("../aptUpdate.js");
+      const handler = captureHandler(register);
+
+      await handler({ upgrade: false });
+      expect(mockExecSSH.mock.calls[0][0]).not.toContain("apt-get upgrade");
+
+      await handler({ upgrade: true, confirm: true });
+      expect(mockExecSSH.mock.calls[1][0]).toContain("apt-get upgrade -y");
+    });
+
     it("composeDown blocks when confirm=false", async () => {
       const { register } = await import("../composeDown.js");
       const handler = captureHandler(register);

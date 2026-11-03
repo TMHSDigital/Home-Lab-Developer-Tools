@@ -49,7 +49,7 @@ Optional:
 ### Apply Updates
 
 1. Run `homelab_aptUpgradable` to review pending updates.
-2. Run `homelab_aptUpdate` with `upgrade: true` to apply all pending updates.
+2. After the user approves, run `homelab_aptUpdate` with `upgrade: true` and `confirm: true` to apply all pending updates (without `confirm: true` the upgrade is cancelled).
 3. Run `homelab_kernelInfo` to check if a kernel update requires a reboot.
 4. If reboot needed, check running services with `homelab_systemdServices` before scheduling.
 
@@ -111,7 +111,7 @@ Unattended-Upgrade::Mail "root";
    Running kernel 6.6.31 -- this matches the installed version, so no kernel update pending.
 
    Recommendations:
-   - Apply the 3 security updates immediately with `homelab_aptUpdate` (upgrade: true)
+   - Apply the 3 security updates soon with `homelab_aptUpdate` (upgrade: true, confirm: true) once you approve
    - The remaining 9 packages can wait for your next maintenance window
    - Consider enabling unattended-upgrades for security patches
 

@@ -9,7 +9,7 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | System | `homelab_piStatus` | CPU temp, memory, disk, uptime, throttle state |
 | System | `homelab_piReboot` | Safe reboot with pre-checks |
 | System | `homelab_diskUsage` | Disk usage breakdown by directory |
-| System | `homelab_aptUpdate` | Run apt update, list upgradable packages |
+| System | `homelab_aptUpdate` | Run apt update, list upgradable packages; optional upgrade (requires confirm=true) |
 | Containers | `homelab_serviceHealth` | Docker container health status |
 | Containers | `homelab_serviceLogs` | Tail container logs |
 | Containers | `homelab_serviceRestart` | Restart a container |
