@@ -15,6 +15,16 @@ const inputSchema = {
     .describe("Filter alerts by state. Returns all states if omitted"),
 };
 
+/**
+ * Alertmanager v2 GET /api/v2/alerts has no `state` parameter (unknown
+ * params are ignored); filtering uses these boolean flags instead.
+ */
+export const STATE_FILTERS: Record<"active" | "suppressed" | "unprocessed", string> = {
+  active: "active=true&silenced=false&inhibited=false&unprocessed=false",
+  suppressed: "active=false&silenced=true&inhibited=true&unprocessed=false",
+  unprocessed: "active=false&silenced=false&inhibited=false&unprocessed=true",
+};
+
 function getPort(): number {
   const override = process.env.HOMELAB_ALERTMANAGER_PORT;
   return override ? parseInt(override, 10) : DEFAULT_PORT;
@@ -28,7 +38,7 @@ export function register(server: McpServer): void {
     async (args) => {
       const port = getPort();
       try {
-        const stateParam = args.state ? `?state=${args.state}` : "";
+        const stateParam = args.state ? `?${STATE_FILTERS[args.state]}` : "";
         const output = await execSSH(
           `curl -sf 'http://localhost:${port}/api/v2/alerts${stateParam}'`,
           args.node,

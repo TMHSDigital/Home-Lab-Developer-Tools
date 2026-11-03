@@ -1,5 +1,49 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { buildAptHistoryCommand } from "../aptHistory.js";
+import { STATE_FILTERS } from "../alertList.js";
+import { resolveTopics, TOPIC_LIST_RE } from "../ntfyTopics.js";
+
+describe("ntfyTopics topic resolution", () => {
+  const saved = process.env.HOMELAB_NTFY_TOPICS;
+  afterEach(() => {
+    if (saved === undefined) delete process.env.HOMELAB_NTFY_TOPICS;
+    else process.env.HOMELAB_NTFY_TOPICS = saved;
+  });
+
+  it("requires a topic: no wildcard default", () => {
+    delete process.env.HOMELAB_NTFY_TOPICS;
+    expect(resolveTopics(undefined)).toBeNull();
+    expect(resolveTopics("")).toBeNull();
+  });
+
+  it("accepts single and comma-separated topics", () => {
+    expect(resolveTopics("alerts")).toBe("alerts");
+    expect(resolveTopics("alerts,backups")).toBe("alerts,backups");
+  });
+
+  it("falls back to HOMELAB_NTFY_TOPICS", () => {
+    process.env.HOMELAB_NTFY_TOPICS = "alerts, homelab_ops";
+    expect(resolveTopics(undefined)).toBe("alerts,homelab_ops");
+  });
+
+  it("rejects names outside ntfy's topic charset", () => {
+    expect(TOPIC_LIST_RE.test("*")).toBe(false);
+    expect(TOPIC_LIST_RE.test("a/b")).toBe(false);
+    process.env.HOMELAB_NTFY_TOPICS = "bad topic!";
+    expect(resolveTopics(undefined)).toBeNull();
+  });
+});
+
+describe("alertList state filters", () => {
+  it("maps each state to Alertmanager v2 boolean flags, not a state param", () => {
+    expect(STATE_FILTERS.active).toBe("active=true&silenced=false&inhibited=false&unprocessed=false");
+    expect(STATE_FILTERS.suppressed).toContain("silenced=true");
+    expect(STATE_FILTERS.suppressed).toContain("inhibited=true");
+    expect(STATE_FILTERS.suppressed).toContain("active=false");
+    expect(STATE_FILTERS.unprocessed).toContain("unprocessed=true");
+    for (const q of Object.values(STATE_FILTERS)) expect(q).not.toContain("state=");
+  });
+});
 
 describe("aptHistory command", () => {
   it("reads rotated archives oldest-first and the current log last before tail", () => {

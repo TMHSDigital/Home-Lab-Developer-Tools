@@ -40,7 +40,7 @@ Optional:
 
 ### View Recent Notifications
 
-1. Use `homelab_ntfyTopics` to list recent messages across topics or for a specific topic.
+1. Use `homelab_ntfyTopics` with a `topic` (or a comma-separated list such as `alerts,backups`) to list recent messages. Ntfy has no "all topics" query; if no topic is passed, `HOMELAB_NTFY_TOPICS` is used.
 2. Adjust the `since` parameter to widen or narrow the time window.
 
 ### Alertmanager Integration
@@ -104,9 +104,9 @@ Recommended topic structure:
 
 1. First, let me verify Ntfy is running by checking for recent messages.
 
-   *Calls `homelab_ntfyTopics` with since "24h"*
+   *Calls `homelab_ntfyTopics` with topic "alerts,backups,updates" and since "24h"*
 
-   Ntfy is running with 3 topics active. Let me send a test notification to a "backups" topic.
+   Ntfy is running and those 3 topics have recent messages. Let me send a test notification to a "backups" topic.
 
 2. Sending a test notification.
 
