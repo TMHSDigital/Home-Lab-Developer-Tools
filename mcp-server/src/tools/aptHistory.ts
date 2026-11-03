@@ -15,6 +15,22 @@ const inputSchema = {
     .describe("Number of recent history entries to return"),
 };
 
+const PATTERN = "'(Install|Upgrade|Remove|Commandline)'";
+
+/**
+ * Emit history oldest-to-newest so `tail` keeps the most recent entries:
+ * rotated archives in reverse numeric order (history.log.12.gz ... .1.gz),
+ * then the current history.log last.
+ */
+export function buildAptHistoryCommand(lines: number): string {
+  return (
+    `{ ls -1v /var/log/apt/history.log.*.gz 2>/dev/null | tac | ` +
+    `xargs -r zgrep -hE ${PATTERN} 2>/dev/null; ` +
+    `grep -hE ${PATTERN} /var/log/apt/history.log 2>/dev/null; } ` +
+    `| tail -n ${lines}`
+  );
+}
+
 export function register(server: McpServer): void {
   server.tool(
     "homelab_aptHistory",
@@ -22,11 +38,7 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       try {
-        const cmd =
-          `(grep -E '(Install|Upgrade|Remove|Commandline)' /var/log/apt/history.log 2>/dev/null; ` +
-          `zgrep -E '(Install|Upgrade|Remove|Commandline)' /var/log/apt/history.log.*.gz 2>/dev/null) ` +
-          `| tail -${args.lines}`;
-        const output = await execSSH(cmd, args.node);
+        const output = await execSSH(buildAptHistoryCommand(args.lines), args.node);
         return {
           content: [{
             type: "text" as const,
