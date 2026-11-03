@@ -26,8 +26,13 @@ export class SSHAuthError extends SSHError {
 }
 
 export class SSHTimeoutError extends SSHError {
-  constructor(timeoutMs: number) {
-    super(`SSH connection timed out after ${timeoutMs}ms.`);
+  constructor(timeoutMs: number, commandStarted = false) {
+    super(
+      commandStarted
+        ? `SSH command timed out after ${timeoutMs}ms. The remote command may still be running; ` +
+            "check the host before retrying a state-changing operation."
+        : `SSH connection timed out after ${timeoutMs}ms.`,
+    );
     this.name = "SSHTimeoutError";
   }
 }

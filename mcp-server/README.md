@@ -95,6 +95,7 @@ Set environment variables:
 | `HOMELAB_ANSIBLE_INVENTORY` | `/etc/ansible/hosts` | Ansible inventory file path for node discovery |
 | `HOMELAB_DRY_RUN` | (unset) | When set to any truthy value, `execSSH` prints the command without connecting |
 | `HOMELAB_ALLOW_DANGEROUS_COMMANDS` | (unset) | Set to `true` to bypass the runtime command safety guard |
+| `HOMELAB_SSH_TIMEOUT_MS` | `30000` | Default timeout (connect + command) for tools without their own budget. Long-running tools (apt upgrade, compose pull, restic backup/restore, image scans) use longer built-in timeouts |
 
 ## Usage with Cursor
 

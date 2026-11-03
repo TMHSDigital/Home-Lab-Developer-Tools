@@ -29,7 +29,33 @@ export function assertCommandSafe(command: string): void {
 }
 
 const CONNECT_TIMEOUT_MS = 10_000;
-const EXEC_TIMEOUT_MS = 30_000;
+const DEFAULT_EXEC_TIMEOUT_MS = 30_000;
+
+/** Timeout budgets for tools that run long remote operations. */
+export const TIMEOUTS = {
+  /** apt upgrade, compose pull, image scans, volume backups. */
+  long: 30 * 60_000,
+  /** restic backup/restore runs. */
+  backup: 60 * 60_000,
+  /** compose up/down, apt update, cert renewal, disk walks, log searches. */
+  medium: 5 * 60_000,
+} as const;
+
+export interface ExecOptions {
+  /** Overall timeout (connect + command) in milliseconds. */
+  timeoutMs?: number;
+}
+
+/**
+ * Default exec timeout. HOMELAB_SSH_TIMEOUT_MS overrides the 30s default for
+ * tools that do not set their own budget.
+ */
+export function defaultExecTimeoutMs(): number {
+  const raw = process.env.HOMELAB_SSH_TIMEOUT_MS;
+  if (!raw) return DEFAULT_EXEC_TIMEOUT_MS;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : DEFAULT_EXEC_TIMEOUT_MS;
+}
 
 interface NodeConfig {
   host: string;
@@ -122,7 +148,9 @@ export function loadPrivateKey(keyPath: string): Buffer | undefined {
 export async function execSSH(
   command: string,
   node?: string,
+  options: ExecOptions = {},
 ): Promise<string> {
+  const timeoutMs = options.timeoutMs ?? defaultExecTimeoutMs();
   assertCommandSafe(command);
 
   if (process.env.HOMELAB_DRY_RUN && process.env.HOMELAB_DRY_RUN !== "false") {
@@ -140,12 +168,28 @@ export async function execSSH(
     let stdout = "";
     let stderr = "";
     let timedOut = false;
+    let started = false;
+    let activeStream: { signal?: (name: string) => unknown; close?: () => unknown } | null = null;
 
     const timer = setTimeout(() => {
       timedOut = true;
+      if (activeStream) {
+        // Best effort: ask the remote side to terminate the command before
+        // dropping the connection. Not every SSH server honors signals.
+        try {
+          activeStream.signal?.("TERM");
+        } catch {
+          // ignore
+        }
+        try {
+          activeStream.close?.();
+        } catch {
+          // ignore
+        }
+      }
       conn.end();
-      reject(new SSHTimeoutError(EXEC_TIMEOUT_MS));
-    }, EXEC_TIMEOUT_MS);
+      reject(new SSHTimeoutError(timeoutMs, started));
+    }, timeoutMs);
 
     conn
       .on("ready", () => {
@@ -155,6 +199,8 @@ export async function execSSH(
             conn.end();
             return reject(new SSHError(err.message, command));
           }
+          started = true;
+          activeStream = stream;
 
           stream
             .on("close", (code: number) => {

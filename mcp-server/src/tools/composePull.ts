@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 
 const COMPOSE_DIR = process.env.HOMELAB_COMPOSE_DIR || "/opt/homelab/docker";
@@ -31,6 +31,7 @@ export function register(server: McpServer): void {
         const output = await execSSH(
           `cd ${COMPOSE_DIR} && docker compose ${files} pull 2>&1`,
           args.node,
+          { timeoutMs: TIMEOUTS.long },
         );
 
         return { content: [{ type: "text" as const, text: output }] };

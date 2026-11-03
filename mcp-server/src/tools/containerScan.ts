@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
@@ -39,7 +39,7 @@ export function register(server: McpServer): void {
         const cmd = args.image
           ? `trivy image --severity HIGH,CRITICAL --format table '${args.image}' 2>&1`
           : "docker ps --format '{{.Image}}' | sort -u | while read img; do echo \"=== $img ===\"; trivy image --severity HIGH,CRITICAL --format table \"$img\" 2>&1; echo; done";
-        const output = await execSSH(cmd, args.node);
+        const output = await execSSH(cmd, args.node, { timeoutMs: TIMEOUTS.long });
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
         return errorResponse(error);

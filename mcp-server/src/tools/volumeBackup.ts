@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 
@@ -27,6 +27,7 @@ export function register(server: McpServer): void {
         const output = await execSSH(
           `sudo restic -r ${repo} backup '${volumePath}' --tag docker-volume --tag '${args.volume}' 2>&1`,
           args.node,
+          { timeoutMs: TIMEOUTS.backup },
         );
 
         return { content: [{ type: "text" as const, text: output }] };
