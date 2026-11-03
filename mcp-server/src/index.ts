@@ -56,7 +56,7 @@ import { register as registerDiagnostics } from "./tools/diagnostics.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.15.3",
+  version: "0.15.4",
 });
 
 registerPiStatus(server);
