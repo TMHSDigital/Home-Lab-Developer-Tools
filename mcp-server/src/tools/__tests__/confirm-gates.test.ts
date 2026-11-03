@@ -61,15 +61,17 @@ const GATED: Array<[tool: string, file: string, args: Record<string, unknown>, e
   ["homelab_aptUpdate", "aptUpdate", { upgrade: true }, "apt-get upgrade -y"],
 ];
 
-function captureHandler(register: Register) {
-  let handler: ((args: Record<string, unknown>) => Promise<{ content: { text: string }[] }>) | null = null;
+type Handler = (args: Record<string, unknown>) => Promise<{ content: { text: string }[] }>;
+
+function captureHandler(register: Register): Handler {
+  let handler: Handler | null = null;
   register({
-    tool: (_name: string, _desc: string, _schema: unknown, h: typeof handler) => {
+    tool: (_name: string, _desc: string, _schema: unknown, h: Handler) => {
       handler = h;
     },
   });
   if (!handler) throw new Error("handler not captured");
-  return handler as NonNullable<typeof handler>;
+  return handler as Handler;
 }
 
 async function load(file: string) {

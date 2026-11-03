@@ -1,60 +1,89 @@
 import { describe, it, expect } from "vitest";
+import { z } from "zod";
 import { execSSH } from "../../utils/ssh-api.js";
+import { register as piStatus } from "../piStatus.js";
+import { register as diskUsage } from "../diskUsage.js";
+import { register as serviceHealth } from "../serviceHealth.js";
+import { register as healthCheck } from "../healthCheck.js";
+import { register as diagnostics } from "../diagnostics.js";
+import { register as kernelInfo } from "../kernelInfo.js";
+import { register as sshTest } from "../sshTest.js";
+import { register as networkInfo } from "../networkInfo.js";
+import { register as systemdServices } from "../systemdServices.js";
 
 const SKIP = !process.env.HOMELAB_TEST_PI;
 
-describe.skipIf(SKIP)("e2e tests (live Pi)", () => {
+type Result = { content: { text: string }[]; isError?: boolean };
+type Handler = (args: Record<string, unknown>) => Promise<Result>;
+
+/**
+ * Capture a tool's real handler and schema so e2e runs the shipped command
+ * (with schema defaults applied, as the MCP server does), not a copy.
+ */
+function handlerOf(register: (server: never) => void): Handler {
+  let handler: Handler | null = null;
+  let shape: z.ZodRawShape = {};
+  register({
+    tool: (_n: string, _d: string, s: z.ZodRawShape, h: Handler) => {
+      shape = s;
+      handler = h;
+    },
+  } as never);
+  if (!handler) throw new Error("handler not captured");
+  const h = handler as Handler;
+  return (args) => h(z.object(shape).parse(args));
+}
+
+async function run(register: (server: never) => void, args: Record<string, unknown> = {}): Promise<string> {
+  const result = await handlerOf(register)(args);
+  const text = result.content[0]?.text ?? "";
+  expect(result.isError, text).toBeFalsy();
+  expect(text.length).toBeGreaterThan(0);
+  return text;
+}
+
+describe.skipIf(SKIP)("e2e tests (live Pi, read-only tools)", () => {
   it("SSH connectivity", async () => {
-    const output = await execSSH("echo ok");
-    expect(output).toBe("ok");
+    expect(await execSSH("echo ok")).toBe("ok");
   });
 
-  it("piStatus returns expected sections", async () => {
-    const output = await execSSH([
-      'echo "=== Uptime ==="',
-      "uptime",
-      'echo "=== CPU Temperature ==="',
-      "cat /sys/class/thermal/thermal_zone0/temp | awk '{printf \"%.1f C\\n\", $1/1000}'",
-      'echo "=== Memory ==="',
-      "free -h | head -2",
-      'echo "=== Disk ==="',
-      "df -h / | tail -1",
-    ].join(" && "));
-
-    expect(output).toContain("Uptime");
-    expect(output).toContain("CPU Temperature");
-    expect(output).toContain("Memory");
-    expect(output).toContain("Disk");
+  it("homelab_sshTest", async () => {
+    expect(await run(sshTest)).toContain(": OK");
   });
 
-  it("Docker containers are running", async () => {
-    const output = await execSSH(
-      "docker ps --format '{{.Names}}' | head -5",
-    );
-    expect(output.length).toBeGreaterThan(0);
+  it("homelab_piStatus", async () => {
+    await run(piStatus);
   });
 
-  it("disk usage is non-empty", async () => {
-    const output = await execSSH("df -h / | tail -1");
-    expect(output).toContain("/");
+  it("homelab_diskUsage", async () => {
+    expect(await run(diskUsage, { path: "/", depth: 1 })).toContain("=== Filesystem ===");
   });
 
-  it("healthCheck commands succeed", async () => {
-    const checks = [
-      "echo ok",
-      "docker --version",
-      "docker compose version",
-      "command -v curl",
-    ];
-
-    for (const cmd of checks) {
-      const output = await execSSH(cmd);
-      expect(output.length).toBeGreaterThan(0);
-    }
+  it("homelab_serviceHealth", async () => {
+    await run(serviceHealth);
   });
 
-  it("diagnostics commands return data", async () => {
-    const output = await execSSH("uname -a && free -h | head -2 && df -h / | tail -1");
-    expect(output).toContain("Linux");
+  it("homelab_healthCheck", async () => {
+    const text = await run(healthCheck);
+    expect(text).toContain("[PASS] SSH connectivity");
+    expect(text).toMatch(/\d+\/\d+ checks passed/);
+  });
+
+  it("homelab_diagnostics", async () => {
+    const text = await run(diagnostics);
+    expect(text).toContain("=== Kernel ===");
+    expect(text).toContain("Linux");
+  });
+
+  it("homelab_kernelInfo", async () => {
+    await run(kernelInfo);
+  });
+
+  it("homelab_networkInfo", async () => {
+    await run(networkInfo);
+  });
+
+  it("homelab_systemdServices", async () => {
+    await run(systemdServices);
   });
 });
