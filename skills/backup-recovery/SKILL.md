@@ -6,6 +6,7 @@ tools:
   - homelab_backupRun
   - homelab_backupList
   - homelab_backupDiff
+  - homelab_journalLogs
 standards-version: 1.10.0
 ---
 
@@ -62,13 +63,13 @@ Optional:
 
    **Running a manual backup:**
    - Call `homelab_backupRun` to trigger an immediate backup
-   - Monitor progress via `homelab_serviceLogs` on the backup service
+   - Review the run with `homelab_journalLogs` (the restic systemd service/timer unit) if the output needs more detail
    - Verify the new snapshot appears in `homelab_backupStatus`
 
    **Restoring data:**
    - List available snapshots and identify the target snapshot ID
-   - Stop the affected service via `homelab_serviceRestart` or
-     `homelab_composeDown` to avoid file conflicts
+   - Stop the affected containers via `homelab_composeDown` (with `confirm: true`)
+     to avoid file conflicts
    - Restore with `restic restore <snapshot-id> --target <path>`
    - Restart the service and verify functionality
    - Call `homelab_serviceHealth` to confirm the service is healthy
@@ -139,7 +140,7 @@ Retention policy defaults:
 | `homelab_sshTest`        | Validate SSH connectivity                      |
 | `homelab_backupStatus`   | Get last backup time, snapshot count, errors    |
 | `homelab_backupRun`      | Trigger an immediate backup                    |
-| `homelab_serviceLogs`    | Monitor backup job progress and errors         |
+| `homelab_journalLogs`    | Review backup service and timer runs and errors |
 | `homelab_composeDown`    | Stop services before restore operations        |
 | `homelab_composeUp`      | Restart services after restore                 |
 | `homelab_serviceHealth`  | Verify service health after restore            |

@@ -108,8 +108,8 @@ Use this skill when the user wants to:
 | `homelab_sshTest` | Pre-flight connectivity check before running playbooks |
 | `homelab_piStatus` | Verify system state after provisioning |
 | `homelab_serviceHealth` | Confirm deployed services are running |
-| `homelab_serviceLogs` | Debug service startup failures post-deployment |
-| `homelab_serviceRestart` | Restart a service if Ansible handler did not trigger |
+| `homelab_serviceLogs` / `homelab_journalLogs` | Debug container / systemd service startup failures post-deployment |
+| `homelab_serviceRestart` / `homelab_nodeExec` | Restart a container, or a systemd service via `systemctl` (`confirm: true`), if an Ansible handler did not trigger |
 | `homelab_aptUpdate` | Check for package updates before running apt tasks |
 | `homelab_composeUp` | Bring up Docker stacks deployed by playbooks |
 | `homelab_composePs` | Verify container state after compose deployment |

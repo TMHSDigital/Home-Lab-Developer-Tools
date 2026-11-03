@@ -4,6 +4,8 @@ description: Manage Samba shares, Syncthing file sync, Docker volumes, and disk 
 tools:
   - homelab_diskUsage
   - homelab_volumeBackup
+  - homelab_journalLogs
+  - homelab_nodeExec
 standards-version: 1.10.0
 ---
 
@@ -125,8 +127,10 @@ Use this skill when the user wants to:
 | `homelab_composePs` | Check Syncthing and other container states |
 | `homelab_composeUp` | Redeploy stacks after volume config changes |
 | `homelab_composeDown` | Stop stacks before major volume operations |
-| `homelab_serviceLogs` | Debug Samba or Syncthing issues |
-| `homelab_serviceRestart` | Restart smbd after config changes |
+| `homelab_journalLogs` | Debug Samba (`unit: "smbd"`) via the systemd journal |
+| `homelab_serviceLogs` | Debug the Syncthing container |
+| `homelab_nodeExec` | Restart smbd after config changes (`sudo systemctl restart smbd`, `confirm: true`) |
+| `homelab_serviceRestart` | Restart the Syncthing container |
 | `homelab_backupStatus` | Check if backups are consuming excessive space |
 
 ## Common Pitfalls

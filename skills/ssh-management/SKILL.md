@@ -3,6 +3,9 @@ name: ssh-management
 description: Manage SSH keys, harden SSH configuration, set up tunnels, and troubleshoot connection issues.
 tools:
   - homelab_sshTest
+  - homelab_journalLogs
+  - homelab_systemdServices
+  - homelab_nodeExec
 standards-version: 1.10.0
 ---
 
@@ -28,7 +31,7 @@ Use this skill when the user wants to:
 ## Workflow
 
 1. **Verify connectivity** -- call `homelab_sshTest` to confirm the Pi is reachable before making changes.
-2. **Assess current config** -- call `homelab_piStatus` to check uptime, then inspect the current sshd_config state via `homelab_serviceLogs` for sshd or relevant systemd journal entries.
+2. **Assess current config** -- call `homelab_piStatus` to check uptime, then inspect sshd via `homelab_systemdServices` with `unit: "ssh.service"` and its journal via `homelab_journalLogs` with `unit: "ssh"`.
 3. **Key generation** (if requested):
    - Generate an ed25519 key pair on the Windows host using `ssh-keygen -t ed25519 -C "homelab-<hostname>"`.
    - Copy the public key to the Pi's `~/.ssh/authorized_keys` using `ssh-copy-id` or manual append.
@@ -39,7 +42,7 @@ Use this skill when the user wants to:
    - Restrict to key-only: `PubkeyAuthentication yes`
    - Set `MaxAuthTries 3` and `LoginGraceTime 30`
    - Limit allowed users: `AllowUsers <username>`
-   - Restart sshd via `homelab_serviceRestart` with the sshd service name.
+   - Apply the change via `homelab_nodeExec` with `node: "default"` (or the target node), `command: "sudo sshd -t && sudo systemctl reload ssh"` and `confirm: true` (validates the config first; `reload` keeps existing sessions open; the unit is `ssh` on Debian/Raspberry Pi OS). Keep the current session open until `homelab_sshTest` succeeds.
 5. **Tunnel setup** (if requested):
    - Local forward: `ssh -L <localPort>:<remoteHost>:<remotePort> user@pi`
    - Remote forward: `ssh -R <remotePort>:localhost:<localPort> user@pi`
@@ -71,7 +74,7 @@ Use this skill when the user wants to:
    ```
 3. Copy the public key to the Pi's authorized_keys.
 4. Update sshd_config on the Pi to disable password auth, disable root login, and restrict to the user's account.
-5. Call `homelab_serviceRestart` for sshd.
+5. Reload sshd via `homelab_nodeExec` with `node: "default"` (or the target node), `command: "sudo sshd -t && sudo systemctl reload ssh"` and `confirm: true` (validates the config first; `reload` keeps existing sessions open; the unit is `ssh` on Debian/Raspberry Pi OS).
 6. Call `homelab_sshTest` to confirm key-based access works.
 7. Create an SSH config entry on Windows:
    ```
@@ -89,8 +92,9 @@ Use this skill when the user wants to:
 |------|---------|
 | `homelab_sshTest` | Verify SSH connectivity before and after config changes |
 | `homelab_piStatus` | Check Pi uptime and basic system state |
-| `homelab_serviceRestart` | Restart sshd after config modifications |
-| `homelab_serviceLogs` | Inspect sshd logs for auth failures or config errors |
+| `homelab_nodeExec` | Validate and reload sshd after config changes (`confirm: true`) |
+| `homelab_systemdServices` | Check the `ssh.service` unit status |
+| `homelab_journalLogs` | Inspect sshd journal entries (`unit: "ssh"`) for auth failures or config errors |
 | `homelab_networkInfo` | Verify the Pi's IP and network interfaces |
 
 ## Common Pitfalls
