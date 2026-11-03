@@ -43,16 +43,16 @@ Before finalizing any version bump, complete every item in order:
    - Rules table (add new rule rows with scope)
 9. Regenerate `package-lock.json` by running `npm install` in `mcp-server/` after version bump.
 10. Re-run all tests after doc changes (some tests validate docs consistency).
-11. Commit everything (including `package-lock.json`) and push to `main`. The `auto-tag.yml` workflow creates the tag and release automatically.
+11. Commit everything (including `package-lock.json`) and push to `main`. The `release.yml` workflow bumps the version, creates the tag and release, and dispatches the npm publish automatically.
 12. Verify the release appears on GitHub and npm publish succeeds.
 
 ## Publishing flow
-- Pushing a version bump in `mcp-server/package.json` to `main` triggers `auto-tag.yml`.
-- `auto-tag.yml` detects the version change, creates a git tag (`vX.Y.Z`), creates a GitHub Release, then dispatches `publish.yml`.
+- Every push to `main` triggers `release.yml`, which bumps one shared version across `.cursor-plugin/plugin.json` and `mcp-server/` (package.json, package-lock.json, src/index.ts).
+- `release.yml` pushes the bump commit and tag (`vX.Y.Z`) atomically, creates a GitHub Release, then dispatches `publish.yml`.
 - `publish.yml` builds, tests, and publishes to npm via trusted publishing (OIDC, no `NPM_TOKEN`). The npm trusted publisher is bound to this filename.
 - Release Drafter auto-drafts release notes from merged PRs (labels control categories).
 - Never publish to npm manually -- always go through the automated workflow.
-- Never create tags or releases manually -- `auto-tag.yml` handles this automatically on version bumps.
+- Never create tags or releases manually -- `release.yml` handles this automatically.
 
 ## Home lab conventions
 - Target platform is Raspberry Pi 5 running Raspberry Pi OS Lite 64-bit (arm64).

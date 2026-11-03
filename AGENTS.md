@@ -25,7 +25,7 @@ Home-Lab-Developer-Tools/
   docs/                        # Generated GitHub Pages site (do not edit manually)
   assets/                      # Logo and images
   tests/                       # Test suite
-  .github/workflows/           # CI/CD (auto-tag, ci, codeql, dep-review, e2e, links, pages, publish, release-drafter, stale, validate)
+  .github/workflows/           # CI/CD (ci, codeql, dep-review, e2e, links, pages, publish, release-drafter, stale, validate)
 ```
 
 ## Branching and commit model
@@ -76,8 +76,7 @@ The `pages.yml` workflow clones Developer-Tools-Directory, runs `build_site.py`,
 - `e2e.yml` -- end-to-end tests
 - `validate.yml` -- validates plugin.json schema
 - `pages.yml` -- builds and deploys GitHub Pages via shared template
-- `publish.yml` -- publishes MCP server to npm
-- `auto-tag.yml` -- auto-tags releases from version bumps
+- `publish.yml` -- publishes MCP server to npm via trusted publishing (dispatched by `release.yml`)
 - `codeql.yml` -- security scanning
 - `dependency-review.yml` -- audits PR dependencies
 - `release-drafter.yml` -- auto-drafts release notes

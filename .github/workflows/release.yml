@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: release
@@ -97,6 +98,25 @@ jobs:
           )
           with open(readme, 'w') as f:
               f.write(content)
+
+          # Keep the npm package version in lockstep with the plugin version
+          for path in ('mcp-server/package.json', 'mcp-server/package-lock.json'):
+              with open(path) as f:
+                  data = json.load(f)
+              data['version'] = new_version
+              if 'packages' in data and '' in data['packages']:
+                  data['packages']['']['version'] = new_version
+              with open(path, 'w') as f:
+                  json.dump(data, f, indent=2, ensure_ascii=False)
+                  f.write('\n')
+
+          import re
+          index = 'mcp-server/src/index.ts'
+          with open(index) as f:
+              content = f.read()
+          content = re.sub(r'version: \x22[0-9][^\x22]*\x22', f'version: \x22{new_version}\x22', content, count=1)
+          with open(index, 'w') as f:
+              f.write(content)
           "
 
       - name: Sync release docs
@@ -114,7 +134,9 @@ jobs:
           git add -A
           git commit -m "chore: bump version to ${{ steps.new.outputs.version }} [skip ci]"
           git tag "v${{ steps.new.outputs.version }}"
-          git push origin main --tags
+          # --atomic: never push the tag unless main also moves, so a race
+          # with another push cannot leave an orphaned tag behind
+          git push --atomic origin main "refs/tags/v${{ steps.new.outputs.version }}"
 
       - name: Create GitHub Release
         if: steps.check.outputs.skip == 'false'
@@ -124,3 +146,15 @@ jobs:
           gh release create "v${{ steps.new.outputs.version }}" \
             --title "v${{ steps.new.outputs.version }}" \
             --generate-notes
+
+      # npm trusted publishing (OIDC) is bound to publish.yml, so publishing
+      # must run there. Releases created with GITHUB_TOKEN do not trigger
+      # other workflows, but workflow_dispatch does.
+      - name: Dispatch npm publish
+        if: steps.check.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run publish.yml \
+            --ref main \
+            -f tag="v${{ steps.new.outputs.version }}"
