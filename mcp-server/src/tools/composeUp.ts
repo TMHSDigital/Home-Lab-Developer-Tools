@@ -3,15 +3,17 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
-
-const COMPOSE_DIR = process.env.HOMELAB_COMPOSE_DIR || "/opt/homelab/docker";
+import { buildComposeCommand } from "../utils/compose.js";
 
 const inputSchema = {
   ...nodeParam,
   stacks: z
     .array(z.string())
     .optional()
-    .describe("Specific compose files to start (e.g. ['compose.monitoring.yml']). Omit for all."),
+    .describe(
+      "Specific compose files to start (e.g. ['compose.monitoring.yml']); compose.base.yml is always included. " +
+        "Omit for all (HOMELAB_COMPOSE_FILES, or every compose*.yml found in HOMELAB_COMPOSE_DIR).",
+    ),
   ...confirmParam,
 };
 
@@ -26,15 +28,8 @@ export function register(server: McpServer): void {
       }
 
       try {
-        let files = "-f compose.base.yml";
-        if (args.stacks && args.stacks.length > 0) {
-          files += " " + args.stacks.map((s) => `-f ${s}`).join(" ");
-        } else {
-          files += " -f compose.monitoring.yml -f compose.network.yml -f compose.apps.yml -f compose.security.yml -f compose.storage.yml -f compose.tools.yml";
-        }
-
         const output = await execSSH(
-          `cd ${COMPOSE_DIR} && docker compose ${files} up -d --remove-orphans 2>&1`,
+          buildComposeCommand("up -d --remove-orphans 2>&1", args.stacks),
           args.node,
           { timeoutMs: TIMEOUTS.medium },
         );

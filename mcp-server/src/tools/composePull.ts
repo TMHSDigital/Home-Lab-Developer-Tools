@@ -2,8 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
-
-const COMPOSE_DIR = process.env.HOMELAB_COMPOSE_DIR || "/opt/homelab/docker";
+import { buildComposeCommand } from "../utils/compose.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -21,15 +20,8 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       try {
-        let files = "-f compose.base.yml";
-        if (args.stacks && args.stacks.length > 0) {
-          files += " " + args.stacks.map((s) => `-f ${s}`).join(" ");
-        } else {
-          files += " -f compose.monitoring.yml -f compose.network.yml -f compose.apps.yml -f compose.security.yml -f compose.storage.yml -f compose.tools.yml";
-        }
-
         const output = await execSSH(
-          `cd ${COMPOSE_DIR} && docker compose ${files} pull 2>&1`,
+          buildComposeCommand("pull 2>&1", args.stacks),
           args.node,
           { timeoutMs: TIMEOUTS.long },
         );

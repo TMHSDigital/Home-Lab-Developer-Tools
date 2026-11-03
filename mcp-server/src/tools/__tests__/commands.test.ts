@@ -3,6 +3,52 @@ import { buildAptHistoryCommand } from "../aptHistory.js";
 import { STATE_FILTERS } from "../alertList.js";
 import { resolveTopics, TOPIC_LIST_RE } from "../ntfyTopics.js";
 import { resolveSlug, SLUG_RE } from "../uptimeKumaStatus.js";
+import { buildComposeCommand, KNOWN_STACK_FILES } from "../../utils/compose.js";
+import { assertCommandSafe } from "../../utils/ssh-api.js";
+
+describe("compose file selection", () => {
+  const saved = {
+    dir: process.env.HOMELAB_COMPOSE_DIR,
+    files: process.env.HOMELAB_COMPOSE_FILES,
+  };
+  afterEach(() => {
+    if (saved.dir === undefined) delete process.env.HOMELAB_COMPOSE_DIR;
+    else process.env.HOMELAB_COMPOSE_DIR = saved.dir;
+    if (saved.files === undefined) delete process.env.HOMELAB_COMPOSE_FILES;
+    else process.env.HOMELAB_COMPOSE_FILES = saved.files;
+  });
+
+  it("passes compose.base.yml plus requested stacks when stacks are given", () => {
+    delete process.env.HOMELAB_COMPOSE_DIR;
+    expect(buildComposeCommand("pull", ["compose.monitoring.yml"])).toBe(
+      "cd /opt/homelab/docker || exit 1; docker compose -f compose.base.yml -f compose.monitoring.yml pull",
+    );
+  });
+
+  it("uses HOMELAB_COMPOSE_FILES in order when set", () => {
+    process.env.HOMELAB_COMPOSE_DIR = "/srv/stack";
+    process.env.HOMELAB_COMPOSE_FILES = "docker-compose.yml, override.yml";
+    expect(buildComposeCommand("ps")).toBe(
+      "cd /srv/stack || exit 1; docker compose -f docker-compose.yml -f override.yml ps",
+    );
+  });
+
+  it("rejects unexpected characters in HOMELAB_COMPOSE_FILES", () => {
+    process.env.HOMELAB_COMPOSE_FILES = "a.yml;b.yml";
+    expect(() => buildComposeCommand("ps")).toThrow(/Invalid entry/);
+  });
+
+  it("discovers files on the node, keeping the reference order first", () => {
+    delete process.env.HOMELAB_COMPOSE_FILES;
+    const cmd = buildComposeCommand("up -d");
+    expect(cmd).toContain(`for f in ${KNOWN_STACK_FILES.join(" ")}; do`);
+    expect(cmd).toContain("for f in compose.*.yml;");
+    expect(cmd).toContain("docker-compose.yml");
+    expect(cmd).toContain("No compose files found");
+    expect(cmd.endsWith("docker compose $files up -d")).toBe(true);
+    expect(() => assertCommandSafe(cmd)).not.toThrow();
+  });
+});
 
 describe("uptimeKumaStatus slug", () => {
   const saved = process.env.HOMELAB_UPTIME_KUMA_SLUG;

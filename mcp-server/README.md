@@ -75,6 +75,7 @@ Set environment variables:
 | `HOMELAB_PI_USER` | `pi` | SSH username |
 | `HOMELAB_PI_KEY_PATH` | (empty) | Path to SSH private key (e.g. `~/.ssh/id_ed25519`) |
 | `HOMELAB_COMPOSE_DIR` | `/opt/homelab/docker` | Compose project directory on Pi |
+| `HOMELAB_COMPOSE_FILES` | (discovered) | Comma-separated compose files (in order) used when no `stacks` are passed. If unset, `compose.base.yml` and every `compose.*.yml` in the compose dir are used, falling back to `compose.yaml` / `docker-compose.yml` |
 | `HOMELAB_BACKUP_REPO` | `/mnt/backup/restic` | Restic backup repo path on Pi |
 | `HOMELAB_GRAFANA_TOKEN` | (empty) | Grafana API token (preferred auth method) |
 | `HOMELAB_GRAFANA_USER` | `admin` | Grafana basic auth username |
