@@ -8,13 +8,18 @@ const inputSchema = {
   image: z
     .string()
     .optional()
-    .describe("Specific container image to scan. Scans all running images if omitted"),
+    .describe("Specific container image to scan. Scans all running images if omitted (slow on a Pi)"),
+  severity: z
+    .array(z.enum(["UNKNOWN", "LOW", "MEDIUM", "HIGH", "CRITICAL"]))
+    .min(1)
+    .optional()
+    .describe("Severities to report (default: HIGH, CRITICAL)"),
 };
 
 export function register(server: McpServer): void {
   server.tool(
     "homelab_containerScan",
-    "Scan running container images for HIGH/CRITICAL vulnerabilities using Trivy",
+    "Scan running container images for vulnerabilities using Trivy (default severities: HIGH, CRITICAL)",
     inputSchema,
     async (args) => {
       try {
@@ -36,9 +41,12 @@ export function register(server: McpServer): void {
           };
         }
 
+        const severity = [...new Set(args.severity ?? ["HIGH", "CRITICAL"])].join(",");
+        // --quiet drops progress bars, which otherwise dominate the output.
+        const trivy = `trivy image --quiet --severity ${severity} --format table`;
         const cmd = args.image
-          ? `trivy image --severity HIGH,CRITICAL --format table '${args.image}' 2>&1`
-          : "docker ps --format '{{.Image}}' | sort -u | while read img; do echo \"=== $img ===\"; trivy image --severity HIGH,CRITICAL --format table \"$img\" 2>&1; echo; done";
+          ? `${trivy} '${args.image}' 2>&1`
+          : `docker ps --format '{{.Image}}' | sort -u | while read img; do echo "=== $img ==="; ${trivy} "$img" 2>&1; echo; done`;
         const output = await execSSH(cmd, args.node, { timeoutMs: TIMEOUTS.long });
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {

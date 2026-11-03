@@ -5,6 +5,24 @@ import { resolveTopics, TOPIC_LIST_RE } from "../ntfyTopics.js";
 import { resolveSlug, SLUG_RE } from "../uptimeKumaStatus.js";
 import { buildComposeCommand, KNOWN_STACK_FILES } from "../../utils/compose.js";
 import { assertCommandSafe } from "../../utils/ssh-api.js";
+import { SINCE_RE, toDockerSince } from "../../utils/since-param.js";
+
+describe("since parameter", () => {
+  it.each(["30s", "10m", "24h", "7d", "2024-05-01", "2024-05-01T12:00", "2024-05-01T12:00:00Z", "2024-05-01T12:00:00+02:00"])(
+    "accepts %s",
+    (v) => expect(SINCE_RE.test(v)).toBe(true),
+  );
+
+  it.each(["", "1w", "yesterday", "10 m", "2024/05/01", "1.5h"])("rejects %j", (v) =>
+    expect(SINCE_RE.test(v)).toBe(false),
+  );
+
+  it("converts days to hours for docker logs", () => {
+    expect(toDockerSince("7d")).toBe("168h");
+    expect(toDockerSince("90m")).toBe("90m");
+    expect(toDockerSince("2024-05-01")).toBe("2024-05-01");
+  });
+});
 
 describe("compose file selection", () => {
   const saved = {

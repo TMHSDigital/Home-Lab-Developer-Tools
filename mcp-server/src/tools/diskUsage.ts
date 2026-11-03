@@ -31,7 +31,8 @@ export function register(server: McpServer): void {
           "df -h",
           'echo ""',
           `echo "=== Directory Usage (${args.path}, depth ${args.depth}) ==="`,
-          `sudo du -h --max-depth=${args.depth} ${args.path} 2>/dev/null | sort -rh | head -20`,
+          // -x: stay on one filesystem (skip /proc, overlay and network mounts)
+          `sudo du -x -h --max-depth=${args.depth} ${args.path} 2>/dev/null | sort -rh | head -20`,
           'echo ""',
           'echo "=== Docker Disk Usage ==="',
           "docker system df 2>/dev/null || echo 'Docker not available'",
