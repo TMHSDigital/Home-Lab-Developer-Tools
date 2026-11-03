@@ -1,5 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH } from "../utils/ssh-api.js";
+import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { CommandFailedError } from "../utils/errors.js";
 import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = { ...nodeParam };
@@ -25,7 +26,11 @@ export function register(server: McpServer): void {
           sections.push("=== Certbot ===\nNot installed. Skipping.");
         }
       } catch (error) {
-        sections.push("=== Certbot ===\nFailed to query certbot certificates.");
+        if (!(error instanceof CommandFailedError)) {
+          // Unknown node, unreachable host, or auth failure: report the cause.
+          return errorResponse(error);
+        }
+        sections.push(`=== Certbot ===\nFailed to query certbot certificates: ${error.message}`);
       }
 
       try {
@@ -49,8 +54,17 @@ export function register(server: McpServer): void {
           args.node,
         );
         sections.push("\n=== Nginx Proxy Manager Certificates ===\n" + certsOutput);
-      } catch {
-        sections.push("\n=== Nginx Proxy Manager ===\nCould not query NPM certificates. Check connectivity and credentials.");
+      } catch (error) {
+        const reason =
+          error instanceof SyntaxError
+            ? "unexpected response from the NPM API"
+            : error instanceof Error
+              ? error.message
+              : String(error);
+        sections.push(
+          "\n=== Nginx Proxy Manager ===\nCould not query NPM certificates " +
+            `(${reason}). Check HOMELAB_NPM_PORT and credentials.`,
+        );
       }
 
       return { content: [{ type: "text" as const, text: sections.join("\n") }] };

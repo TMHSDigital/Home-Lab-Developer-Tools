@@ -82,6 +82,7 @@ describe("integration tests (mocked SSH)", () => {
 
     it("handles individual section failures gracefully", async () => {
       mockExecSSH
+        .mockResolvedValueOnce("ok") // connectivity probe
         .mockResolvedValueOnce("Debian GNU/Linux 12")
         .mockRejectedValueOnce(new Error("fail"))
         .mockResolvedValue("ok");
@@ -93,7 +94,34 @@ describe("integration tests (mocked SSH)", () => {
       const text = result.content[0].text;
       expect(text).toContain("=== OS ===");
       expect(text).toContain("Debian GNU/Linux 12");
-      expect(text).toContain("(unavailable)");
+      expect(text).toContain("(unavailable: fail)");
+      expect(result.isError).toBeUndefined();
+    });
+
+    it("returns an error with the cause when the node is unreachable", async () => {
+      mockExecSSH.mockRejectedValueOnce(new Error('Unknown node "typo"'));
+
+      const { register } = await import("../diagnostics.js");
+      const handler = captureHandler(register);
+      const result = await handler({ node: "typo" });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Unknown node "typo"');
+      expect(mockExecSSH).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("healthCheck failures", () => {
+    it("stops and reports the cause when SSH connectivity fails", async () => {
+      mockExecSSH.mockRejectedValueOnce(new Error("SSH authentication failed."));
+
+      const { register } = await import("../healthCheck.js");
+      const handler = captureHandler(register);
+      const result = await handler({});
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("[FAIL] SSH connectivity: SSH authentication failed.");
+      expect(mockExecSSH).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -173,7 +201,20 @@ describe("integration tests (mocked SSH)", () => {
 
       const text = result.content[0].text;
       expect(text).toContain("default (raspberrypi.local) -- online");
-      expect(text).toContain("nas (nas.local) -- offline");
+      expect(text).toContain("nas (nas.local) -- offline (connection refused)");
+    });
+
+    it("returns an error when the node registry is invalid", async () => {
+      mockListNodes.mockImplementationOnce(() => {
+        throw new Error("HOMELAB_NODES is not valid JSON");
+      });
+
+      const { register } = await import("../nodeList.js");
+      const handler = captureHandler(register);
+      const result = await handler({});
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("HOMELAB_NODES is not valid JSON");
     });
   });
 

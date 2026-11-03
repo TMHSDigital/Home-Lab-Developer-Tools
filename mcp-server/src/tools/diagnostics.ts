@@ -12,8 +12,9 @@ async function collect(
   try {
     const output = await execSSH(command, node);
     return `=== ${label} ===\n${output}`;
-  } catch {
-    return `=== ${label} ===\n(unavailable)`;
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    return `=== ${label} ===\n(unavailable: ${reason})`;
   }
 }
 
@@ -24,6 +25,10 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       try {
+        // Fail the whole tool (with the real cause) when the node is unknown,
+        // unreachable, or rejects auth, instead of nine "(unavailable)" sections.
+        await execSSH("echo ok", args.node);
+
         const sections: string[] = [];
 
         sections.push(await collect("OS", "cat /etc/os-release | head -5", args.node));

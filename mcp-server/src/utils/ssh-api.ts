@@ -71,36 +71,64 @@ function getDefaultConfig(): NodeConfig {
   };
 }
 
-function getNodesRegistry(): Record<string, NodeConfig> {
-  const raw = process.env.HOMELAB_NODES;
-  if (!raw) return {};
+function optionalString(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
 
+/**
+ * Parse HOMELAB_NODES. Invalid JSON or entries without a host raise an
+ * SSHError naming the problem instead of silently dropping every node.
+ */
+function getNodesRegistry(): Map<string, NodeConfig> {
+  const registry = new Map<string, NodeConfig>();
+  const raw = process.env.HOMELAB_NODES;
+  if (!raw || !raw.trim()) return registry;
+
+  let parsed: unknown;
   try {
-    const parsed = JSON.parse(raw);
-    const registry: Record<string, NodeConfig> = {};
-    for (const [name, cfg] of Object.entries(parsed)) {
-      const c = cfg as Record<string, string>;
-      registry[name] = {
-        host: c.host || "",
-        username: c.user || c.username || "pi",
-        keyPath: c.keyPath || "",
-      };
-    }
-    return registry;
-  } catch {
-    return {};
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    throw new SSHError(`HOMELAB_NODES is not valid JSON (${reason}).`);
   }
+
+  if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+    throw new SSHError(
+      'HOMELAB_NODES must be a JSON object mapping node names to {"host", "user", "keyPath"}.',
+    );
+  }
+
+  for (const [name, cfg] of Object.entries(parsed as Record<string, unknown>)) {
+    if (typeof cfg !== "object" || cfg === null || Array.isArray(cfg)) {
+      throw new SSHError(`HOMELAB_NODES entry "${name}" must be an object.`);
+    }
+    const c = cfg as Record<string, unknown>;
+    const host = optionalString(c.host).trim();
+    if (!host) {
+      throw new SSHError(`HOMELAB_NODES entry "${name}" is missing "host".`);
+    }
+    registry.set(name, {
+      host,
+      username: optionalString(c.user) || optionalString(c.username) || "pi",
+      keyPath: optionalString(c.keyPath),
+    });
+  }
+  return registry;
 }
 
 export function getNodeConfig(node?: string): NodeConfig {
   if (!node) return getDefaultConfig();
 
   const registry = getNodesRegistry();
-  if (registry[node]) return registry[node];
+  const cfg = registry.get(node);
+  if (cfg) return cfg;
 
   if (node === "default") return getDefaultConfig();
 
-  throw new SSHError(`Unknown node "${node}". Available nodes: ${listNodes().map((n) => n.name).join(", ") || "(none -- set HOMELAB_NODES)"}`);
+  throw new SSHError(
+    `Unknown node "${node}". Available nodes: ${listNodes().map((n) => n.name).join(", ")}. ` +
+      "Add nodes via HOMELAB_NODES.",
+  );
 }
 
 export function listNodes(): { name: string; host: string }[] {
@@ -110,7 +138,7 @@ export function listNodes(): { name: string; host: string }[] {
   ];
 
   const registry = getNodesRegistry();
-  for (const [name, cfg] of Object.entries(registry)) {
+  for (const [name, cfg] of registry) {
     nodes.push({ name, host: cfg.host });
   }
 

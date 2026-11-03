@@ -18,8 +18,9 @@ async function runCheck(
   try {
     const output = await execSSH(command, node);
     return { name, status: "pass", detail: output.split("\n")[0] };
-  } catch {
-    return { name, status: "fail", detail: "not available" };
+  } catch (error) {
+    const reason = error instanceof Error ? error.message.split("\n")[0] : String(error);
+    return { name, status: "fail", detail: reason || "not available" };
   }
 }
 
@@ -32,7 +33,18 @@ export function register(server: McpServer): void {
       try {
         const checks: CheckResult[] = [];
 
-        checks.push(await runCheck("SSH connectivity", "echo ok", args.node));
+        const ssh = await runCheck("SSH connectivity", "echo ok", args.node);
+        checks.push(ssh);
+        if (ssh.status === "fail") {
+          // Every other check depends on SSH; report the cause and stop.
+          return {
+            content: [{
+              type: "text" as const,
+              text: `[FAIL] SSH connectivity: ${ssh.detail}\n\nRemaining checks skipped.`,
+            }],
+            isError: true,
+          };
+        }
         checks.push(await runCheck("Docker", "docker --version", args.node));
         checks.push(
           await runCheck("Docker Compose", "docker compose version", args.node),

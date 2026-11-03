@@ -1,8 +1,16 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { expandHome, loadPrivateKey, execSSH, TailBuffer, isDryRun } from "../ssh-api.js";
-import { SSHAuthError } from "../errors.js";
+import {
+  expandHome,
+  loadPrivateKey,
+  execSSH,
+  TailBuffer,
+  isDryRun,
+  getNodeConfig,
+  listNodes,
+} from "../ssh-api.js";
+import { SSHAuthError, SSHError } from "../errors.js";
 
 const ENV_KEYS = [
   "HOMELAB_PI_HOST",
@@ -45,6 +53,47 @@ describe("loadPrivateKey", () => {
     const missing = "~/.ssh/definitely-missing-homelab-test-key";
     expect(() => loadPrivateKey(missing)).toThrow(SSHAuthError);
     expect(() => loadPrivateKey(missing)).toThrow(join(homedir(), ".ssh/definitely-missing-homelab-test-key"));
+  });
+});
+
+describe("node registry", () => {
+  it("lists only the default node when HOMELAB_NODES is unset", () => {
+    expect(listNodes()).toEqual([{ name: "default", host: "raspberrypi.local" }]);
+  });
+
+  it("maps user and username and defaults the user to pi", () => {
+    process.env.HOMELAB_NODES = JSON.stringify({
+      nas: { host: "nas.local", user: "admin", keyPath: "~/.ssh/k" },
+      zero: { host: "zero.local", username: "ops" },
+      other: { host: "other.local" },
+    });
+    expect(getNodeConfig("nas")).toEqual({ host: "nas.local", username: "admin", keyPath: "~/.ssh/k" });
+    expect(getNodeConfig("zero").username).toBe("ops");
+    expect(getNodeConfig("other").username).toBe("pi");
+    expect(listNodes().map((n) => n.name)).toEqual(["default", "nas", "zero", "other"]);
+  });
+
+  it("throws a clear error for malformed JSON", () => {
+    process.env.HOMELAB_NODES = "{nas: nope}";
+    expect(() => getNodeConfig("nas")).toThrow(/HOMELAB_NODES is not valid JSON/);
+    expect(() => listNodes()).toThrow(SSHError);
+  });
+
+  it("rejects non-object JSON and entries without a host", () => {
+    process.env.HOMELAB_NODES = "[]";
+    expect(() => listNodes()).toThrow(/must be a JSON object/);
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { user: "admin" } });
+    expect(() => getNodeConfig("nas")).toThrow(/"nas" is missing "host"/);
+  });
+
+  it("throws for unknown nodes and lists the available ones", () => {
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local" } });
+    expect(() => getNodeConfig("typo")).toThrow(/Unknown node "typo"\. Available nodes: default, nas/);
+  });
+
+  it("returns the env config for 'default' when not in the registry", () => {
+    process.env.HOMELAB_PI_HOST = "pi.example";
+    expect(getNodeConfig("default").host).toBe("pi.example");
   });
 });
 

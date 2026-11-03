@@ -91,7 +91,7 @@ Set environment variables:
 | `HOMELAB_NPM_PASSWORD` | `changeme` | NPM admin password |
 | `HOMELAB_NPM_PORT` | `81` | NPM admin API port override |
 | `HOMELAB_NTFY_PORT` | `8080` | Ntfy server port override |
-| `HOMELAB_NODES` | (empty) | JSON object mapping node names to SSH config for multi-node support |
+| `HOMELAB_NODES` | (empty) | JSON object mapping node names to SSH config (`host` required; `user`, `keyPath` optional) for multi-node support. Invalid JSON or an entry without `host` is reported as an error |
 | `HOMELAB_ANSIBLE_INVENTORY` | `/etc/ansible/hosts` | Ansible inventory file path for node discovery |
 | `HOMELAB_DRY_RUN` | (unset) | When set to `true`, `1`, `yes`, or `on`, `execSSH` prints the command without connecting |
 | `HOMELAB_MAX_OUTPUT_BYTES` | `1048576` | Max bytes of command output kept per call; longer output is truncated to the last N bytes with a marker |
