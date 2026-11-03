@@ -1,4 +1,6 @@
 import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { resolve as resolvePath } from "node:path";
 import { Client } from "ssh2";
 import {
   SSHError,
@@ -8,6 +10,18 @@ import {
   CommandFailedError,
   UnsafeCommandError,
 } from "./errors.js";
+
+/**
+ * Expand a leading `~` / `~/` / `~\` to the process home directory.
+ * MCP clients and GitHub Actions `env:` pass values literally — Node does not.
+ */
+export function expandHomePath(p: string): string {
+  if (p === "~") return homedir();
+  if (p.startsWith("~/") || p.startsWith("~\\")) {
+    return resolvePath(homedir(), p.slice(2));
+  }
+  return p;
+}
 
 const DANGEROUS_PATTERNS: Array<[RegExp, string]> = [
   [/\brm\s+-[a-z]*r[a-z]*f?[a-z]*\s+(--no-preserve-root\s+)?\/(\s|\*|$)/i, "rm -rf /"],
@@ -39,7 +53,7 @@ function getDefaultConfig(): NodeConfig {
   return {
     host: process.env.HOMELAB_PI_HOST || "raspberrypi.local",
     username: process.env.HOMELAB_PI_USER || "pi",
-    keyPath: process.env.HOMELAB_PI_KEY_PATH || "",
+    keyPath: expandHomePath(process.env.HOMELAB_PI_KEY_PATH || ""),
   };
 }
 
@@ -55,7 +69,7 @@ function getNodesRegistry(): Record<string, NodeConfig> {
       registry[name] = {
         host: c.host || "",
         username: c.user || c.username || "pi",
-        keyPath: c.keyPath || "",
+        keyPath: expandHomePath(c.keyPath || ""),
       };
     }
     return registry;
@@ -101,6 +115,20 @@ export async function execSSH(
   }
 
   const { host, username, keyPath } = getNodeConfig(node);
+
+  // Read the key before arming the connect timer so a missing path becomes a
+  // clear auth error instead of a raw ENOENT after a dangling timeout.
+  let privateKey: Buffer | undefined;
+  if (keyPath) {
+    try {
+      privateKey = readFileSync(keyPath);
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      throw new SSHAuthError(
+        `Cannot read SSH private key at ${keyPath}. ${detail}`,
+      );
+    }
+  }
 
   return new Promise((resolve, reject) => {
     const conn = new Client();
@@ -167,7 +195,7 @@ export async function execSSH(
         host,
         port: 22,
         username,
-        privateKey: keyPath ? readFileSync(keyPath) : undefined,
+        privateKey,
         agent: process.env.SSH_AUTH_SOCK,
         readyTimeout: CONNECT_TIMEOUT_MS,
       });
