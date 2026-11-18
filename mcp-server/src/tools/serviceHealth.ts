@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
 import { forNodes, nodeOrAllParam } from "../utils/fan-out.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeOrAllParam,
@@ -42,10 +43,13 @@ async function healthReport(service: string | undefined, node: string | undefine
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_serviceHealth",
-    'Check Docker container health status on the Pi, or on every node with node: "all"',
-    inputSchema,
+    {
+      description: 'Check Docker container health status on the Pi, or on every node with node: "all"',
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => forNodes(args.node, (node) => healthReport(args.service, node)),
   );
 }

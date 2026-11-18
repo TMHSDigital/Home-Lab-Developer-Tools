@@ -24,8 +24,8 @@ function handlerOf(register: (server: never) => void): Handler {
   let handler: Handler | null = null;
   let shape: z.ZodRawShape = {};
   register({
-    tool: (_n: string, _d: string, s: z.ZodRawShape, h: Handler) => {
-      shape = s;
+    registerTool: (_n: string, config: { inputSchema: z.ZodRawShape }, h: Handler) => {
+      shape = config.inputSchema;
       handler = h;
     },
   } as never);

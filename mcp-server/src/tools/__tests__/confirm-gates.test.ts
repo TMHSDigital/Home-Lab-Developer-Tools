@@ -73,7 +73,7 @@ type Handler = (args: Record<string, unknown>) => Promise<{ content: { text: str
 function captureHandler(register: Register): Handler {
   let handler: Handler | null = null;
   register({
-    tool: (_name: string, _desc: string, _schema: unknown, h: Handler) => {
+    registerTool: (_name: string, _config: unknown, h: Handler) => {
       handler = h;
     },
   });

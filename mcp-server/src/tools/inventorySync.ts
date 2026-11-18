@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse, nodeSetting } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -11,10 +12,13 @@ const inputSchema = {
 };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_inventorySync",
-    "Discover nodes from Ansible inventory or Tailscale network",
-    inputSchema,
+    {
+      description: "Discover nodes from Ansible inventory or Tailscale network",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       try {
         if (args.source === "ansible") {

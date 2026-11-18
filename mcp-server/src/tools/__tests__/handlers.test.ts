@@ -49,7 +49,7 @@ type Handler = (args: Record<string, unknown>) => Promise<{ content: { text: str
 function handlerOf(register: (server: never) => void): Handler {
   let handler: Handler | null = null;
   register({
-    tool: (_n: string, _d: string, _s: unknown, h: Handler) => {
+    registerTool: (_n: string, _c: unknown, h: Handler) => {
       handler = h;
     },
   } as never);

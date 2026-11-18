@@ -2,14 +2,18 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { SERVICES, servicePort, adguardAuth, curlErrorResponse } from "../utils/service-http.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const SERVICE = SERVICES.adguard;
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_adguardFilters",
-    "List AdGuard Home filter lists with name, URL, enabled status, and rule count",
-    { ...nodeParam },
+    {
+      description: "List AdGuard Home filter lists with name, URL, enabled status, and rule count",
+      inputSchema: { ...nodeParam },
+      annotations: READ_ONLY,
+    },
     async (args) => {
       let port = SERVICE.defaultPort;
       try {

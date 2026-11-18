@@ -105,8 +105,8 @@ function schemaOf(tool: string) {
   if (!register) throw new Error(`unknown tool ${tool}`);
   let shape: z.ZodRawShape | undefined;
   const fakeServer = {
-    tool: (_name: string, _desc: string, schema: z.ZodRawShape) => {
-      shape = schema;
+    registerTool: (_name: string, config: { inputSchema: z.ZodRawShape }) => {
+      shape = config.inputSchema;
     },
   };
   register(fakeServer as never);

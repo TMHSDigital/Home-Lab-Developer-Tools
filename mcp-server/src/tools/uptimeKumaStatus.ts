@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { SERVICES, servicePort, setting, curlErrorResponse } from "../utils/service-http.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const SERVICE = SERVICES.uptimeKuma;
 
@@ -24,10 +25,13 @@ const inputSchema = {
 };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_uptimeKumaStatus",
-    "Get the status of all Uptime Kuma monitors",
-    inputSchema,
+    {
+      description: "Get the status of all Uptime Kuma monitors",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       let port = SERVICE.defaultPort;
       let slug = "default";

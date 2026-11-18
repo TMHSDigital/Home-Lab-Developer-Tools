@@ -4,6 +4,7 @@ import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 import { SERVICES, servicePort, adguardAuth, curlErrorResponse } from "../utils/service-http.js";
+import { destructive } from "../utils/annotations.js";
 
 const SERVICE = SERVICES.adguard;
 
@@ -56,10 +57,13 @@ export function buildSetUrlPayload(filter: AdguardFilter, whitelist: boolean, en
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_adguardFilterToggle",
-    "Enable or disable an existing AdGuard Home filter list by URL (requires confirm=true)",
-    inputSchema,
+    {
+      description: "Enable or disable an existing AdGuard Home filter list by URL (requires confirm=true)",
+      inputSchema,
+      annotations: destructive(true),
+    },
     async (args) => {
       if (!args.confirm) {
         return confirmCancelled("Filter toggle", {

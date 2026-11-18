@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { sinceSchema, toDockerSince } from "../utils/since-param.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -19,10 +20,13 @@ const inputSchema = {
 };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_serviceLogs",
-    "Tail recent logs from a Docker container on the Pi",
-    inputSchema,
+    {
+      description: "Tail recent logs from a Docker container on the Pi",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       try {
         const since = args.since ? ` --since ${toDockerSince(args.since)}` : "";

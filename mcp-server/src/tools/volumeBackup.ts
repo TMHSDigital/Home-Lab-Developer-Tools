@@ -5,6 +5,7 @@ import { nodeParam } from "../utils/node-param.js";
 import { backupRepo } from "../utils/config.js";
 import { resticCommand, resticErrorResponse } from "../utils/restic.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
+import { destructive } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -18,10 +19,13 @@ function volumeCommand(volume: string, node?: string): string {
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_volumeBackup",
-    "Back up a specific Docker volume to the restic repository",
-    inputSchema,
+    {
+      description: "Back up a specific Docker volume to the restic repository",
+      inputSchema,
+      annotations: destructive(false),
+    },
     async (args) => {
       if (!args.confirm) {
         return confirmCancelled("Volume backup", { node: args.node, commands: () => [volumeCommand(args.volume, args.node)] });

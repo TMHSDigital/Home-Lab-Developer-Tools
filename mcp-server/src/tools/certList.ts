@@ -3,16 +3,20 @@ import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
 import { SERVICES, servicePort, getNpmToken } from "../utils/service-http.js";
 import { nodeParam } from "../utils/node-param.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = { ...nodeParam };
 
 const CERTBOT_MISSING = "__CERTBOT_NOT_INSTALLED__";
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_certList",
-    "List all managed SSL certificates from certbot and Nginx Proxy Manager",
-    inputSchema,
+    {
+      description: "List all managed SSL certificates from certbot and Nginx Proxy Manager",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       const sections: string[] = [];
 

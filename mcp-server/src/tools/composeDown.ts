@@ -4,6 +4,7 @@ import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 import { buildComposeCommand, buildStackCommand } from "../utils/compose.js";
+import { destructive } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -36,10 +37,13 @@ function downCommand(args: { node?: string; stacks?: string[]; removeVolumes?: b
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_composeDown",
-    "Stop Docker Compose stacks on the Pi",
-    inputSchema,
+    {
+      description: "Stop Docker Compose stacks on the Pi",
+      inputSchema,
+      annotations: destructive(true),
+    },
     async (args) => {
       if (!args.confirm) {
         return confirmCancelled("Compose down", { node: args.node, commands: () => [downCommand(args)] });

@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { CommandFailedError } from "../utils/errors.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -13,10 +14,13 @@ const inputSchema = {
 };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_certCheck",
-    "Check SSL certificate expiry, issuer, and fingerprint for a domain",
-    inputSchema,
+    {
+      description: "Check SSL certificate expiry, issuer, and fingerprint for a domain",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       const unavailable = `Could not retrieve certificate for ${args.domain}. Verify the host is reachable and serving TLS.`;
       try {

@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
+import { destructive } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -9,10 +10,13 @@ const inputSchema = {
 };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_piReboot",
-    "Safely reboot the Raspberry Pi. Checks for running containers before rebooting.",
-    inputSchema,
+    {
+      description: "Safely reboot the Raspberry Pi. Checks for running containers before rebooting.",
+      inputSchema,
+      annotations: destructive(false),
+    },
     async (args) => {
       if (!args.confirm) {
         return confirmCancelled("Reboot", {

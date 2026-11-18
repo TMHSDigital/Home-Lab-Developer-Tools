@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -32,10 +33,13 @@ export function buildAptHistoryCommand(lines: number): string {
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_aptHistory",
-    "Show recent apt install, upgrade, and remove history",
-    inputSchema,
+    {
+      description: "Show recent apt install, upgrade, and remove history",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       try {
         const output = await execSSH(buildAptHistoryCommand(args.lines), args.node);

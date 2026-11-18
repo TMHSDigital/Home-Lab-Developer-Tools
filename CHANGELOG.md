@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Every tool now declares MCP tool annotations: read-only tools set `readOnlyHint`, the confirm-gated tools set `destructiveHint` (with `idempotentHint`), and `homelab_composePull` and `homelab_ntfySend` are marked as state-changing but not destructive, so clients can auto-approve reads and warn before destructive calls. Tools are registered with `registerTool` instead of the deprecated `server.tool()`.
 - `node: "all"` on `homelab_nodeStatus`, `homelab_piStatus` and `homelab_serviceHealth` queries every registered node in parallel and returns one section per node, with per-node errors for offline nodes.
 - `HOMELAB_BACKUP_SCRIPT` (per-node overridable) sets the script `homelab_backupRun` runs; default `/opt/backup/backup.sh`.
 - `homelab_alertSilences` lists Alertmanager silences (optionally by state), and `homelab_alertSilence` creates a silence from label matchers, a duration and a comment, or expires one by ID (requires confirm=true). The alerting-rules skill and the pre-reboot-checklist prompt use them for maintenance windows.

@@ -2,14 +2,18 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = { ...nodeParam };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_kernelInfo",
-    "Show kernel version, boot parameters, and loaded modules",
-    inputSchema,
+    {
+      description: "Show kernel version, boot parameters, and loaded modules",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       try {
         const cmd = [

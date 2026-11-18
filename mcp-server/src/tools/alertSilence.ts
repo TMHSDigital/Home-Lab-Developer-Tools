@@ -5,6 +5,7 @@ import { nodeParam } from "../utils/node-param.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 import { SERVICES, servicePort, curlErrorResponse } from "../utils/service-http.js";
 import { shellQuote } from "./adguardFilterToggle.js";
+import { destructive } from "../utils/annotations.js";
 
 const SERVICE = SERVICES.alertmanager;
 
@@ -96,10 +97,13 @@ export function silenceCommand(args: Args, now: Date): string {
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_alertSilence",
-    "Create an Alertmanager silence for matching alerts, or expire one by ID (requires confirm=true)",
-    inputSchema,
+    {
+      description: "Create an Alertmanager silence for matching alerts, or expire one by ID (requires confirm=true)",
+      inputSchema,
+      annotations: destructive(false),
+    },
     async (args) => {
       if (!args.confirm) {
         return confirmCancelled(args.action === "expire" ? "Silence expiry" : "Silence", {

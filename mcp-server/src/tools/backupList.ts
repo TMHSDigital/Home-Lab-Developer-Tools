@@ -5,6 +5,7 @@ import { resticCommand, resticErrorResponse } from "../utils/restic.js";
 import { nodeParam } from "../utils/node-param.js";
 import { backupRepo } from "../utils/config.js";
 import { completeJson } from "../utils/json-output.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -51,10 +52,13 @@ export function summarizeSnapshots(json: string, count: number): string {
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_backupList",
-    "List restic backup snapshots (newest first, compact) with optional filtering by path, tag, or host",
-    inputSchema,
+    {
+      description: "List restic backup snapshots (newest first, compact) with optional filtering by path, tag, or host",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       let repo = "";
       try {

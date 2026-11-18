@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { confirmCancelled } from "../utils/confirm-param.js";
+import { destructive } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -29,10 +30,13 @@ function aptCommand(upgrade: boolean): string {
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_aptUpdate",
-    "Run apt update on the Pi and list upgradable packages; optionally upgrade (requires confirm=true)",
-    inputSchema,
+    {
+      description: "Run apt update on the Pi and list upgradable packages; optionally upgrade (requires confirm=true)",
+      inputSchema,
+      annotations: destructive(false),
+    },
     async (args) => {
       if (args.upgrade && args.confirm !== true) {
         // Upgrading changes system state (packages, services, possibly the

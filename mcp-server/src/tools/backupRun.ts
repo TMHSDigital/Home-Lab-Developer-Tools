@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse, nodeSetting, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
+import { destructive } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -37,10 +38,13 @@ export function backupCommand(node?: string): string {
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_backupRun",
-    "Trigger a restic backup on the Pi by running its backup script (HOMELAB_BACKUP_SCRIPT)",
-    inputSchema,
+    {
+      description: "Trigger a restic backup on the Pi by running its backup script (HOMELAB_BACKUP_SCRIPT)",
+      inputSchema,
+      annotations: destructive(false),
+    },
     async (args) => {
       if (!args.confirm) {
         return confirmCancelled("Backup", { node: args.node, commands: () => [backupCommand(args.node)] });

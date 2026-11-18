@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
 import { forNodes, nodeOrAllParam } from "../utils/fan-out.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const STATUS_COMMAND = [
   'echo "=== Uptime ==="',
@@ -20,10 +21,13 @@ const STATUS_COMMAND = [
 ].join(" && ");
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_piStatus",
-    'Get Raspberry Pi system status: CPU temp, memory, disk, uptime, and throttle state (node: "all" for every node)',
-    { ...nodeOrAllParam },
+    {
+      description: 'Get Raspberry Pi system status: CPU temp, memory, disk, uptime, and throttle state (node: "all" for every node)',
+      inputSchema: { ...nodeOrAllParam },
+      annotations: READ_ONLY,
+    },
     async (args) => forNodes(args.node, (node) => execSSH(STATUS_COMMAND, node)),
   );
 }

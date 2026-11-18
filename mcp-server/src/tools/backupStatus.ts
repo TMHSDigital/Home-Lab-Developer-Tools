@@ -4,6 +4,7 @@ import { execSSH } from "../utils/ssh-api.js";
 import { resticCommand, resticErrorResponse } from "../utils/restic.js";
 import { nodeParam } from "../utils/node-param.js";
 import { backupRepo } from "../utils/config.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -18,10 +19,13 @@ const inputSchema = {
 };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_backupStatus",
-    "Check the latest restic backup snapshots on the Pi",
-    inputSchema,
+    {
+      description: "Check the latest restic backup snapshots on the Pi",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       let repo = "";
       try {

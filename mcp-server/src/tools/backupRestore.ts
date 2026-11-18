@@ -5,6 +5,7 @@ import { nodeParam } from "../utils/node-param.js";
 import { backupRepo } from "../utils/config.js";
 import { resticCommand, resticErrorResponse } from "../utils/restic.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
+import { destructive } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -29,10 +30,13 @@ function restoreCommand(args: { node?: string; snapshot: string; target: string;
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_backupRestore",
-    "Restore files from a restic backup snapshot to a target path on the Pi",
-    inputSchema,
+    {
+      description: "Restore files from a restic backup snapshot to a target path on the Pi",
+      inputSchema,
+      annotations: destructive(true),
+    },
     async (args) => {
       if (!args.confirm) {
         return confirmCancelled("Restore", { node: args.node, commands: () => [restoreCommand(args)] });

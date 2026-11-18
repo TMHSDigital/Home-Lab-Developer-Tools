@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { SERVICES, servicePort, curlErrorResponse } from "../utils/service-http.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const SERVICE = SERVICES.alertmanager;
 
@@ -25,10 +26,13 @@ export const STATE_FILTERS: Record<"active" | "suppressed" | "unprocessed", stri
 };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_alertList",
-    "List alerts from Alertmanager, optionally filtered by state",
-    inputSchema,
+    {
+      description: "List alerts from Alertmanager, optionally filtered by state",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       let port = SERVICE.defaultPort;
       try {

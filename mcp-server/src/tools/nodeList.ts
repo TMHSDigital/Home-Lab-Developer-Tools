@@ -1,15 +1,19 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, listNodes, errorResponse } from "../utils/ssh-api.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {};
 
 const PROBE_TIMEOUT_MS = 15_000;
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_nodeList",
-    "List all managed nodes and their connection status",
-    inputSchema,
+    {
+      description: "List all managed nodes and their connection status",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async () => {
       let nodes: { name: string; host: string; port: number }[];
       try {

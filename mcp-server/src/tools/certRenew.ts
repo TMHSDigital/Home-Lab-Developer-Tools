@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
+import { destructive } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -27,10 +28,13 @@ function renewCommand(domain?: string, force = false): string {
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_certRenew",
-    "Trigger Let's Encrypt certificate renewal via certbot",
-    inputSchema,
+    {
+      description: "Trigger Let's Encrypt certificate renewal via certbot",
+      inputSchema,
+      annotations: destructive(false),
+    },
     async (args) => {
       if (!args.confirm) {
         return confirmCancelled("Renewal", {

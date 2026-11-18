@@ -12,7 +12,11 @@ interface Registered {
   name: string;
   file: string;
   shape: z.ZodRawShape;
+  annotations?: Record<string, unknown>;
 }
+
+/** Tools that change state without being confirm-gated (no data is removed). */
+const CHANGES_STATE = ["homelab_composePull", "homelab_ntfySend"];
 
 const modules = (import.meta as unknown as {
   glob: (pattern: string, opts: { eager: true }) => Record<string, { register?: (s: never) => void }>;
@@ -23,8 +27,11 @@ for (const [path, mod] of Object.entries(modules)) {
   if (typeof mod.register !== "function") continue;
   const file = path.replace("../", "").replace(/\.ts$/, "");
   const fake = {
-    tool: (name: string, _desc: string, shape: z.ZodRawShape) => {
-      registered.push({ name, file, shape });
+    registerTool: (
+      name: string,
+      config: { description: string; inputSchema: z.ZodRawShape; annotations?: Record<string, unknown> },
+    ) => {
+      registered.push({ name, file, shape: config.inputSchema, annotations: config.annotations });
     },
   };
   mod.register(fake as never);
@@ -99,6 +106,30 @@ describe("tool registration", () => {
     expect(read("README.md")).toContain(`badge/tools-${n}-`);
     expect(read("CLAUDE.md")).toContain(`## MCP Tools (${n})`);
     expect(read("mcp-server/README.md")).toContain(`provides ${n} tools`);
+  });
+});
+
+describe("tool annotations", () => {
+  const gated = [...GATED_REQUIRED, "homelab_aptUpdate"];
+
+  it.each(registered.map((r) => [r.name, r] as const))("%s declares annotations", (name, r) => {
+    const a = r.annotations;
+    expect(a, `${name} has no annotations`).toBeDefined();
+    if (gated.includes(name)) {
+      expect(a).toMatchObject({ readOnlyHint: false, destructiveHint: true });
+      expect(typeof a!.idempotentHint).toBe("boolean");
+    } else if (CHANGES_STATE.includes(name)) {
+      expect(a).toMatchObject({ readOnlyHint: false, destructiveHint: false });
+    } else {
+      expect(a).toMatchObject({ readOnlyHint: true, destructiveHint: false });
+    }
+  });
+
+  it("registers no tool through the deprecated server.tool() overload", () => {
+    for (const r of registered) {
+      const source = readFileSync(join(toolsDir, `${r.file}.ts`), "utf8");
+      expect(source, r.file).not.toContain("server.tool(");
+    }
   });
 });
 

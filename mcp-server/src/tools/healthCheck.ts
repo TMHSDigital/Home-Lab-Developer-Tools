@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = { ...nodeParam };
 
@@ -48,10 +49,13 @@ export function parseHealthCheckOutput(output: string): CheckResult[] {
 }
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_healthCheck",
-    "Comprehensive self-test: SSH connectivity, Docker, required tools",
-    inputSchema,
+    {
+      description: "Comprehensive self-test: SSH connectivity, Docker, required tools",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       let output: string;
       try {

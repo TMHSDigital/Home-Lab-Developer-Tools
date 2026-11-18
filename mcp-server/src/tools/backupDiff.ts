@@ -4,6 +4,7 @@ import { execSSH } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { backupRepo } from "../utils/config.js";
 import { resticCommand, resticErrorResponse } from "../utils/restic.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -12,10 +13,13 @@ const inputSchema = {
 };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_backupDiff",
-    "Show the difference between two restic backup snapshots",
-    inputSchema,
+    {
+      description: "Show the difference between two restic backup snapshots",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       try {
         const output = await execSSH(

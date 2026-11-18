@@ -3,14 +3,18 @@ import { execSSH } from "../utils/ssh-api.js";
 import { completeJson } from "../utils/json-output.js";
 import { nodeParam } from "../utils/node-param.js";
 import { SERVICES, servicePort, getNpmToken, curlErrorResponse } from "../utils/service-http.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const SERVICE = SERVICES.npm;
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_npmCerts",
-    "List SSL certificates managed by Nginx Proxy Manager with expiry dates",
-    { ...nodeParam },
+    {
+      description: "List SSL certificates managed by Nginx Proxy Manager with expiry dates",
+      inputSchema: { ...nodeParam },
+      annotations: READ_ONLY,
+    },
     async (args) => {
       let port = SERVICE.defaultPort;
       try {

@@ -354,7 +354,7 @@ function captureHandler(
 ): (args: any) => Promise<any> {
   let captured: ((args: any) => Promise<any>) | null = null;
   const fakeServer = {
-    tool: (_name: string, _desc: string, _schema: any, handler: any) => {
+    registerTool: (_name: string, _config: any, handler: any) => {
       captured = handler;
     },
   };

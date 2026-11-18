@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { buildComposeCommand } from "../utils/compose.js";
+import { changesState } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -14,10 +15,13 @@ const inputSchema = {
 
 // Intentionally ungated: pull only downloads images, does not change running state.
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_composePull",
-    "Pull latest Docker images for compose stacks on the Pi",
-    inputSchema,
+    {
+      description: "Pull latest Docker images for compose stacks on the Pi",
+      inputSchema,
+      annotations: changesState(true),
+    },
     async (args) => {
       try {
         const output = await execSSH(
