@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { homedir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import {
   expandHome,
   loadPrivateKey,
@@ -42,12 +43,28 @@ describe("expandHome", () => {
     expect(expandHome("/etc/ssh/key")).toBe("/etc/ssh/key");
     expect(expandHome("keys/id")).toBe("keys/id");
     expect(expandHome("~user/key")).toBe("~user/key");
+    expect(expandHome("C:\\Users\\x\\.ssh\\id_ed25519")).toBe("C:\\Users\\x\\.ssh\\id_ed25519");
   });
 });
 
 describe("loadPrivateKey", () => {
   it("returns undefined when no key path is set", () => {
     expect(loadPrivateKey("")).toBeUndefined();
+  });
+
+  it("reads a key from an absolute path with the platform's separators", () => {
+    const dir = mkdtempSync(join(tmpdir(), "homelab-key-"));
+    try {
+      const keyPath = join(dir, ".ssh-test-key");
+      writeFileSync(keyPath, "not-a-real-key");
+      expect(loadPrivateKey(keyPath)?.toString()).toBe("not-a-real-key");
+      if (process.platform === "win32") {
+        // Forward slashes work on Windows too (MCP configs often use them).
+        expect(loadPrivateKey(keyPath.replace(/\\/g, "/"))?.toString()).toBe("not-a-real-key");
+      }
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("throws SSHAuthError naming the resolved path when the file is missing", () => {

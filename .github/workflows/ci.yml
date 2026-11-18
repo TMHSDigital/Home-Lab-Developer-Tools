@@ -13,10 +13,16 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest]
         node-version: [22, 24]
+        # The server runs on the user's machine, often Windows.
+        include:
+          - os: windows-latest
+            node-version: 22
     steps:
       - uses: actions/checkout@v6
 
