@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## 0.17.1 to 0.22.2 (catch-up)
+## [0.22.2] - 2026-11-18
 
-These entries were listed under `[Unreleased]` but are already published; they were not sorted by version.
+The changes below shipped across 0.17.1 to 0.22.2 and were not sorted by version at the time. See the [GitHub releases](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases) for each version's notes.
 
 ### Added
 
@@ -36,10 +36,6 @@ These entries were listed under `[Unreleased]` but are already published; they w
 - `homelab_composeUp` and `homelab_composeDown` with `stacks` now act only on the services of the named files. Updating one stack no longer removes other stacks' containers as orphans, and stopping one stack no longer stops base services.
 - `homelab_serviceHealth` now includes stopped containers, flags non-running or unhealthy containers, and reports empty selections instead of claiming they are healthy.
 - Failed SSH commands now retain diagnostics redirected to stdout. Inactive systemd units return their status, and certificate retrieval failures include a clear explanation and the command output.
-
-## [0.22.2] - 2026-11-18
-
-See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.22.2) for details.
 
 ## [0.22.1] - 2026-11-18
 
