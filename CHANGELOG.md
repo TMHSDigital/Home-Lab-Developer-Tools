@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Node.js 22.12 or newer is now required (Node 20 reached end of life on 2026-04-30). CI tests Node 22 and 24.
+
 ### Fixed
 
 - Restic tools (`homelab_backupStatus`, `homelab_backupList`, `homelab_backupDiff`, `homelab_backupRestore`, `homelab_volumeBackup`) now get the repository password under sudo: they source `/etc/restic-env` (`HOMELAB_RESTIC_ENV_FILE`) when it exists and pass `HOMELAB_RESTIC_PASSWORD_FILE` as `--password-file`. Password failures name these settings.

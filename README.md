@@ -132,7 +132,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
   <img src="https://img.shields.io/badge/tools-51-green" alt="tools">
-  <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2020-yellow" alt="runtime">
+  <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2022.12-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
 
