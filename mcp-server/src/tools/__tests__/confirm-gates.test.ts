@@ -105,6 +105,30 @@ describe("confirm gate", () => {
     expect(commands.some((c) => c.includes(expected))).toBe(true);
   });
 
+  it("composeUp with stacks targets the stack's services without removing orphans", async () => {
+    const handler = await load("composeUp");
+    await handler({ stacks: ["compose.monitoring.yml"], confirm: true });
+    const command = String(mockExecSSH.mock.calls[0][0]);
+    expect(command).toContain("up -d $services");
+    expect(command).not.toContain("--remove-orphans");
+  });
+
+  it("composeDown with stacks stops only the stack's services", async () => {
+    const handler = await load("composeDown");
+    await handler({ stacks: ["compose.monitoring.yml"], confirm: true });
+    const command = String(mockExecSSH.mock.calls[0][0]);
+    expect(command).toContain("stop $services");
+    expect(command).toContain("rm -f $services");
+    expect(command).not.toMatch(/\bdown\b/);
+  });
+
+  it("composeDown refuses removeVolumes for a stack subset", async () => {
+    const handler = await load("composeDown");
+    const result = await handler({ stacks: ["compose.apps.yml"], removeVolumes: true, confirm: true });
+    expect(result.content[0].text).toContain("removeVolumes is only supported");
+    expect(mockExecSSH).not.toHaveBeenCalled();
+  });
+
   it("matches the gated tool list documented in CLAUDE.md", () => {
     const here = dirname(fileURLToPath(import.meta.url));
     const claude = readFileSync(join(here, "../../../../CLAUDE.md"), "utf8");

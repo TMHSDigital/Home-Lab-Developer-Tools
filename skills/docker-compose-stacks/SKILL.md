@@ -40,14 +40,18 @@ Optional:
 2. **Identify the target stack file** -- map the user's request to one of the
    compose files in the compose directory (reference layout below). Tools take
    file names, not directories: `stacks: ["compose.monitoring.yml"]`.
-   `compose.base.yml` is always included automatically when `stacks` is given.
+   For `homelab_composeUp` and `homelab_composeDown`, every project file is still
+   passed so the project stays complete, but only the services of the named
+   files are started or stopped (`compose.base.yml` services only when it is named).
 3. **Check current state** -- call `homelab_composePs`. It takes no stack
    parameter and always lists containers across all compose files.
 4. **Execute the requested action:**
    - **Start/deploy:** `homelab_composeUp` with `stacks` and `confirm: true`
-     (it always runs `up -d --remove-orphans`)
+     (starts only the services defined in those files; other stacks are untouched)
    - **Stop:** `homelab_composeDown` with `stacks` and `confirm: true`
-     (`removeVolumes: true` also deletes named volumes -- only with explicit user approval)
+     (stops and removes only that stack's services; base services keep running.
+     `removeVolumes: true` is only accepted without `stacks` and deletes named
+     volumes -- only with explicit user approval)
    - **Update:** `homelab_composePull` with `stacks`, then `homelab_composeUp`
      with the same `stacks` and `confirm: true`. Compose recreates containers
      whose image changed; there is no force-recreate option.
@@ -133,8 +137,10 @@ Service-to-file mapping (quick reference):
 - **Forgetting dependent stacks** -- the monitoring stack depends on the network
   stack for DNS resolution and proxy. Do not take down `compose.network.yml`
   without considering the impact on monitoring dashboards.
-- **Orphan containers** -- `homelab_composeUp` always passes `--remove-orphans`,
-  so containers removed from the selected compose files are cleaned up.
+- **Orphan containers** -- all stack files share one Compose project.
+  `homelab_composeUp` passes `--remove-orphans` only when `stacks` is omitted, so
+  containers whose service was deleted from every compose file are cleaned up on
+  a full deploy, never on a single-stack update.
 - **Port conflicts** -- bringing up a stack that binds ports already in use by
   another stack will fail silently in some cases. Check `homelab_composePs` if a
   container exits immediately.

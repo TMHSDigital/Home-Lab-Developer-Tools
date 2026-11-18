@@ -3,7 +3,7 @@ import { buildAptHistoryCommand } from "../aptHistory.js";
 import { STATE_FILTERS } from "../alertList.js";
 import { resolveTopics, TOPIC_LIST_RE } from "../ntfyTopics.js";
 import { resolveSlug, SLUG_RE } from "../uptimeKumaStatus.js";
-import { buildComposeCommand, KNOWN_STACK_FILES } from "../../utils/compose.js";
+import { buildComposeCommand, buildStackCommand, KNOWN_STACK_FILES } from "../../utils/compose.js";
 import { assertCommandSafe } from "../../utils/ssh-api.js";
 import { SINCE_RE, toDockerSince } from "../../utils/since-param.js";
 
@@ -65,6 +65,43 @@ describe("compose file selection", () => {
     expect(cmd).toContain("No compose files found");
     expect(cmd.endsWith("docker compose $files up -d")).toBe(true);
     expect(() => assertCommandSafe(cmd)).not.toThrow();
+  });
+});
+
+describe("stack subset commands", () => {
+  afterEach(() => {
+    delete process.env.HOMELAB_COMPOSE_DIR;
+    delete process.env.HOMELAB_COMPOSE_FILES;
+  });
+
+  it("keeps the full project file list and targets only the stack's services", () => {
+    const cmd = buildStackCommand(["up -d $services"], ["compose.monitoring.yml"]);
+    expect(cmd).toContain(`for f in ${KNOWN_STACK_FILES.join(" ")}; do`);
+    expect(cmd).toContain(
+      "services=$(docker compose -f compose.base.yml -f compose.monitoring.yml config --services)",
+    );
+    expect(cmd).toContain('grep -vxF "$base"');
+    expect(cmd).toContain('if [ -z "$services" ]');
+    expect(cmd.endsWith("docker compose $files up -d $services")).toBe(true);
+    expect(cmd).not.toContain("--remove-orphans");
+    expect(() => assertCommandSafe(cmd)).not.toThrow();
+  });
+
+  it("includes base services when compose.base.yml is requested", () => {
+    const cmd = buildStackCommand(["up -d $services"], ["compose.base.yml"]);
+    expect(cmd).toContain("services=$(docker compose -f compose.base.yml config --services)");
+    expect(cmd).not.toContain("grep -vxF");
+  });
+
+  it("uses HOMELAB_COMPOSE_FILES as the project file list", () => {
+    process.env.HOMELAB_COMPOSE_FILES = "compose.base.yml,compose.apps.yml";
+    const cmd = buildStackCommand(["stop $services", "rm -f $services"], ["compose.apps.yml"]);
+    expect(cmd).toContain('files=" -f compose.base.yml -f compose.apps.yml"');
+    expect(cmd).toContain("docker compose $files stop $services && docker compose $files rm -f $services");
+  });
+
+  it("rejects stack names with unexpected characters", () => {
+    expect(() => buildStackCommand(["up -d $services"], ["a.yml;b"])).toThrow(/Invalid stack file/);
   });
 });
 

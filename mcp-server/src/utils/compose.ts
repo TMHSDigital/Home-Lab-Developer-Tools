@@ -102,3 +102,48 @@ export function buildComposeCommand(action: string, stacks?: string[], node?: st
 
   return `${cd}; ${discoverySnippet(dir)}; docker compose $files ${action}`;
 }
+
+/**
+ * Build a command that acts on the services of the given stack files only.
+ *
+ * All stack files in the compose directory share one Compose project, so
+ * running `up --remove-orphans` or `down` with a subset of files would treat
+ * every other stack's containers as orphans (or take base services down).
+ * Instead, the full project file list is passed so the project stays
+ * complete, and each action targets only the services the stack files
+ * define. Services from compose.base.yml are excluded unless it is one of
+ * the requested stacks. Each action is run as `docker compose $files <action>`
+ * and may use `$services`.
+ */
+export function buildStackCommand(actions: string[], stacks: string[], node?: string): string {
+  for (const s of stacks) {
+    if (!COMPOSE_FILE_RE.test(s)) {
+      throw new Error(
+        `Invalid stack file "${s}". Use file names relative to HOMELAB_COMPOSE_DIR ` +
+          "(letters, digits, '.', '_', '-', '/').",
+      );
+    }
+  }
+  const dir = composeDir(node);
+  const configured = configuredComposeFiles(node);
+  const filesSnippet = configured
+    ? `files="${configured.map((f) => ` -f ${f}`).join("")}"`
+    : discoverySnippet(dir);
+  const stackFlags = stacks.map((s) => `-f ${s}`).join(" ");
+  const includeBase = stacks.includes("compose.base.yml");
+
+  return [
+    `cd ${dir} || exit 1`,
+    filesSnippet,
+    `for s in ${stacks.join(" ")}; do case "$files " in *" -f $s "*) ;; *) files="$files -f $s";; esac; done`,
+    includeBase
+      ? `services=$(docker compose ${stackFlags} config --services) || exit 1`
+      : `if [ -f compose.base.yml ]; then ` +
+        `services=$(docker compose -f compose.base.yml ${stackFlags} config --services) || exit 1; ` +
+        `base=$(docker compose -f compose.base.yml config --services) || exit 1; ` +
+        `services=$(printf '%s\\n' "$services" | grep -vxF "$base"); ` +
+        `else services=$(docker compose ${stackFlags} config --services) || exit 1; fi`,
+    `if [ -z "$services" ]; then echo "No services found in ${stacks.join(", ")}." >&2; exit 1; fi`,
+    actions.map((a) => `docker compose $files ${a}`).join(" && "),
+  ].join("; ");
+}
