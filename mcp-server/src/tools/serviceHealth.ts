@@ -11,6 +11,13 @@ const inputSchema = {
     .describe("Specific container name to check, or omit for all"),
 };
 
+const containerSchema = z.object({
+  Names: z.string(),
+  State: z.string(),
+  Status: z.string(),
+  Ports: z.string(),
+});
+
 export function register(server: McpServer): void {
   server.tool(
     "homelab_serviceHealth",
@@ -18,22 +25,34 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       try {
-        const filter = args.service ? `--filter "name=${args.service}"` : "";
+        const filter = args.service ? `--filter 'name=${args.service.replace(/'/g, "'\\''")}'` : "";
         const ps = await execSSH(
-          `docker ps ${filter} --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}"`,
+          `docker ps -a ${filter} --format '{{json .}}'`,
           args.node,
         );
 
-        const unhealthy = await execSSH(
-          `docker ps ${filter} --filter "health=unhealthy" --format "{{.Names}}"`,
-          args.node,
-        );
+        if (ps.startsWith("[dry-run]")) {
+          return { content: [{ type: "text" as const, text: ps }] };
+        }
+        const containers = ps.trim() ? ps.trim().split("\n").map(
+          (line) => containerSchema.parse(JSON.parse(line)),
+        ) : [];
+        if (containers.length === 0) {
+          const text = args.service ? `No containers matched "${args.service}".` : "No containers found.";
+          return { content: [{ type: "text" as const, text }] };
+        }
 
-        let text = ps || "No containers found.";
-        if (unhealthy) {
-          text += `\n\nUnhealthy containers: ${unhealthy}`;
+        // Use one snapshot so the table and its summary describe the same set.
+        const problems = containers.filter(
+          (c) => c.State !== "running" || /\((unhealthy|health: starting)\)/.test(c.Status),
+        );
+        let text = ["NAMES\tSTATUS\tPORTS", ...containers.map(
+          (c) => `${c.Names}\t${c.Status}\t${c.Ports}`,
+        )].join("\n");
+        if (problems.length > 0) {
+          text += `\n\nContainers needing attention: ${problems.map((c) => c.Names).join(", ")}`;
         } else {
-          text += "\n\nAll containers healthy.";
+          text += "\n\nNo container problems detected.";
         }
 
         return { content: [{ type: "text" as const, text }] };
