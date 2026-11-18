@@ -102,7 +102,7 @@ Use this skill when the user wants to:
 - **Locking yourself out** -- always verify key-based login works in a separate session before disabling password auth. Keep a backup access method (e.g., console via Cockpit or physical access).
 - **Wrong permissions** -- `~/.ssh` must be 700, `authorized_keys` must be 600. sshd silently ignores keys with wrong permissions.
 - **Agent forwarding security** -- only enable ForwardAgent for trusted hosts. A compromised Pi with agent forwarding can use your keys.
-- **Firewall blocking** -- if UFW is active, ensure port 22 (or custom SSH port) is allowed before restarting sshd. Call `homelab_networkInfo` to check.
+- **Firewall blocking** -- if UFW is active, ensure port 22 (or custom SSH port) is allowed before restarting sshd. Call `homelab_networkInfo` to check. After moving sshd to another port, set `HOMELAB_PI_PORT` (or `port` in the node's `HOMELAB_NODES` entry) so the MCP tools can still connect.
 - **Windows line endings** -- if editing sshd_config or authorized_keys from Windows, ensure LF line endings, not CRLF.
 
 ## See Also

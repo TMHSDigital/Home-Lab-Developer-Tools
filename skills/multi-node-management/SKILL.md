@@ -77,7 +77,7 @@ Add this to your MCP config's `env` block. The default node (from `HOMELAB_PI_*`
 ## Key References
 
 - `HOMELAB_NODES` env var: JSON object mapping node names to SSH config
-- `HOMELAB_PI_HOST`, `HOMELAB_PI_USER`, `HOMELAB_PI_KEY_PATH`: default node config
+- `HOMELAB_PI_HOST`, `HOMELAB_PI_USER`, `HOMELAB_PI_KEY_PATH`, `HOMELAB_PI_PORT`: default node config (registry entries take an optional `port`)
 - `HOMELAB_ANSIBLE_INVENTORY`: path to Ansible inventory file (default `/etc/ansible/hosts`)
 - Tailscale documentation: https://tailscale.com/kb
 

@@ -14,13 +14,13 @@ vi.mock("../../utils/ssh-api.js", () => ({
   checkSSHAvailable: vi.fn(),
   TIMEOUTS: { long: 1_800_000, backup: 3_600_000, medium: 300_000 },
   listNodes: vi.fn(() => [
-    { name: "default", host: "raspberrypi.local" },
-    { name: "nas", host: "nas.local" },
+    { name: "default", host: "raspberrypi.local", port: 22 },
+    { name: "nas", host: "nas.local", port: 2222 },
   ]),
   getNodeConfig: vi.fn((node?: string) =>
     node === "nas"
-      ? { host: "nas.local", username: "admin", keyPath: "", env: { HOMELAB_BACKUP_REPO: "/srv/restic" } }
-      : { host: "raspberrypi.local", username: "pi", keyPath: "", env: {} },
+      ? { host: "nas.local", username: "admin", keyPath: "", port: 2222, env: { HOMELAB_BACKUP_REPO: "/srv/restic" } }
+      : { host: "raspberrypi.local", username: "pi", keyPath: "", port: 22, env: {} },
   ),
   nodeSetting: vi.fn((node: string | undefined, key: string) =>
     node === "nas" && key === "HOMELAB_BACKUP_REPO" ? "/srv/restic" : process.env[key] || undefined,
@@ -190,7 +190,7 @@ describe("integration tests (mocked SSH)", () => {
       const handler = captureHandler(register);
       const result = await handler({ node: "nas" });
 
-      expect(result.content[0].text).toContain("SSH connection to admin@nas.local: OK");
+      expect(result.content[0].text).toContain("SSH connection to admin@nas.local:2222: OK");
       expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
     });
 
@@ -319,7 +319,7 @@ describe("integration tests (mocked SSH)", () => {
 
       const text = result.content[0].text;
       expect(text).toContain("default (raspberrypi.local) -- online");
-      expect(text).toContain("nas (nas.local) -- offline (connection refused)");
+      expect(text).toContain("nas (nas.local:2222) -- offline (connection refused)");
     });
 
     it("returns an error when the node registry is invalid", async () => {

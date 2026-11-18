@@ -75,6 +75,7 @@ Set environment variables:
 | `HOMELAB_PI_HOST` | `raspberrypi.local` | Pi hostname or IP |
 | `HOMELAB_PI_USER` | `pi` | SSH username |
 | `HOMELAB_PI_KEY_PATH` | (empty) | Path to SSH private key (e.g. `~/.ssh/id_ed25519`) |
+| `HOMELAB_PI_PORT` | `22` | SSH port of the default node (1-65535) |
 | `HOMELAB_COMPOSE_DIR` | `/opt/homelab/docker` | Compose project directory on Pi |
 | `HOMELAB_COMPOSE_FILES` | (discovered) | Comma-separated compose files (in order) used when no `stacks` are passed. If unset, `compose.base.yml` and every `compose.*.yml` in the compose dir are used, falling back to `compose.yaml` / `docker-compose.yml` |
 | `HOMELAB_BACKUP_REPO` | `/mnt/backup/restic` | Restic backup repo path on Pi |
@@ -95,7 +96,7 @@ Set environment variables:
 | `HOMELAB_NPM_PASSWORD` | `changeme` | NPM admin password |
 | `HOMELAB_NPM_PORT` | `81` | NPM admin API port override |
 | `HOMELAB_NTFY_PORT` | `8080` | Ntfy server port override |
-| `HOMELAB_NODES` | (empty) | JSON object mapping node names to SSH config (`host` required; `user`, `keyPath` optional) for multi-node support. An optional `env` object overrides `HOMELAB_*` settings for that node (for example `HOMELAB_COMPOSE_DIR`, `HOMELAB_BACKUP_REPO`, service ports and credentials). Invalid JSON or an entry without `host` is reported as an error |
+| `HOMELAB_NODES` | (empty) | JSON object mapping node names to SSH config (`host` required; `user`, `keyPath`, `port` optional, `port` defaults to 22) for multi-node support. An optional `env` object overrides `HOMELAB_*` settings for that node (for example `HOMELAB_COMPOSE_DIR`, `HOMELAB_BACKUP_REPO`, service ports and credentials). Invalid JSON or an entry without `host` is reported as an error |
 | `HOMELAB_ANSIBLE_INVENTORY` | `/etc/ansible/hosts` | Ansible inventory file path for node discovery |
 | `HOMELAB_DRY_RUN` | (unset) | When set to `true`, `1`, `yes`, or `on`, `execSSH` prints the command without connecting |
 | `HOMELAB_MAX_OUTPUT_BYTES` | `1048576` | Max bytes of command output kept per call; longer output is truncated to the last N bytes with a marker |

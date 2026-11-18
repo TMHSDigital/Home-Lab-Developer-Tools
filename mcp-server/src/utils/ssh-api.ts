@@ -61,8 +61,20 @@ export interface NodeConfig {
   host: string;
   username: string;
   keyPath: string;
+  /** SSH port (HOMELAB_PI_PORT for the default node, "port" in HOMELAB_NODES; default 22). */
+  port: number;
   /** Per-node overrides for HOMELAB_* settings (compose dir, backup repo, ports, ...). */
   env: Record<string, string>;
+}
+
+/** Parse an SSH port (number or numeric string); unset or empty means 22. */
+export function parsePort(value: unknown, label: string): number {
+  if (value === undefined || value === null || value === "") return 22;
+  const n = typeof value === "number" ? value : typeof value === "string" && /^\d+$/.test(value.trim()) ? Number(value) : NaN;
+  if (!Number.isInteger(n) || n < 1 || n > 65535) {
+    throw new SSHError(`${label}: SSH port must be an integer between 1 and 65535.`);
+  }
+  return n;
 }
 
 function getDefaultConfig(): NodeConfig {
@@ -70,6 +82,7 @@ function getDefaultConfig(): NodeConfig {
     host: process.env.HOMELAB_PI_HOST || "raspberrypi.local",
     username: process.env.HOMELAB_PI_USER || "pi",
     keyPath: process.env.HOMELAB_PI_KEY_PATH || "",
+    port: parsePort(process.env.HOMELAB_PI_PORT, "HOMELAB_PI_PORT"),
     env: {},
   };
 }
@@ -128,7 +141,7 @@ function getNodesRegistry(): Map<string, NodeConfig> {
 
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
     throw new SSHError(
-      'HOMELAB_NODES must be a JSON object mapping node names to {"host", "user", "keyPath", "env"}.',
+            'HOMELAB_NODES must be a JSON object mapping node names to {"host", "user", "keyPath", "port", "env"}.',
     );
   }
 
@@ -145,6 +158,7 @@ function getNodesRegistry(): Map<string, NodeConfig> {
       host,
       username: optionalString(c.user) || optionalString(c.username) || "pi",
       keyPath: optionalString(c.keyPath),
+      port: parsePort(c.port, `HOMELAB_NODES entry "${name}"`),
       env: parseNodeEnv(name, c.env),
     });
   }
@@ -166,15 +180,15 @@ export function getNodeConfig(node?: string): NodeConfig {
   );
 }
 
-export function listNodes(): { name: string; host: string }[] {
+export function listNodes(): { name: string; host: string; port: number }[] {
   const defaultCfg = getDefaultConfig();
-  const nodes: { name: string; host: string }[] = [
-    { name: "default", host: defaultCfg.host },
+  const nodes: { name: string; host: string; port: number }[] = [
+    { name: "default", host: defaultCfg.host, port: defaultCfg.port },
   ];
 
   const registry = getNodesRegistry();
   for (const [name, cfg] of registry) {
-    nodes.push({ name, host: cfg.host });
+    nodes.push({ name, host: cfg.host, port: cfg.port });
   }
 
   return nodes;
@@ -281,7 +295,7 @@ export async function execSSH(
     return `[dry-run] would execute on ${cfg.host}: ${command}`;
   }
 
-  const { host, username, keyPath } = getNodeConfig(node);
+  const { host, port, username, keyPath } = getNodeConfig(node);
   // Read the key before arming the timer so a bad path fails fast and
   // does not leave a pending timeout behind.
   const privateKey = loadPrivateKey(keyPath);
@@ -380,7 +394,7 @@ export async function execSSH(
       })
       .connect({
         host,
-        port: 22,
+        port,
         username,
         privateKey,
         agent: process.env.SSH_AUTH_SOCK,

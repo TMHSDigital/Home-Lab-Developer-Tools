@@ -11,7 +11,7 @@ export function register(server: McpServer): void {
     "List all managed nodes and their connection status",
     inputSchema,
     async () => {
-      let nodes: { name: string; host: string }[];
+      let nodes: { name: string; host: string; port: number }[];
       try {
         nodes = listNodes();
       } catch (error) {
@@ -29,10 +29,10 @@ export function register(server: McpServer): void {
       );
       const results = nodes.map((node, i) => {
         const probe = probes[i];
-        if (probe.status === "fulfilled") return `${node.name} (${node.host}) -- online`;
+        if (probe.status === "fulfilled") return `${node.name} (${node.port === 22 ? node.host : `${node.host}:${node.port}`}) -- online`;
         const error = probe.reason;
         const reason = error instanceof Error ? error.message.split("\n")[0] : String(error);
-        return `${node.name} (${node.host}) -- offline (${reason})`;
+        return `${node.name} (${node.port === 22 ? node.host : `${node.host}:${node.port}`}) -- offline (${reason})`;
       });
 
       return {

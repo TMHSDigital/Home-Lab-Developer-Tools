@@ -18,6 +18,7 @@ const state = vi.hoisted(() => ({
   behavior: {} as Behavior,
   ended: 0,
   signals: [] as string[],
+  connectConfig: undefined as { port?: number } | undefined,
 }));
 
 vi.mock("ssh2", async () => {
@@ -32,7 +33,8 @@ vi.mock("ssh2", async () => {
   }
 
   class Client extends EventEmitter {
-    connect() {
+    connect(config: { port?: number }) {
+      state.connectConfig = config;
       const b = state.behavior;
       queueMicrotask(() => {
         if (b.connectError) this.emit("error", b.connectError);
@@ -136,6 +138,13 @@ describe("execSSH with a mocked SSH client", () => {
     state.behavior = { exitCode: 7 };
     const err = await execSSH("job").catch((e) => e);
     expect(err.message).toBe("Command exited with code 7");
+  });
+
+  it("connects on the configured SSH port", async () => {
+    vi.stubEnv("HOMELAB_PI_PORT", "2222");
+    state.behavior = { stdout: ["ok"] };
+    await execSSH("true");
+    expect(state.connectConfig?.port).toBe(2222);
   });
 
   it("maps exec channel errors to SSHError", async () => {

@@ -59,7 +59,7 @@ describe("loadPrivateKey", () => {
 
 describe("node registry", () => {
   it("lists only the default node when HOMELAB_NODES is unset", () => {
-    expect(listNodes()).toEqual([{ name: "default", host: "raspberrypi.local" }]);
+    expect(listNodes()).toEqual([{ name: "default", host: "raspberrypi.local", port: 22 }]);
   });
 
   it("maps user and username and defaults the user to pi", () => {
@@ -68,10 +68,42 @@ describe("node registry", () => {
       zero: { host: "zero.local", username: "ops" },
       other: { host: "other.local" },
     });
-    expect(getNodeConfig("nas")).toEqual({ host: "nas.local", username: "admin", keyPath: "~/.ssh/k", env: {} });
+    expect(getNodeConfig("nas")).toEqual({ host: "nas.local", username: "admin", keyPath: "~/.ssh/k", port: 22, env: {} });
     expect(getNodeConfig("zero").username).toBe("ops");
     expect(getNodeConfig("other").username).toBe("pi");
     expect(listNodes().map((n) => n.name)).toEqual(["default", "nas", "zero", "other"]);
+  });
+
+  it("reads the SSH port from HOMELAB_PI_PORT and registry entries", () => {
+    process.env.HOMELAB_PI_PORT = "2222";
+    process.env.HOMELAB_NODES = JSON.stringify({
+      nas: { host: "nas.local", port: 2200 },
+      zero: { host: "zero.local", port: "22022" },
+      other: { host: "other.local" },
+    });
+    try {
+      expect(getNodeConfig().port).toBe(2222);
+      expect(getNodeConfig("nas").port).toBe(2200);
+      expect(getNodeConfig("zero").port).toBe(22022);
+      expect(getNodeConfig("other").port).toBe(22);
+      expect(listNodes().map((n) => n.port)).toEqual([2222, 2200, 22022, 22]);
+    } finally {
+      delete process.env.HOMELAB_PI_PORT;
+    }
+  });
+
+  it.each([0, 65536, 22.5, "ssh", "-1"])("rejects invalid port %j", (port) => {
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local", port } });
+    expect(() => getNodeConfig("nas")).toThrow(/"nas": SSH port must be an integer between 1 and 65535/);
+  });
+
+  it("rejects an invalid HOMELAB_PI_PORT", () => {
+    process.env.HOMELAB_PI_PORT = "70000";
+    try {
+      expect(() => getNodeConfig()).toThrow(/HOMELAB_PI_PORT: SSH port must be/);
+    } finally {
+      delete process.env.HOMELAB_PI_PORT;
+    }
   });
 
   it("throws a clear error for malformed JSON", () => {

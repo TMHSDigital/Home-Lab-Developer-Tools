@@ -10,7 +10,7 @@ export function register(server: McpServer): void {
     async (args) => {
       try {
         // Report the node that was actually tested, not the default Pi.
-        const { host, username: user } = getNodeConfig(args.node);
+        const { host, port, username: user } = getNodeConfig(args.node);
 
         const output = await execSSH("echo ok && hostname && uptime -p", args.node);
         const lines = output.split("\n");
@@ -19,7 +19,7 @@ export function register(server: McpServer): void {
           content: [{
             type: "text" as const,
             text: [
-              `SSH connection to ${user}@${host}: OK`,
+              `SSH connection to ${user}@${host}:${port}: OK`,
               `Hostname: ${lines[1] || "unknown"}`,
               `Uptime: ${lines[2] || "unknown"}`,
             ].join("\n"),

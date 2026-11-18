@@ -19,7 +19,7 @@ export function registerResources(server: McpServer): void {
     async (uri) => {
       let text: string;
       try {
-        text = JSON.stringify({ nodes: listNodes() }, null, 2);
+        text = JSON.stringify({ nodes: listNodes().map(({ name, host }) => ({ name, host })) }, null, 2);
       } catch (error) {
         text = JSON.stringify({ error: error instanceof Error ? error.message : String(error) }, null, 2);
       }
