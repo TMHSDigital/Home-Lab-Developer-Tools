@@ -12,6 +12,11 @@ const inputSchema = {
   ...confirmParam,
 };
 
+function volumeCommand(volume: string, node?: string): string {
+  const volumePath = `/var/lib/docker/volumes/${volume}/_data`;
+  return resticCommand(`backup '${volumePath}' --tag docker-volume --tag '${volume}' 2>&1`, node);
+}
+
 export function register(server: McpServer): void {
   server.tool(
     "homelab_volumeBackup",
@@ -19,14 +24,13 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       if (!args.confirm) {
-        return confirmCancelled("Volume backup");
+        return confirmCancelled("Volume backup", { node: args.node, commands: () => [volumeCommand(args.volume, args.node)] });
       }
 
       try {
 
-        const volumePath = `/var/lib/docker/volumes/${args.volume}/_data`;
         const output = await execSSH(
-          resticCommand(`backup '${volumePath}' --tag docker-volume --tag '${args.volume}' 2>&1`, args.node),
+          volumeCommand(args.volume, args.node),
           args.node,
           { timeoutMs: TIMEOUTS.backup },
         );

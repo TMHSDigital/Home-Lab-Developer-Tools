@@ -23,6 +23,11 @@ const inputSchema = {
   ...confirmParam,
 };
 
+function restoreCommand(args: { node?: string; snapshot: string; target: string; include?: string }): string {
+  const includeFlag = args.include ? ` --include '${args.include}'` : "";
+  return resticCommand(`restore '${args.snapshot}' --target '${args.target}'${includeFlag} 2>&1`, args.node);
+}
+
 export function register(server: McpServer): void {
   server.tool(
     "homelab_backupRestore",
@@ -30,14 +35,13 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       if (!args.confirm) {
-        return confirmCancelled("Restore");
+        return confirmCancelled("Restore", { node: args.node, commands: () => [restoreCommand(args)] });
       }
 
       try {
 
-        const includeFlag = args.include ? ` --include '${args.include}'` : "";
         const output = await execSSH(
-          resticCommand(`restore '${args.snapshot}' --target '${args.target}'${includeFlag} 2>&1`, args.node),
+          restoreCommand(args),
           args.node,
           { timeoutMs: TIMEOUTS.backup },
         );

@@ -13,6 +13,12 @@ const inputSchema = {
   ...confirmParam,
 };
 
+function renewCommand(domain?: string): string {
+  return domain
+    ? `sudo certbot renew --cert-name '${domain}' --force-renewal 2>&1`
+    : "sudo certbot renew 2>&1";
+}
+
 export function register(server: McpServer): void {
   server.tool(
     "homelab_certRenew",
@@ -20,7 +26,11 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       if (!args.confirm) {
-        return confirmCancelled("Renewal");
+        return confirmCancelled("Renewal", {
+          node: args.node,
+          commands: () => [renewCommand(args.domain)],
+          note: "It first checks that certbot is installed.",
+        });
       }
 
       try {
@@ -40,10 +50,7 @@ export function register(server: McpServer): void {
           };
         }
 
-        const cmd = args.domain
-          ? `sudo certbot renew --cert-name '${args.domain}' --force-renewal 2>&1`
-          : "sudo certbot renew 2>&1";
-        const output = await execSSH(cmd, args.node, { timeoutMs: TIMEOUTS.medium });
+        const output = await execSSH(renewCommand(args.domain), args.node, { timeoutMs: TIMEOUTS.medium });
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
         return errorResponse(error);

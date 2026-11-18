@@ -15,7 +15,11 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       if (!args.confirm) {
-        return confirmCancelled("Reboot");
+        return confirmCancelled("Reboot", {
+          node: args.node,
+          commands: () => ["sudo shutdown -r +0"],
+          note: "Before rebooting it counts running containers and reads the uptime.",
+        });
       }
 
       try {

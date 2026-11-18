@@ -17,6 +17,17 @@ const inputSchema = {
     .describe("Safety gate. Must be true when upgrade is true; not needed to only list updates."),
 };
 
+function aptCommand(upgrade: boolean): string {
+  let cmd = "sudo apt-get update -qq 2>&1 && apt list --upgradable 2>/dev/null";
+  if (upgrade) {
+    // Non-interactive so a conffile prompt cannot block on stdin.
+    cmd +=
+      " && sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y" +
+      " -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold 2>&1";
+  }
+  return cmd;
+}
+
 export function register(server: McpServer): void {
   server.tool(
     "homelab_aptUpdate",
@@ -26,19 +37,11 @@ export function register(server: McpServer): void {
       if (args.upgrade && args.confirm !== true) {
         // Upgrading changes system state (packages, services, possibly the
         // kernel), so it uses the same confirm gate as other mutating tools.
-        return confirmCancelled("Package upgrade");
+        return confirmCancelled("Package upgrade", { node: args.node, commands: () => [aptCommand(true)] });
       }
 
       try {
-        let cmd = "sudo apt-get update -qq 2>&1 && apt list --upgradable 2>/dev/null";
-        if (args.upgrade) {
-          // Non-interactive so a conffile prompt cannot block on stdin.
-          cmd +=
-            " && sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y" +
-            " -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold 2>&1";
-        }
-
-        const output = await execSSH(cmd, args.node, {
+        const output = await execSSH(aptCommand(!!args.upgrade), args.node, {
           timeoutMs: args.upgrade ? TIMEOUTS.long : TIMEOUTS.medium,
         });
 

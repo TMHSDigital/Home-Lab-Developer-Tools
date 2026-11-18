@@ -18,6 +18,13 @@ const inputSchema = {
   ...confirmParam,
 };
 
+function upCommand(stacks: string[] | undefined, node?: string): string {
+  // Orphan removal is only safe when the whole project is brought up.
+  return stacks && stacks.length > 0
+    ? buildStackCommand(["up -d $services 2>&1"], stacks, node)
+    : buildComposeCommand("up -d --remove-orphans 2>&1", undefined, node);
+}
+
 export function register(server: McpServer): void {
   server.tool(
     "homelab_composeUp",
@@ -25,16 +32,12 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       if (!args.confirm) {
-        return confirmCancelled("Compose up");
+        return confirmCancelled("Compose up", { node: args.node, commands: () => [upCommand(args.stacks, args.node)] });
       }
 
       try {
-        // Orphan removal is only safe when the whole project is brought up.
-        const cmd = args.stacks && args.stacks.length > 0
-          ? buildStackCommand(["up -d $services 2>&1"], args.stacks, args.node)
-          : buildComposeCommand("up -d --remove-orphans 2>&1", undefined, args.node);
         const output = await execSSH(
-          cmd,
+          upCommand(args.stacks, args.node),
           args.node,
           { timeoutMs: TIMEOUTS.medium },
         );

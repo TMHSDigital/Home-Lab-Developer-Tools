@@ -17,7 +17,11 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       if (!args.confirm) {
-        return confirmCancelled("Restart");
+        return confirmCancelled("Restart", {
+          node: args.node,
+          commands: () => [`docker restart ${args.service}`],
+          note: "Afterwards it reports the container's status.",
+        });
       }
 
       try {

@@ -62,7 +62,15 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       if (!args.confirm) {
-        return confirmCancelled("Filter toggle");
+        return confirmCancelled("Filter toggle", {
+          node: args.node,
+          commands: () => [
+            `curl -sf ${adguardAuth(args.node)} 'http://localhost:${servicePort(SERVICE, args.node)}/control/filtering/status'`,
+          ],
+          note:
+            `Then, if the filter's current state differs, it posts the list with enabled=${args.enabled} ` +
+            "to /control/filtering/set_url.",
+        });
       }
 
       let port = SERVICE.defaultPort;

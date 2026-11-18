@@ -3,14 +3,15 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-vi.mock("../../utils/ssh-api.js", () => ({
+vi.mock("../../utils/ssh-api.js", async (importOriginal) => ({
+  assertCommandSafe: (await importOriginal<typeof import("../../utils/ssh-api.js")>()).assertCommandSafe,
   execSSH: vi.fn(),
   errorResponse: vi.fn((error: unknown) => ({
     content: [{ type: "text" as const, text: error instanceof Error ? error.message : "Unknown error" }],
     isError: true,
   })),
   nodeSetting: vi.fn((_node: string | undefined, key: string) => process.env[key] || undefined),
-  getNodeConfig: vi.fn(() => ({ host: "raspberrypi.local", username: "pi", keyPath: "", env: {} })),
+  getNodeConfig: vi.fn(() => ({ host: "raspberrypi.local", username: "pi", keyPath: "", port: 22, env: {} })),
   listNodes: vi.fn(() => [{ name: "default", host: "raspberrypi.local" }]),
   TIMEOUTS: { long: 1_800_000, backup: 3_600_000, medium: 300_000 },
 }));
@@ -96,6 +97,39 @@ describe("confirm gate", () => {
       expect(result.content[0].text).toContain("cancelled");
     }
     expect(mockExecSSH).not.toHaveBeenCalled();
+  });
+
+  it.each(GATED)("%s previews its command without confirm and runs nothing", async (_tool, file, args, expected) => {
+    const handler = await load(file);
+    const text = (await handler({ ...args, confirm: false })).content[0].text;
+    expect(text).toContain("Preview (nothing was run):");
+    expect(text).toMatch(/Node: \w+ \(pi@raspberrypi\.local\)/);
+    expect(text).toContain(expected);
+    expect(mockExecSSH).not.toHaveBeenCalled();
+  });
+
+  it("masks credentials in previews", async () => {
+    process.env.HOMELAB_ADGUARD_PASSWORD = "hunter2";
+    try {
+      const handler = await load("adguardFilterToggle");
+      const text = (await handler({ url: "https://l.example/a.txt", enabled: false, confirm: false })).content[0].text;
+      expect(text).toContain("curl -sf -u '****'");
+      expect(text).not.toContain("hunter2");
+    } finally {
+      delete process.env.HOMELAB_ADGUARD_PASSWORD;
+    }
+  });
+
+  it("says when the command guard would block the previewed command", async () => {
+    const handler = await load("nodeExec");
+    const text = (await handler({ node: "nas", command: "sudo poweroff", confirm: false })).content[0].text;
+    expect(text).toContain("would be blocked");
+  });
+
+  it("reports invalid arguments in the preview", async () => {
+    const handler = await load("composeDown");
+    const text = (await handler({ stacks: ["compose.apps.yml"], removeVolumes: true, confirm: false })).content[0].text;
+    expect(text).toContain("Preview unavailable: removeVolumes is only supported");
   });
 
   it.each(GATED)("%s runs its command with confirm=true", async (_tool, file, args, expected) => {

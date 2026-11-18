@@ -16,7 +16,7 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       if (!args.confirm) {
-        return confirmCancelled("Execution");
+        return confirmCancelled("Execution", { node: args.node, commands: () => [args.command] });
       }
 
       try {

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Confirm-gated tools called without `confirm: true` now return a preview instead of only "cancelled": the target node and host, the command they would run (credentials masked), whether the command guard would block it, and any extra steps. Nothing is executed.
 - Configurable SSH port: `HOMELAB_PI_PORT` for the default node and an optional `port` in `HOMELAB_NODES` entries (default 22, validated 1-65535). `homelab_sshTest` and `homelab_nodeList` show the port.
 
 ### Changed
