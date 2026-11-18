@@ -185,6 +185,22 @@ jobs:
               f.write(content)
           "
 
+      - name: Roll Unreleased changelog entries into the new version
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          python3 - <<'PY'
+          import datetime, re
+          version = "${{ steps.new.outputs.version }}"
+          with open("CHANGELOG.md", encoding="utf-8") as f:
+              text = f.read()
+          m = re.search(r"^## \[Unreleased\][ \t]*\n(.*?)(?=^## )", text, re.S | re.M)
+          if m and m.group(1).strip() and f"## [{version}]" not in text:
+              heading = f"## [Unreleased]\n\n## [{version}] - {datetime.date.today().isoformat()}\n"
+              text = text[:m.start()] + heading + text[m.start() + len("## [Unreleased]\n"):]
+              with open("CHANGELOG.md", "w", encoding="utf-8", newline="") as f:
+                  f.write(text)
+          PY
+
       - name: Sync release docs
         if: steps.check.outputs.skip == 'false'
         uses: TMHSDigital/Developer-Tools-Directory/.github/actions/release-doc-sync@f10dd5e060ffcd30e44b950c09af970f96579ff8 # v1.20.0

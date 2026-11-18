@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.17.1 to 0.22.2 (catch-up)
+
+These entries were listed under `[Unreleased]` but are already published; they were not sorted by version.
+
 ### Added
 
 - Every tool now declares MCP tool annotations: read-only tools set `readOnlyHint`, the confirm-gated tools set `destructiveHint` (with `idempotentHint`), and `homelab_composePull` and `homelab_ntfySend` are marked as state-changing but not destructive, so clients can auto-approve reads and warn before destructive calls. Tools are registered with `registerTool` instead of the deprecated `server.tool()`.
