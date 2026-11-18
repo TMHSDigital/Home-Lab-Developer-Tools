@@ -13,10 +13,75 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  version-and-release:
-    name: Bump version, tag, and release
+  # Release only when something that ships (MCP server code, skills, rules,
+  # plugin manifest) changed since the last tag. Docs, tests and CI changes
+  # alone do not publish a new version; they go out with the next release.
+  gate:
+    name: Check for shipped changes
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    outputs:
+      release: ${{ steps.paths.outputs.release }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Compare with the last tag
+        id: paths
+        run: |
+          last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$last_tag" ]; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          shipped=$(git diff --name-only "$last_tag"..HEAD \
+            | grep -E '^(mcp-server/|skills/|rules/|\.cursor-plugin/)' \
+            | grep -vE '(^|/)__tests__/|\.test\.ts$' || true)
+          if [ -n "$shipped" ]; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            echo "Shipped changes since $last_tag:"
+            printf '%s\n' "$shipped"
+          else
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "No shipped changes since $last_tag; skipping release."
+          fi
+
+  # The same checks as CI, so a commit that fails them is never tagged.
+  test:
+    name: Build and test before release
+    needs: gate
+    if: needs.gate.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mcp-server/package-lock.json
+
+      - name: Build and test the MCP server
+        working-directory: mcp-server
+        run: |
+          npm ci
+          npm run build
+          npm test
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run structure tests
+        run: |
+          pip install -r requirements-test.txt
+          pytest tests/ --tb=short
+
+  version-and-release:
+    name: Bump version, tag, and release
+    needs: [gate, test]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
