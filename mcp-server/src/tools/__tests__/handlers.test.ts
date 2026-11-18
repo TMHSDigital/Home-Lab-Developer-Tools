@@ -26,6 +26,7 @@ import { register as serviceHealth } from "../serviceHealth.js";
 import { register as systemdServices } from "../systemdServices.js";
 import { register as logSearch } from "../logSearch.js";
 import { register as certRenew } from "../certRenew.js";
+import { register as backupRun } from "../backupRun.js";
 import { register as alertSilences } from "../alertSilences.js";
 import { register as alertSilence, buildSilenceBody } from "../alertSilence.js";
 import { register as backupStatus } from "../backupStatus.js";
@@ -443,6 +444,35 @@ describe("logSearch", () => {
       expect(() => assertCommandSafe(cmd())).not.toThrow();
       expect(cmd()).toContain(Buffer.from(args.pattern).toString("base64"));
       expect(cmd()).toContain('grep -i -e "$pat"');
+    }
+  });
+});
+
+describe("backupRun", () => {
+  it("runs the node's HOMELAB_BACKUP_SCRIPT", async () => {
+    vi.mocked(nodeSetting).mockImplementation((node, key) =>
+      node === "nas" && key === "HOMELAB_BACKUP_SCRIPT" ? "/srv/scripts/restic-backup.sh" : undefined,
+    );
+    try {
+      mockExecSSH.mockResolvedValueOnce("done");
+      await handlerOf(backupRun)({ node: "nas", confirm: true });
+      expect(cmd()).toContain("sudo test -x '/srv/scripts/restic-backup.sh'");
+      expect(cmd()).toContain("out=$(sudo '/srv/scripts/restic-backup.sh' 2>&1)");
+      expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+    } finally {
+      vi.mocked(nodeSetting).mockImplementation((_n, key) => process.env[key] || undefined);
+    }
+  });
+
+  it("rejects a relative or unusual script path without running anything", async () => {
+    process.env.HOMELAB_BACKUP_SCRIPT = "backup.sh; id";
+    try {
+      const result = await handlerOf(backupRun)({ confirm: true });
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("HOMELAB_BACKUP_SCRIPT must be an absolute path");
+      expect(mockExecSSH).not.toHaveBeenCalled();
+    } finally {
+      delete process.env.HOMELAB_BACKUP_SCRIPT;
     }
   });
 });

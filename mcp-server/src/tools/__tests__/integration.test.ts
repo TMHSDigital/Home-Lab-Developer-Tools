@@ -146,7 +146,7 @@ describe("integration tests (mocked SSH)", () => {
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain("unable to create lock");
       const cmd = mockExecSSH.mock.calls[0][0] as string;
-      expect(cmd).toContain("sudo test -x /opt/backup/backup.sh");
+      expect(cmd).toContain("sudo test -x '/opt/backup/backup.sh'");
       expect(cmd).not.toContain("|| echo");
     });
 
