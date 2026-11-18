@@ -36,14 +36,18 @@ export function register(server: McpServer): void {
     inputSchema,
     async (args) => {
       try {
-        const escaped = args.pattern.replace(/'/g, "'\\''");
+        // The pattern travels base64-encoded and is decoded on the node, so
+        // search text such as "poweroff" is data for grep, not part of the
+        // command line the command guard inspects, and needs no shell quoting.
+        const encoded = Buffer.from(args.pattern, "utf8").toString("base64");
+        const pat = `pat=$(printf '%s' '${encoded}' | base64 -d)`;
         // Bound the work: only read logs inside the time window instead of
         // every container's full history. -e keeps patterns that start with
         // "-" from being parsed as grep options.
         const since = `--since ${toDockerSince(args.since)}`;
         const cmd = args.service
-          ? `docker logs ${since} '${args.service}' 2>&1 | grep -i -e '${escaped}' | tail -${args.lines}`
-          : `docker ps --format '{{.Names}}' | while read name; do matches=$(docker logs ${since} "$name" 2>&1 | grep -i -e '${escaped}' | tail -${args.lines}); if [ -n "$matches" ]; then echo "=== $name ==="; echo "$matches"; echo; fi; done`;
+          ? `${pat}; docker logs ${since} '${args.service}' 2>&1 | grep -i -e "$pat" | tail -${args.lines}`
+          : `${pat}; docker ps --format '{{.Names}}' | while read name; do matches=$(docker logs ${since} "$name" 2>&1 | grep -i -e "$pat" | tail -${args.lines}); if [ -n "$matches" ]; then echo "=== $name ==="; echo "$matches"; echo; fi; done`;
         const output = await execSSH(cmd, args.node, { timeoutMs: TIMEOUTS.medium });
         return {
           content: [{

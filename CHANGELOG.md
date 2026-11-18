@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `homelab_logSearch` no longer trips the command guard when the search text contains words like "poweroff" or "halt"; the pattern is passed to grep as data.
+- `homelab_certRenew` with `domain` renews only when the certificate is due; the new `force` flag reissues it (mind the Let's Encrypt duplicate-certificate limit).
+- `homelab_inventorySync` honors a per-node `HOMELAB_ANSIBLE_INVENTORY` from `HOMELAB_NODES`.
 - Restic tools (`homelab_backupStatus`, `homelab_backupList`, `homelab_backupDiff`, `homelab_backupRestore`, `homelab_volumeBackup`) now get the repository password under sudo: they source `/etc/restic-env` (`HOMELAB_RESTIC_ENV_FILE`) when it exists and pass `HOMELAB_RESTIC_PASSWORD_FILE` as `--password-file`. Password failures name these settings.
 - `homelab_composeUp` and `homelab_composeDown` with `stacks` now act only on the services of the named files. Updating one stack no longer removes other stacks' containers as orphans, and stopping one stack no longer stops base services.
 - `homelab_serviceHealth` now includes stopped containers, flags non-running or unhealthy containers, and reports empty selections instead of claiming they are healthy.

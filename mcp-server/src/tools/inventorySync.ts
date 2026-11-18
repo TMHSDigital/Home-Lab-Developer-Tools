@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { execSSH, errorResponse, nodeSetting } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 
 const inputSchema = {
@@ -19,7 +19,7 @@ export function register(server: McpServer): void {
       try {
         if (args.source === "ansible") {
           const inventoryPath =
-            process.env.HOMELAB_ANSIBLE_INVENTORY || "/etc/ansible/hosts";
+            nodeSetting(args.node, "HOMELAB_ANSIBLE_INVENTORY") || "/etc/ansible/hosts";
           const cmd =
             `test -f '${inventoryPath}' && cat '${inventoryPath}' || echo 'Inventory file not found at ${inventoryPath}. Set HOMELAB_ANSIBLE_INVENTORY to the correct path.'`;
           const output = await execSSH(cmd, args.node);

@@ -10,13 +10,20 @@ const inputSchema = {
     .string()
     .optional()
     .describe("Specific certificate name to renew. Renews all eligible certificates if omitted"),
+  force: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      "With domain: reissue even if the certificate is not due. Let's Encrypt allows only 5 duplicate " +
+        "certificates per week, so use it only when the current certificate is broken.",
+    ),
   ...confirmParam,
 };
 
-function renewCommand(domain?: string): string {
-  return domain
-    ? `sudo certbot renew --cert-name '${domain}' --force-renewal 2>&1`
-    : "sudo certbot renew 2>&1";
+function renewCommand(domain?: string, force = false): string {
+  if (!domain) return "sudo certbot renew 2>&1";
+  return `sudo certbot renew --cert-name '${domain}'${force ? " --force-renewal" : ""} 2>&1`;
 }
 
 export function register(server: McpServer): void {
@@ -28,7 +35,7 @@ export function register(server: McpServer): void {
       if (!args.confirm) {
         return confirmCancelled("Renewal", {
           node: args.node,
-          commands: () => [renewCommand(args.domain)],
+          commands: () => [renewCommand(args.domain, args.force)],
           note: "It first checks that certbot is installed.",
         });
       }
@@ -50,7 +57,7 @@ export function register(server: McpServer): void {
           };
         }
 
-        const output = await execSSH(renewCommand(args.domain), args.node, { timeoutMs: TIMEOUTS.medium });
+        const output = await execSSH(renewCommand(args.domain, args.force), args.node, { timeoutMs: TIMEOUTS.medium });
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
         return errorResponse(error);

@@ -12,7 +12,7 @@ vi.mock("../../utils/ssh-api.js", () => ({
   TIMEOUTS: { long: 1_800_000, backup: 3_600_000, medium: 300_000 },
 }));
 
-import { execSSH } from "../../utils/ssh-api.js";
+import { execSSH, nodeSetting } from "../../utils/ssh-api.js";
 import { CommandFailedError } from "../../utils/errors.js";
 import { register as prometheusQuery } from "../prometheusQuery.js";
 import { register as grafanaSnapshot } from "../grafanaSnapshot.js";
@@ -24,6 +24,8 @@ import { register as inventorySync } from "../inventorySync.js";
 import { register as composePs } from "../composePs.js";
 import { register as serviceHealth } from "../serviceHealth.js";
 import { register as systemdServices } from "../systemdServices.js";
+import { register as logSearch } from "../logSearch.js";
+import { register as certRenew } from "../certRenew.js";
 import { register as alertSilences } from "../alertSilences.js";
 import { register as alertSilence, buildSilenceBody } from "../alertSilence.js";
 import { register as backupStatus } from "../backupStatus.js";
@@ -418,6 +420,41 @@ describe("inventorySync", () => {
     expect((await h({ source: "ansible" })).content[0].text).toContain("=== Ansible Inventory (/etc/ansible/hosts) ===");
     mockExecSSH.mockResolvedValueOnce("100.64.0.1 pi1");
     expect((await h({ source: "tailscale" })).content[0].text).toContain("=== Tailscale Peers ===");
+  });
+
+  it("uses the node's HOMELAB_ANSIBLE_INVENTORY override", async () => {
+    vi.mocked(nodeSetting).mockImplementationOnce((node, key) =>
+      node === "lab" && key === "HOMELAB_ANSIBLE_INVENTORY" ? "/srv/ansible/hosts" : undefined,
+    );
+    mockExecSSH.mockResolvedValueOnce("[pis]");
+    const text = (await handlerOf(inventorySync)({ source: "ansible", node: "lab" })).content[0].text;
+    expect(cmd()).toContain("cat '/srv/ansible/hosts'");
+    expect(text).toContain("=== Ansible Inventory (/srv/ansible/hosts) ===");
+  });
+});
+
+describe("logSearch", () => {
+  it("passes the pattern as data so the command guard allows words like poweroff", async () => {
+    const { assertCommandSafe } = await vi.importActual<typeof import("../../utils/ssh-api.js")>("../../utils/ssh-api.js");
+    mockExecSSH.mockResolvedValue("");
+    for (const args of [{ pattern: "poweroff" }, { pattern: "system halt", service: "web" }]) {
+      mockExecSSH.mockClear();
+      await handlerOf(logSearch)(args);
+      expect(() => assertCommandSafe(cmd())).not.toThrow();
+      expect(cmd()).toContain(Buffer.from(args.pattern).toString("base64"));
+      expect(cmd()).toContain('grep -i -e "$pat"');
+    }
+  });
+});
+
+describe("certRenew", () => {
+  it("renews a named certificate only when due unless force is set", async () => {
+    mockExecSSH.mockResolvedValue("installed");
+    await handlerOf(certRenew)({ domain: "example.org", confirm: true });
+    expect(cmd(1)).toBe("sudo certbot renew --cert-name 'example.org' 2>&1");
+    mockExecSSH.mockClear();
+    await handlerOf(certRenew)({ domain: "example.org", force: true, confirm: true });
+    expect(cmd(1)).toBe("sudo certbot renew --cert-name 'example.org' --force-renewal 2>&1");
   });
 });
 
