@@ -80,10 +80,25 @@ describe("tool registration", () => {
     const manifest = JSON.parse(readFileSync(join(repoRoot, "mcp-tools.json"), "utf8")) as Array<{ name: string }>;
     const manifestNames = manifest.map((t) => t.name).sort();
     expect(manifestNames).toEqual(registered.map((r) => r.name).sort());
+    const serverReadme = readFileSync(join(repoRoot, "mcp-server/README.md"), "utf8");
     for (const r of registered) {
       expect(readme, `${r.name} missing from README.md`).toContain(`\`${r.name}\``);
       expect(claude, `${r.name} missing from CLAUDE.md`).toContain(`\`${r.name}\``);
+      expect(serverReadme, `${r.name} missing from mcp-server/README.md`).toContain(`\`${r.name}\``);
     }
+  });
+
+  it("states the current tool count everywhere it is published", () => {
+    const n = registered.length;
+    const read = (p: string) => readFileSync(join(repoRoot, p), "utf8");
+    const plugin = JSON.parse(read(".cursor-plugin/plugin.json")) as { description: string };
+    const pkg = JSON.parse(read("mcp-server/package.json")) as { description: string };
+    expect(plugin.description).toContain(`${n} MCP tools`);
+    expect(pkg.description).toContain(`${n} tools`);
+    expect(read("README.md")).toContain(`11 rules &nbsp;&bull;&nbsp; ${n} MCP tools`);
+    expect(read("README.md")).toContain(`badge/tools-${n}-`);
+    expect(read("CLAUDE.md")).toContain(`## MCP Tools (${n})`);
+    expect(read("mcp-server/README.md")).toContain(`provides ${n} tools`);
   });
 });
 
