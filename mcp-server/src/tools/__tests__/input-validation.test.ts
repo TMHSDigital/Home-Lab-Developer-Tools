@@ -351,7 +351,7 @@ describe("input validation schemas", () => {
       const result = schema.parse(create);
       expect(result.duration).toBe("2h");
       expect(result.createdBy).toBe("homelab-mcp");
-      expect(result.matchers![0]).toEqual({ name: "alertname", value: "HighCPU", isRegex: false, isEqual: true });
+      expect((result.matchers as unknown[])[0]).toEqual({ name: "alertname", value: "HighCPU", isRegex: false, isEqual: true });
     });
 
     it.each(["bad-name", "1x", "a b", ""])("rejects matcher name %j", (name) => {

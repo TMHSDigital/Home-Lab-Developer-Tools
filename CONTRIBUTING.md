@@ -31,6 +31,7 @@ cd mcp-server
 npm install
 npm run build
 npm test
+npm run typecheck
 npm run dev  # watch mode with tsx
 ```
 

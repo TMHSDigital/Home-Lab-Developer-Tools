@@ -153,6 +153,7 @@ cd mcp-server
 npm install
 npm run build    # Compile TypeScript
 npm test         # Run Vitest tests
+npm run typecheck  # Type-check sources and test files
 npm run dev      # Watch mode with tsx
 ```
 

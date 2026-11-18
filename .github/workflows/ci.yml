@@ -41,6 +41,10 @@ jobs:
         run: npm run build
         working-directory: mcp-server
 
+      - name: Type-check sources and tests
+        run: npm run typecheck
+        working-directory: mcp-server
+
       - name: Test
         run: npm test
         working-directory: mcp-server
