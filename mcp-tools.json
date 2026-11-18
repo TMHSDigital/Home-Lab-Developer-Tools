@@ -43,6 +43,8 @@
   {"name": "homelab_grafanaSnapshot", "description": "Export a Grafana dashboard configuration", "category": "Monitoring"},
   {"name": "homelab_uptimeKumaStatus", "description": "Get status of all Uptime Kuma monitors", "category": "Monitoring"},
   {"name": "homelab_alertList", "description": "List alerts from Alertmanager", "category": "Monitoring"},
+  {"name": "homelab_alertSilences", "description": "List Alertmanager silences, optionally by state", "category": "Monitoring"},
+  {"name": "homelab_alertSilence", "description": "Create an Alertmanager silence or expire one by ID (requires confirm=true)", "category": "Monitoring"},
   {"name": "homelab_speedtestResults", "description": "Get recent speedtest results", "category": "Monitoring"},
   {"name": "homelab_adguardStats", "description": "AdGuard Home DNS statistics and query counts", "category": "AdGuard Home"},
   {"name": "homelab_adguardFilters", "description": "List AdGuard Home filter lists", "category": "AdGuard Home"},

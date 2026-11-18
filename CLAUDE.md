@@ -6,7 +6,7 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 51 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 53 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
@@ -83,7 +83,7 @@ Home-Lab-Developer-Tools/
 | resource-limits | compose*.yml | Flag containers without memory or CPU limits |
 | inventory-consistency | hosts, inventory*, .env* | Flag nodes in config missing from HOMELAB_NODES registry |
 
-## MCP Tools (51)
+## MCP Tools (53)
 
 All tools connect to the Pi (or any registered node) via SSH. All tools except `homelab_nodeList` accept a `node` parameter to target a specific node from the `HOMELAB_NODES` registry (optional everywhere except `homelab_nodeExec` and `homelab_nodeStatus`, where it is required).
 
@@ -104,6 +104,8 @@ All tools connect to the Pi (or any registered node) via SSH. All tools except `
 | `homelab_grafanaSnapshot` | Export a Grafana dashboard configuration by UID |
 | `homelab_uptimeKumaStatus` | Get the status of all Uptime Kuma monitors |
 | `homelab_alertList` | List alerts from Alertmanager by state |
+| `homelab_alertSilences` | List Alertmanager silences, optionally by state |
+| `homelab_alertSilence` | Create a silence for matching alerts or expire one by ID (requires confirm=true) |
 | `homelab_speedtestResults` | Get recent Speedtest Tracker results |
 | `homelab_adguardStats` | AdGuard Home DNS statistics and top blocked domains |
 | `homelab_adguardFilters` | List AdGuard filter/blocklists and status |
@@ -184,7 +186,7 @@ npm install -g @tmhs/homelab-mcp
 
 ## Security
 
-- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, `homelab_adguardFilterToggle`, and `homelab_aptUpdate` when `upgrade=true`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`; pass `confirmCancelled` a preview (`node` plus a lazy `commands` builder) so a call without `confirm` shows the target node and the masked command it would run, and runs nothing.
+- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, `homelab_adguardFilterToggle`, `homelab_alertSilence`, and `homelab_aptUpdate` when `upgrade=true`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`; pass `confirmCancelled` a preview (`node` plus a lazy `commands` builder) so a call without `confirm` shows the target node and the masked command it would run, and runs nothing.
 - `execSSH()` runs `assertCommandSafe()` before opening any SSH connection. This blocks catastrophic patterns (`rm -rf /`, `mkfs` on block devices, fork bombs, `poweroff`, etc.). Override with `HOMELAB_ALLOW_DANGEROUS_COMMANDS=true`.
 - `HOMELAB_DRY_RUN=true` makes `execSSH` return a description string instead of connecting. The command guard still runs in dry-run mode.
 - No personal SSH usernames, hostnames, or key names in code or docs. Use `pi` / `raspberrypi.local` / `~/.ssh/id_ed25519` as generic defaults.

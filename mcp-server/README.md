@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 51 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. All tools accept an optional `node` parameter to target specific nodes.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 53 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. All tools accept an optional `node` parameter to target specific nodes.
 
 ## Tools
 
@@ -28,6 +28,8 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | Monitoring | `homelab_grafanaSnapshot` | Export Grafana dashboard config by UID |
 | Monitoring | `homelab_uptimeKumaStatus` | Get Uptime Kuma monitor statuses |
 | Monitoring | `homelab_alertList` | List Alertmanager alerts by state |
+| Monitoring | `homelab_alertSilences` | List Alertmanager silences, optionally by state |
+| Monitoring | `homelab_alertSilence` | Create or expire an Alertmanager silence (requires confirm=true) |
 | Monitoring | `homelab_speedtestResults` | Get recent Speedtest Tracker results |
 | DNS/Proxy | `homelab_adguardStats` | AdGuard Home DNS statistics |
 | DNS/Proxy | `homelab_adguardFilters` | List AdGuard filter lists and status |

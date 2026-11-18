@@ -22,6 +22,8 @@ import { register as registerPrometheusQuery } from "./tools/prometheusQuery.js"
 import { register as registerGrafanaSnapshot } from "./tools/grafanaSnapshot.js";
 import { register as registerUptimeKumaStatus } from "./tools/uptimeKumaStatus.js";
 import { register as registerAlertList } from "./tools/alertList.js";
+import { register as registerAlertSilences } from "./tools/alertSilences.js";
+import { register as registerAlertSilence } from "./tools/alertSilence.js";
 import { register as registerSpeedtestResults } from "./tools/speedtestResults.js";
 import { register as registerAdguardStats } from "./tools/adguardStats.js";
 import { register as registerAdguardFilters } from "./tools/adguardFilters.js";
@@ -81,6 +83,8 @@ registerPrometheusQuery(server);
 registerGrafanaSnapshot(server);
 registerUptimeKumaStatus(server);
 registerAlertList(server);
+registerAlertSilences(server);
+registerAlertSilence(server);
 registerSpeedtestResults(server);
 registerAdguardStats(server);
 registerAdguardFilters(server);

@@ -37,6 +37,7 @@ export function preRebootChecklistText(node?: string): string {
     "2. Call `homelab_backupStatus` and confirm a recent snapshot exists.",
     "3. Call `homelab_kernelInfo` and `homelab_aptUpgradable` to see whether a kernel or package update is pending.",
     "4. Call `homelab_systemdServices` for failed units that might not come back cleanly.",
+    "5. Call `homelab_alertSilences` and suggest a maintenance silence (`homelab_alertSilence`) for the reboot window; do not create it unless I confirm.",
     "",
     "List the risks and the containers that will restart. Do not call `homelab_piReboot`;",
     "only reboot if I explicitly confirm afterwards (it requires `confirm: true`).",

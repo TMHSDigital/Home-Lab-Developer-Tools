@@ -5,6 +5,8 @@ import { register as adguardFilterToggle } from "../adguardFilterToggle.js";
 import { register as adguardQueryLog } from "../adguardQueryLog.js";
 import { register as adguardStats } from "../adguardStats.js";
 import { register as alertList } from "../alertList.js";
+import { register as alertSilence } from "../alertSilence.js";
+import { register as alertSilences } from "../alertSilences.js";
 import { register as aptHistory } from "../aptHistory.js";
 import { register as aptUpdate } from "../aptUpdate.js";
 import { register as aptUpgradable } from "../aptUpgradable.js";
@@ -55,6 +57,8 @@ const REGISTRARS: Record<string, (server: never) => void> = {
   adguardQueryLog,
   adguardStats,
   alertList,
+  alertSilence,
+  alertSilences,
   aptHistory,
   aptUpdate,
   aptUpgradable,
@@ -324,6 +328,48 @@ describe("input validation schemas", () => {
     it("accepts valid dashboard UID", () => {
       const result = schema.parse({ dashboard: "abc123" });
       expect(result.dashboard).toBe("abc123");
+    });
+  });
+
+  describe("alertSilences", () => {
+    const schema = schemaOf("alertSilences");
+
+    it("accepts silence states", () => {
+      expect(schema.parse({ state: "expired" }).state).toBe("expired");
+    });
+
+    it("rejects alert states", () => {
+      expect(() => schema.parse({ state: "firing" })).toThrow();
+    });
+  });
+
+  describe("alertSilence", () => {
+    const schema = schemaOf("alertSilence");
+    const create = { action: "create", matchers: [{ name: "alertname", value: "HighCPU" }], comment: "maintenance", confirm: true };
+
+    it("accepts a create request and fills defaults", () => {
+      const result = schema.parse(create);
+      expect(result.duration).toBe("2h");
+      expect(result.createdBy).toBe("homelab-mcp");
+      expect(result.matchers![0]).toEqual({ name: "alertname", value: "HighCPU", isRegex: false, isEqual: true });
+    });
+
+    it.each(["bad-name", "1x", "a b", ""])("rejects matcher name %j", (name) => {
+      expect(() => schema.parse({ ...create, matchers: [{ name, value: "x" }] })).toThrow();
+    });
+
+    it.each(["2", "2w", "0h", "1.5h", "-1h"])("rejects duration %j", (duration) => {
+      expect(() => schema.parse({ ...create, duration })).toThrow();
+    });
+
+    it("requires a UUID for the silence id", () => {
+      expect(() => schema.parse({ action: "expire", id: "abc", confirm: true })).toThrow();
+      expect(schema.parse({ action: "expire", id: "8e6c1b9a-6d1f-4c1e-9a43-0f5d2b7a9c10", confirm: true }).id).toBeDefined();
+    });
+
+    it("rejects unknown actions and requires confirm", () => {
+      expect(() => schema.parse({ ...create, action: "delete" })).toThrow();
+      expect(() => schema.parse({ action: "expire" })).toThrow();
     });
   });
 

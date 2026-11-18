@@ -24,6 +24,8 @@ import { register as inventorySync } from "../inventorySync.js";
 import { register as composePs } from "../composePs.js";
 import { register as serviceHealth } from "../serviceHealth.js";
 import { register as systemdServices } from "../systemdServices.js";
+import { register as alertSilences } from "../alertSilences.js";
+import { register as alertSilence, buildSilenceBody } from "../alertSilence.js";
 import { register as backupStatus } from "../backupStatus.js";
 import { register as backupList } from "../backupList.js";
 import { register as backupDiff } from "../backupDiff.js";
@@ -60,6 +62,84 @@ beforeEach(() => {
 
 afterEach(() => {
   for (const k of ENV_KEYS) delete process.env[k];
+});
+
+describe("alert silences", () => {
+  const silence = (id: string, state: string, endsAt: string) => ({
+    id,
+    status: { state },
+    matchers: [
+      { name: "alertname", value: "HighCPU", isRegex: false, isEqual: true },
+      { name: "instance", value: "pi.*", isRegex: true, isEqual: false },
+    ],
+    startsAt: "2026-11-18T10:00:00Z",
+    endsAt,
+    createdBy: "ops",
+    comment: "reboot",
+  });
+
+  it("lists silences compactly, active first, and filters by state", async () => {
+    const body = JSON.stringify([
+      silence("old", "expired", "2026-11-17T00:00:00Z"),
+      silence("now", "active", "2026-11-18T12:00:00Z"),
+    ]);
+    mockExecSSH.mockResolvedValueOnce(body);
+    const text = (await handlerOf(alertSilences)({})).content[0].text;
+    expect(cmd()).toBe("curl -sf 'http://localhost:9093/api/v2/silences'");
+    expect(text.split("\n")[0]).toBe(
+      'now [active] {alertname="HighCPU", instance!~"pi.*"} 2026-11-18T10:00:00Z -> 2026-11-18T12:00:00Z by ops: reboot',
+    );
+    mockExecSSH.mockResolvedValueOnce(body);
+    expect((await handlerOf(alertSilences)({ state: "pending" })).content[0].text).toBe("No pending silences.");
+  });
+
+  it("builds a silence body for the requested window", () => {
+    const now = new Date("2026-11-18T10:00:00Z");
+    const body = JSON.parse(buildSilenceBody({
+      action: "create",
+      matchers: [{ name: "alertname", value: "it's", isRegex: false, isEqual: true }],
+      duration: "90m",
+      comment: "maintenance",
+    }, now));
+    expect(body).toEqual({
+      matchers: [{ name: "alertname", value: "it's", isRegex: false, isEqual: true }],
+      startsAt: "2026-11-18T10:00:00.000Z",
+      endsAt: "2026-11-18T11:30:00.000Z",
+      createdBy: "homelab-mcp",
+      comment: "maintenance",
+    });
+    expect(() => buildSilenceBody({ action: "create", matchers: [], comment: "x" }, now)).toThrow(/matcher/);
+    expect(() => buildSilenceBody({ action: "create", matchers: body.matchers, duration: "31d", comment: "x" }, now)).toThrow(/30d/);
+  });
+
+  it("creates a silence with a safely quoted body and reports its id", async () => {
+    mockExecSSH.mockResolvedValueOnce('{"silenceID":"8e6c1b9a-6d1f-4c1e-9a43-0f5d2b7a9c10"}');
+    const result = await handlerOf(alertSilence)({
+      action: "create",
+      matchers: [{ name: "alertname", value: "it's" }],
+      comment: "maintenance",
+      confirm: true,
+    });
+    expect(cmd()).toContain("curl -sf -X POST -H 'Content-Type: application/json' -d '{");
+    expect(cmd()).toContain(String.raw`it'\''s`);
+    expect(cmd()).toContain("'http://localhost:9093/api/v2/silences'");
+    expect(result.content[0].text).toContain("Silence 8e6c1b9a-6d1f-4c1e-9a43-0f5d2b7a9c10 created for 2h");
+  });
+
+  it("expires a silence by id", async () => {
+    mockExecSSH.mockResolvedValueOnce("");
+    const id = "8e6c1b9a-6d1f-4c1e-9a43-0f5d2b7a9c10";
+    const result = await handlerOf(alertSilence)({ action: "expire", id, confirm: true });
+    expect(cmd()).toBe(`curl -sf -X DELETE 'http://localhost:9093/api/v2/silence/${id}'`);
+    expect(result.content[0].text).toBe(`Silence ${id} expired.`);
+  });
+
+  it("explains a missing comment instead of calling Alertmanager", async () => {
+    const result = await handlerOf(alertSilence)({ action: "create", matchers: [{ name: "a", value: "b" }], confirm: true });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("needs a comment");
+    expect(mockExecSSH).not.toHaveBeenCalled();
+  });
 });
 
 describe("restic tools", () => {

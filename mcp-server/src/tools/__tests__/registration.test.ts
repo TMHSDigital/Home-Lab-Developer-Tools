@@ -45,6 +45,7 @@ const GATED_REQUIRED = [
   "homelab_composeUp",
   "homelab_composeDown",
   "homelab_adguardFilterToggle",
+  "homelab_alertSilence",
 ];
 
 describe("tool registration", () => {
@@ -94,7 +95,11 @@ describe("tool input schemas", () => {
     const base = Object.fromEntries(
       Object.entries(tool!.shape)
         .filter(([key, s]) => key !== "confirm" && !(s as z.ZodType).safeParse(undefined).success)
-        .map(([key, s]) => [key, (s as z.ZodType).safeParse("x").success ? "x" : true]),
+        .map(([key, s]) => {
+          const options = (s as { options?: unknown[] }).options;
+          if (Array.isArray(options)) return [key, options[0]];
+          return [key, (s as z.ZodType).safeParse("x").success ? "x" : true];
+        }),
     );
     expect(schema.safeParse(base).success).toBe(false);
     expect(schema.safeParse({ ...base, confirm: "yes" }).success).toBe(false);

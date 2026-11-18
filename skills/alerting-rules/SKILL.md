@@ -3,6 +3,8 @@ name: alerting-rules
 description: Write Prometheus alerting rules and configure Alertmanager routing for home lab notifications.
 tools:
   - homelab_alertList
+  - homelab_alertSilences
+  - homelab_alertSilence
   - homelab_prometheusQuery
   - homelab_ntfySend
 standards-version: 1.10.0
@@ -121,6 +123,16 @@ receivers:
 > After adding, reload Prometheus config. The alert will fire after disk stays
 > above 85% for 10 minutes.
 
+**User:** "Silence the CPU alerts while I update the monitoring stack."
+
+**Assistant actions:**
+1. Call `homelab_alertSilences` with `state: "active"` to avoid stacking a duplicate silence
+2. Call `homelab_alertSilence` with `action: "create"`,
+   `matchers: [{ name: "alertname", value: "HighCPU" }]`, `duration: "1h"`,
+   a comment naming the maintenance, and `confirm: false` first to show the preview
+3. After the user agrees, repeat with `confirm: true`; when the work is done,
+   expire it early with `action: "expire"` and the returned ID
+
 **User:** "Why am I not getting notifications for my alerts?"
 
 **Assistant actions:**
@@ -135,6 +147,8 @@ receivers:
 | `homelab_sshTest`             | Validate connectivity before operations             |
 | `homelab_prometheusQuery`     | Verify metrics exist and test alert expressions     |
 | `homelab_alertList`           | Check current Alertmanager alert states              |
+| `homelab_alertSilences`       | List silences and their matchers, window and author  |
+| `homelab_alertSilence`        | Create a silence (matchers, duration, comment) or expire one by ID; requires `confirm: true` |
 | `homelab_serviceHealth`       | Check Prometheus and Alertmanager health            |
 | `homelab_serviceLogs`         | Debug alert delivery issues                         |
 | `homelab_serviceRestart`      | Restart Prometheus/Alertmanager after config changes |
