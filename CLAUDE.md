@@ -84,7 +84,7 @@ Home-Lab-Developer-Tools/
 
 ## MCP Tools (53)
 
-All tools connect to the Pi (or any registered node) via SSH. All tools except `homelab_nodeList` accept a `node` parameter to target a specific node from the `HOMELAB_NODES` registry (optional everywhere except `homelab_nodeExec` and `homelab_nodeStatus`, where it is required).
+All tools connect to the Pi (or any registered node) via SSH. All tools except `homelab_nodeList` accept a `node` parameter to target a specific node from the `HOMELAB_NODES` registry (optional everywhere except `homelab_nodeExec` and `homelab_nodeStatus`, where it is required). The read-only `homelab_nodeStatus`, `homelab_piStatus` and `homelab_serviceHealth` also accept `node: "all"` to query every node in parallel (`utils/fan-out.ts`); state-changing tools stay single-node.
 
 | Tool | Description |
 |------|-------------|

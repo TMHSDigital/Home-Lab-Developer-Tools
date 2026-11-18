@@ -12,7 +12,7 @@ vi.mock("../../utils/ssh-api.js", () => ({
   TIMEOUTS: { long: 1_800_000, backup: 3_600_000, medium: 300_000 },
 }));
 
-import { execSSH, nodeSetting } from "../../utils/ssh-api.js";
+import { execSSH, nodeSetting, listNodes } from "../../utils/ssh-api.js";
 import { CommandFailedError } from "../../utils/errors.js";
 import { register as prometheusQuery } from "../prometheusQuery.js";
 import { register as grafanaSnapshot } from "../grafanaSnapshot.js";
@@ -27,6 +27,7 @@ import { register as systemdServices } from "../systemdServices.js";
 import { register as logSearch } from "../logSearch.js";
 import { register as certRenew } from "../certRenew.js";
 import { register as backupRun } from "../backupRun.js";
+import { register as nodeStatus } from "../nodeStatus.js";
 import { register as alertSilences } from "../alertSilences.js";
 import { register as alertSilence, buildSilenceBody } from "../alertSilence.js";
 import { register as backupStatus } from "../backupStatus.js";
@@ -212,6 +213,56 @@ describe("bounded JSON output", () => {
     const body = JSON.parse((await handlerOf(prometheusQuery)({ query: "up", limit: 2 })).content[0].text);
     expect(body.data.result).toHaveLength(2);
     expect(body.note).toBe("Showing the first 2 of 5 series. Narrow the query or raise limit.");
+  });
+});
+
+describe('node: "all" fan-out', () => {
+  const fleet = [
+    { name: "default", host: "raspberrypi.local", port: 22 },
+    { name: "nas", host: "nas.local", port: 22 },
+    { name: "zero", host: "zero.local", port: 22 },
+  ];
+
+  it("nodeStatus reports every node, with per-node errors for offline ones", async () => {
+    vi.mocked(listNodes).mockReturnValueOnce(fleet);
+    mockExecSSH.mockImplementation(async (_cmd, node) => {
+      if (node === "zero") throw new Error("Cannot connect to zero.local\nmore detail");
+      return `up on ${node ?? "default"}`;
+    });
+    const result = await handlerOf(nodeStatus)({ node: "all" });
+    expect(result.isError).toBeUndefined();
+    expect(mockExecSSH.mock.calls.map((c) => c[1])).toEqual([undefined, "nas", "zero"]);
+    expect(result.content[0].text).toBe(
+      "2 of 3 nodes responded.\n\n" +
+        "=== default (raspberrypi.local) ===\nup on default\n\n" +
+        "=== nas (nas.local) ===\nup on nas\n\n" +
+        "=== zero (zero.local) ===\nError: Cannot connect to zero.local",
+    );
+    mockExecSSH.mockReset();
+  });
+
+  it("serviceHealth fans out and is an error only when every node fails", async () => {
+    const row = JSON.stringify({ Names: "web", State: "exited", Status: "Exited (1)", Ports: "" });
+    vi.mocked(listNodes).mockReturnValueOnce(fleet.slice(0, 2));
+    mockExecSSH.mockResolvedValueOnce(row).mockRejectedValueOnce(new Error("timeout"));
+    const mixed = await handlerOf(serviceHealth)({ node: "all" });
+    expect(mixed.isError).toBeUndefined();
+    expect(mixed.content[0].text).toContain("=== default (raspberrypi.local) ===\nNAMES\tSTATUS\tPORTS");
+    expect(mixed.content[0].text).toContain("Containers needing attention: web");
+    expect(mixed.content[0].text).toContain("=== nas (nas.local) ===\nError: timeout");
+
+    vi.mocked(listNodes).mockReturnValueOnce(fleet.slice(0, 2));
+    mockExecSSH.mockRejectedValueOnce(new Error("down")).mockRejectedValueOnce(new Error("down"));
+    const allDown = await handlerOf(serviceHealth)({ node: "all" });
+    expect(allDown.isError).toBe(true);
+    expect(allDown.content[0].text).toContain("0 of 2 nodes responded.");
+  });
+
+  it("keeps single-node behavior for a named node", async () => {
+    mockExecSSH.mockResolvedValueOnce("up");
+    const result = await handlerOf(nodeStatus)({ node: "nas" });
+    expect(result.content[0].text).toBe("up");
+    expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
   });
 });
 
