@@ -22,6 +22,7 @@ import { register as npmProxyHosts } from "../npmProxyHosts.js";
 import { register as certCheck } from "../certCheck.js";
 import { register as inventorySync } from "../inventorySync.js";
 import { register as composePs } from "../composePs.js";
+import { register as serviceHealth } from "../serviceHealth.js";
 import {
   register as adguardFilterToggle,
   buildSetUrlPayload,
@@ -53,6 +54,70 @@ beforeEach(() => {
 
 afterEach(() => {
   for (const k of ENV_KEYS) delete process.env[k];
+});
+
+describe("serviceHealth", () => {
+  const row = (name: string, state: string, status: string) =>
+    JSON.stringify({ Names: name, State: state, Status: status, Ports: "80/tcp" });
+
+  it.each(["exited", "dead", "restarting", "created", "paused", "removing"])(
+    "reports %s containers as problems alongside running containers",
+    async (state) => {
+      mockExecSSH.mockResolvedValueOnce([
+        row("web", "running", "Up 2 hours (healthy)"),
+        row("worker", state, state),
+      ].join("\n"));
+      const result = await handlerOf(serviceHealth)({ node: "lab" });
+      expect(result.content[0].text).toContain("Containers needing attention: worker");
+      expect(result.content[0].text).not.toContain("All containers healthy");
+      expect(mockExecSSH).toHaveBeenCalledTimes(1);
+      expect(cmd()).toContain("docker ps -a");
+      expect(mockExecSSH.mock.calls[0][1]).toBe("lab");
+    },
+  );
+
+  it.each(["unhealthy", "health: starting"])("reports running containers with %s checks", async (health) => {
+    mockExecSSH.mockResolvedValueOnce(row("web", "running", `Up 2 minutes (${health})`));
+    const result = await handlerOf(serviceHealth)({});
+    expect(result.content[0].text).toContain("Containers needing attention: web");
+  });
+
+  it("reports an empty selection without claiming it is healthy", async () => {
+    mockExecSSH.mockResolvedValueOnce("");
+    const result = await handlerOf(serviceHealth)({ service: "missing" });
+    expect(result.content[0].text).toBe('No containers matched "missing".');
+    expect(cmd()).toContain("--filter 'name=missing'");
+    expect(mockExecSSH).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports no containers when the unfiltered list is empty", async () => {
+    mockExecSSH.mockResolvedValueOnce("\n");
+    expect((await handlerOf(serviceHealth)({})).content[0].text).toBe("No containers found.");
+  });
+
+  it("quotes the service filter as one shell argument", async () => {
+    mockExecSSH.mockResolvedValueOnce("");
+    await handlerOf(serviceHealth)({ service: "web'$(id)" });
+    expect(cmd()).toContain("--filter 'name=web'\\''$(id)'");
+  });
+
+  it("keeps the container table and reports a problem-free running set", async () => {
+    mockExecSSH.mockResolvedValueOnce(row("web", "running", "Up 2 hours (healthy)"));
+    const result = await handlerOf(serviceHealth)({});
+    expect(result.content[0].text).toContain("NAMES\tSTATUS\tPORTS\nweb\tUp 2 hours (healthy)\t80/tcp");
+    expect(result.content[0].text).toContain("No container problems detected.");
+  });
+
+  it("preserves the dry-run description without claiming a health result", async () => {
+    const description = "[dry-run] would execute on raspberrypi.local: docker ps -a";
+    mockExecSSH.mockResolvedValueOnce(description);
+    expect((await handlerOf(serviceHealth)({})).content[0].text).toBe(description);
+  });
+
+  it("does not report malformed output as healthy", async () => {
+    mockExecSSH.mockResolvedValueOnce("not JSON");
+    expect((await handlerOf(serviceHealth)({})).isError).toBe(true);
+  });
 });
 
 describe("prometheusQuery", () => {
