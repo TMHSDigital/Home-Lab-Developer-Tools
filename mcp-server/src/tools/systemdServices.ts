@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { CommandFailedError } from "../utils/errors.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -28,6 +29,11 @@ export function register(server: McpServer): void {
         const output = await execSSH(cmd, args.node);
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
+        // systemctl status exits 3 for an inactive unit; its output is still
+        // a valid status read. Other failures must remain errors.
+        if (args.unit && error instanceof CommandFailedError && error.exitCode === 3) {
+          return { content: [{ type: "text" as const, text: error.message }] };
+        }
         return errorResponse(error);
       }
     },

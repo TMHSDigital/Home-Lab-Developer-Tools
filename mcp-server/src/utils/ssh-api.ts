@@ -339,11 +339,13 @@ export async function execSSH(
                   new CommandFailedError(
                     command,
                     -1,
-                    `${stderr.toString().trim()}\nRemote command terminated by signal ${signal}`.trim(),
+                    `${stderr.toString().trim() || stdout.toString().trim()}\nRemote command terminated by signal ${signal}`.trim(),
                   ),
                 );
               } else if (code !== 0 && code !== null && code !== undefined) {
-                reject(new CommandFailedError(command, code, stderr.toString()));
+                // Commands using 2>&1 put their diagnostic in stdout. Both
+                // streams are already bounded by TailBuffer.
+                reject(new CommandFailedError(command, code, stderr.toString().trim() || stdout.toString().trim()));
               } else {
                 resolve(stdout.toString().trim());
               }
