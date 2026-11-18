@@ -1,8 +1,9 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH, errorResponse, TIMEOUTS } from "../utils/ssh-api.js";
+import { execSSH, TIMEOUTS } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { backupRepo } from "../utils/config.js";
+import { resticCommand, resticErrorResponse } from "../utils/restic.js";
 import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
 
 const inputSchema = {
@@ -34,17 +35,16 @@ export function register(server: McpServer): void {
 
       try {
 
-        const repo = backupRepo(args.node);
         const includeFlag = args.include ? ` --include '${args.include}'` : "";
         const output = await execSSH(
-          `sudo restic -r ${repo} restore '${args.snapshot}' --target '${args.target}'${includeFlag} 2>&1`,
+          resticCommand(`restore '${args.snapshot}' --target '${args.target}'${includeFlag} 2>&1`, args.node),
           args.node,
           { timeoutMs: TIMEOUTS.backup },
         );
 
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
-        return errorResponse(error);
+        return resticErrorResponse(error, backupRepo(args.node));
       }
     },
   );

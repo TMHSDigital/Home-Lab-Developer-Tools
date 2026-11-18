@@ -24,6 +24,11 @@ import { register as inventorySync } from "../inventorySync.js";
 import { register as composePs } from "../composePs.js";
 import { register as serviceHealth } from "../serviceHealth.js";
 import { register as systemdServices } from "../systemdServices.js";
+import { register as backupStatus } from "../backupStatus.js";
+import { register as backupList } from "../backupList.js";
+import { register as backupDiff } from "../backupDiff.js";
+import { register as backupRestore } from "../backupRestore.js";
+import { register as volumeBackup } from "../volumeBackup.js";
 import {
   register as adguardFilterToggle,
   buildSetUrlPayload,
@@ -31,7 +36,7 @@ import {
 } from "../adguardFilterToggle.js";
 
 const mockExecSSH = vi.mocked(execSSH);
-const ENV_KEYS = ["HOMELAB_GRAFANA_TOKEN", "HOMELAB_ADGUARD_PORT", "HOMELAB_COMPOSE_FILES"];
+const ENV_KEYS = ["HOMELAB_GRAFANA_TOKEN", "HOMELAB_ADGUARD_PORT", "HOMELAB_COMPOSE_FILES", "HOMELAB_RESTIC_PASSWORD_FILE"];
 
 type Handler = (args: Record<string, unknown>) => Promise<{ content: { text: string }[]; isError?: boolean }>;
 
@@ -55,6 +60,30 @@ beforeEach(() => {
 
 afterEach(() => {
   for (const k of ENV_KEYS) delete process.env[k];
+});
+
+describe("restic tools", () => {
+  it.each([
+    ["backupStatus", backupStatus, {}],
+    ["backupList", backupList, {}],
+    ["backupDiff", backupDiff, { snapshotA: "aaa", snapshotB: "bbb" }],
+    ["backupRestore", backupRestore, { snapshot: "aaa", target: "/tmp/r", confirm: true }],
+    ["volumeBackup", volumeBackup, { volume: "grafana_data", confirm: true }],
+  ] as const)("%s loads the restic env file and passes the password file", async (_name, register, args) => {
+    process.env.HOMELAB_RESTIC_PASSWORD_FILE = "/root/.restic-pass";
+    mockExecSSH.mockResolvedValueOnce("[]");
+    await handlerOf(register)({ ...args });
+    expect(cmd()).toContain(`exec restic "$@"' '/etc/restic-env' -r '/mnt/backup/restic' --password-file '/root/.restic-pass' `);
+  });
+
+  it("names the password settings when restic cannot get a password", async () => {
+    mockExecSSH.mockRejectedValueOnce(
+      new CommandFailedError("restic", 1, "Fatal: an empty password is not allowed by default"),
+    );
+    const result = await handlerOf(backupDiff)({ snapshotA: "aaa", snapshotB: "bbb" });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("HOMELAB_RESTIC_ENV_FILE");
+  });
 });
 
 describe("serviceHealth", () => {

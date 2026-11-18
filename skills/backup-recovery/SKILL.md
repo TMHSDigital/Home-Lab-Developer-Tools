@@ -29,7 +29,10 @@ verification, restore procedures, and retention policy management.
 
 - SSH connectivity to the Raspberry Pi (validated via `homelab_sshTest`)
 - Restic repository location (local path, SFTP, S3, or B2 bucket)
-- Restic repository password (stored in MCP config or environment variable)
+- Restic repository password on the node: `RESTIC_PASSWORD` in `/etc/restic-env`
+  (or the file named by `HOMELAB_RESTIC_ENV_FILE`), or a password file named by
+  `HOMELAB_RESTIC_PASSWORD_FILE`. The restic tools run under sudo, which drops
+  `RESTIC_*` variables from the SSH session.
 
 Optional:
 - Specific paths or volumes to back up

@@ -202,8 +202,8 @@ describe("integration tests (mocked SSH)", () => {
       await handler({ node: "nas" });
       await handler({});
 
-      expect(mockExecSSH.mock.calls[0][0]).toContain("restic -r /srv/restic ");
-      expect(mockExecSSH.mock.calls[1][0]).toContain("restic -r /mnt/backup/restic ");
+      expect(mockExecSSH.mock.calls[0][0]).toContain("-r '/srv/restic' ");
+      expect(mockExecSSH.mock.calls[1][0]).toContain("-r '/mnt/backup/restic' ");
     });
   });
 

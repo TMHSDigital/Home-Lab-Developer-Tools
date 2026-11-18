@@ -78,6 +78,8 @@ Set environment variables:
 | `HOMELAB_COMPOSE_DIR` | `/opt/homelab/docker` | Compose project directory on Pi |
 | `HOMELAB_COMPOSE_FILES` | (discovered) | Comma-separated compose files (in order) used when no `stacks` are passed. If unset, `compose.base.yml` and every `compose.*.yml` in the compose dir are used, falling back to `compose.yaml` / `docker-compose.yml` |
 | `HOMELAB_BACKUP_REPO` | `/mnt/backup/restic` | Restic backup repo path on Pi |
+| `HOMELAB_RESTIC_ENV_FILE` | `/etc/restic-env` | Env file on the node, sourced as root (when it exists) before every restic call, for `RESTIC_PASSWORD` and backend credentials. `none` disables it |
+| `HOMELAB_RESTIC_PASSWORD_FILE` | (empty) | Restic password file on the node, passed as `--password-file` |
 | `HOMELAB_GRAFANA_TOKEN` | (empty) | Grafana API token (preferred auth method) |
 | `HOMELAB_GRAFANA_USER` | `admin` | Grafana basic auth username |
 | `HOMELAB_GRAFANA_PASSWORD` | (empty) | Grafana basic auth password (falls back to admin/admin) |

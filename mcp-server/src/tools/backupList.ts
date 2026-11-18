@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
-import { resticErrorResponse } from "../utils/restic.js";
+import { resticCommand, resticErrorResponse } from "../utils/restic.js";
 import { nodeParam } from "../utils/node-param.js";
 import { backupRepo } from "../utils/config.js";
 
@@ -27,7 +27,7 @@ export function register(server: McpServer): void {
         if (args.host) flags.push(`--host '${args.host}'`);
         const extra = flags.length > 0 ? " " + flags.join(" ") : "";
         const output = await execSSH(
-          `sudo restic -r ${repo} snapshots${extra} --json`,
+          resticCommand(`snapshots${extra} --json`, args.node),
           args.node,
         );
 
