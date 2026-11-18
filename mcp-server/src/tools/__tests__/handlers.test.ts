@@ -86,6 +86,52 @@ describe("restic tools", () => {
   });
 });
 
+describe("bounded JSON output", () => {
+  const snap = (id: string, time: string) =>
+    ({ short_id: id, id: id + "0000", time, hostname: "pi", paths: ["/opt"], tags: null });
+
+  it("backupList returns the newest snapshots, compact, up to count", async () => {
+    mockExecSSH.mockResolvedValueOnce(JSON.stringify([
+      snap("aaa", "2026-01-01T00:00:00Z"),
+      snap("ccc", "2026-03-01T00:00:00Z"),
+      snap("bbb", "2026-02-01T00:00:00Z"),
+    ]));
+    const text = (await handlerOf(backupList)({ count: 2 })).content[0].text;
+    const lines = text.split("\n");
+    expect(lines[0]).toBe("Showing the newest 2 of 3 snapshots. Raise count or add filters to see more.");
+    expect(JSON.parse(lines[1])).toEqual({ id: "ccc", time: "2026-03-01T00:00:00Z", host: "pi", paths: ["/opt"], tags: [] });
+    expect(JSON.parse(lines[2]).id).toBe("bbb");
+    expect(lines).toHaveLength(3);
+  });
+
+  it("backupList defaults to 20 snapshots", async () => {
+    const many = Array.from({ length: 25 }, (_, i) => snap(`s${i}`, new Date(Date.UTC(2026, 0, i + 1)).toISOString()));
+    mockExecSSH.mockResolvedValueOnce(JSON.stringify(many));
+    const text = (await handlerOf(backupList)({})).content[0].text;
+    expect(text.split("\n")).toHaveLength(21);
+  });
+
+  it.each([
+    ["backupList", () => backupList, {}],
+    ["prometheusQuery", () => prometheusQuery, { query: "up" }],
+    ["npmProxyHosts", () => npmProxyHosts, {}],
+  ] as const)("%s reports cut JSON instead of returning it", async (name, get, args) => {
+    if (name === "npmProxyHosts") mockExecSSH.mockResolvedValueOnce('{"token":"t"}');
+    mockExecSSH.mockResolvedValueOnce('[output truncated: showing last 10 of 2000000 bytes]\n"x": 1}]');
+    const result = await handlerOf(get())({ ...args });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("larger than HOMELAB_MAX_OUTPUT_BYTES");
+  });
+
+  it("prometheusQuery keeps at most limit series and stays valid JSON", async () => {
+    const result = Array.from({ length: 5 }, (_, i) => ({ metric: { i: String(i) }, value: [0, "1"] }));
+    mockExecSSH.mockResolvedValueOnce(JSON.stringify({ status: "success", data: { resultType: "vector", result } }));
+    const body = JSON.parse((await handlerOf(prometheusQuery)({ query: "up", limit: 2 })).content[0].text);
+    expect(body.data.result).toHaveLength(2);
+    expect(body.note).toBe("Showing the first 2 of 5 series. Narrow the query or raise limit.");
+  });
+});
+
 describe("serviceHealth", () => {
   const row = (name: string, state: string, status: string) =>
     JSON.stringify({ Names: name, State: state, Status: status, Ports: "80/tcp" });

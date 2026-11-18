@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
+import { completeJson } from "../utils/json-output.js";
 import { nodeParam } from "../utils/node-param.js";
 import { SERVICES, servicePort, adguardAuth, curlErrorResponse } from "../utils/service-http.js";
 
@@ -42,7 +43,7 @@ export function register(server: McpServer): void {
           args.node,
         );
 
-        return { content: [{ type: "text" as const, text: output }] };
+        return { content: [{ type: "text" as const, text: completeJson(output) }] };
       } catch (error) {
         return curlErrorResponse(error, SERVICE, port);
       }

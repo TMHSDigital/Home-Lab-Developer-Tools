@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Node.js 22.12 or newer is now required (Node 20 reached end of life on 2026-04-30). CI tests Node 22 and 24.
 - Releases now wait for the build and all tests to pass, and pushes that change only docs, tests or CI no longer publish a new version.
+- `homelab_backupList` returns the newest `count` snapshots (default 20, max 200) as compact one-line entries instead of restic's full JSON. `homelab_prometheusQuery` returns at most `limit` series (default 100). JSON tools report a response that exceeded `HOMELAB_MAX_OUTPUT_BYTES` instead of returning cut, invalid JSON.
 
 ### Fixed
 
