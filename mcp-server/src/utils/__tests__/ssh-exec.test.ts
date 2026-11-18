@@ -82,6 +82,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllEnvs();
 });
 
 describe("execSSH with a mocked SSH client", () => {
@@ -104,6 +105,37 @@ describe("execSSH with a mocked SSH client", () => {
     const err = await execSSH("big-job").catch((e) => e);
     expect(err).toBeInstanceOf(CommandFailedError);
     expect(err.message).toContain("terminated by signal KILL");
+    expect(err.message).toContain("partial");
+  });
+
+  it.each([undefined, [" \n"]])("keeps merged stdout when stderr is %j", async (stderr) => {
+    state.behavior = { stdout: ["invalid compose", " file\n"], stderr, exitCode: 1 };
+    const err = await execSSH("docker compose config 2>&1").catch((e) => e);
+    expect(err).toBeInstanceOf(CommandFailedError);
+    expect(err.exitCode).toBe(1);
+    expect(err.message).toBe("invalid compose file");
+    expect(errorResponse(err).content[0].text).toContain("invalid compose file");
+  });
+
+  it("prefers stderr when both streams contain output", async () => {
+    state.behavior = { stdout: ["progress"], stderr: ["permission denied\n"], exitCode: 1 };
+    const err = await execSSH("job").catch((e) => e);
+    expect(err.message).toBe("permission denied");
+  });
+
+  it("retains the bounded stdout tail on failure", async () => {
+    vi.stubEnv("HOMELAB_MAX_OUTPUT_BYTES", "32");
+    state.behavior = { stdout: ["x".repeat(1000), "\nfinal diagnostic\n"], exitCode: 1 };
+    const err = await execSSH("job 2>&1").catch((e) => e);
+    expect(err.message).toContain("[output truncated:");
+    expect(err.message).toMatch(/final diagnostic$/);
+    expect(err.message.length).toBeLessThan(120);
+  });
+
+  it("keeps the exit-code fallback when both streams are empty", async () => {
+    state.behavior = { exitCode: 7 };
+    const err = await execSSH("job").catch((e) => e);
+    expect(err.message).toBe("Command exited with code 7");
   });
 
   it("maps exec channel errors to SSHError", async () => {

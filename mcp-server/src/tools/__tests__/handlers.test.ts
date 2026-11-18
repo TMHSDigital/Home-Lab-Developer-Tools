@@ -22,6 +22,7 @@ import { register as npmProxyHosts } from "../npmProxyHosts.js";
 import { register as certCheck } from "../certCheck.js";
 import { register as inventorySync } from "../inventorySync.js";
 import { register as composePs } from "../composePs.js";
+import { register as systemdServices } from "../systemdServices.js";
 import {
   register as adguardFilterToggle,
   buildSetUrlPayload,
@@ -151,6 +152,42 @@ describe("certCheck", () => {
     mockExecSSH.mockResolvedValueOnce("subject=CN = example.org");
     await handlerOf(certCheck)({ domain: "example.org:8443" });
     expect(cmd()).toContain("-connect 'example.org:8443'");
+  });
+
+  it("explains certificate retrieval failures and retains the diagnostic", async () => {
+    mockExecSSH.mockRejectedValueOnce(new CommandFailedError("openssl x509", 1, "Could not read certificate"));
+    const result = await handlerOf(certCheck)({ domain: "example.org" });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Could not retrieve certificate for example.org");
+    expect(result.content[0].text).toContain("Could not read certificate");
+  });
+
+  it("preserves connection failures without mislabeling them as certificate errors", async () => {
+    mockExecSSH.mockRejectedValueOnce(new Error("SSH authentication failed"));
+    const result = await handlerOf(certCheck)({ domain: "example.org" });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe("SSH authentication failed");
+  });
+});
+
+describe("systemdServices", () => {
+  it("returns an inactive unit's status as a successful read", async () => {
+    const status = "backup.service\n   Active: inactive (dead)";
+    mockExecSSH.mockRejectedValueOnce(new CommandFailedError("systemctl status", 3, status));
+    const result = await handlerOf(systemdServices)({ unit: "backup.service", node: "lab" });
+    expect(result.isError).not.toBe(true);
+    expect(result.content[0].text).toBe(status);
+    expect(mockExecSSH.mock.calls[0][1]).toBe("lab");
+  });
+
+  it.each([1, 4])("keeps exit %i for a requested unit as an error", async (code) => {
+    mockExecSSH.mockRejectedValueOnce(new CommandFailedError("systemctl status", code, "status unavailable"));
+    expect((await handlerOf(systemdServices)({ unit: "missing.service" })).isError).toBe(true);
+  });
+
+  it("does not suppress exit 3 when listing units", async () => {
+    mockExecSSH.mockRejectedValueOnce(failed(3));
+    expect((await handlerOf(systemdServices)({})).isError).toBe(true);
   });
 });
 

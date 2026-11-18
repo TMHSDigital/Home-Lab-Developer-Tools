@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { CommandFailedError } from "../utils/errors.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -17,6 +18,7 @@ export function register(server: McpServer): void {
     "Check SSL certificate expiry, issuer, and fingerprint for a domain",
     inputSchema,
     async (args) => {
+      const unavailable = `Could not retrieve certificate for ${args.domain}. Verify the host is reachable and serving TLS.`;
       try {
         const target = args.domain.includes(":") ? args.domain : `${args.domain}:443`;
         const serverName = args.domain.split(":")[0];
@@ -27,10 +29,16 @@ export function register(server: McpServer): void {
         return {
           content: [{
             type: "text" as const,
-            text: output || `Could not retrieve certificate for ${args.domain}. Verify the host is reachable and serving TLS.`,
+            text: output || unavailable,
           }],
         };
       } catch (error) {
+        if (error instanceof CommandFailedError) {
+          return {
+            content: [{ type: "text" as const, text: `${unavailable}\n\n${error.message}` }],
+            isError: true,
+          };
+        }
         return errorResponse(error);
       }
     },
