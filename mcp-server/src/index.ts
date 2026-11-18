@@ -59,7 +59,7 @@ import { registerPrompts } from "./prompts.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.17.0",
+  version: "0.17.1",
 });
 
 registerPiStatus(server);

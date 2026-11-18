@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Failed SSH commands now retain diagnostics redirected to stdout. Inactive systemd units return their status, and certificate retrieval failures include a clear explanation and the command output.
 
+## [0.17.1] - 2026-11-18
+
+See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.17.1) for details.
+
 ## [0.17.0] - 2026-11-03
 
 See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.17.0) for details.
