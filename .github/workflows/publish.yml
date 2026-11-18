@@ -36,7 +36,8 @@ jobs:
         working-directory: mcp-server
       - run: npm test
         working-directory: mcp-server
-      # Trusted publishing (OIDC) requires npm >= 11.5.1; Node 22 ships npm 10.x
-      - run: npm install -g npm@latest
+      # Trusted publishing (OIDC) requires npm >= 11.5.1; Node 22 ships npm 10.x.
+      # Pinned so a hijacked npm release cannot run in this id-token job.
+      - run: npm install -g npm@11.21.3
       - run: npm publish --provenance --access public
         working-directory: mcp-server
