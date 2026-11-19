@@ -79,6 +79,15 @@ describe("prompts", () => {
     expect(text).toContain("do not restart");
   });
 
+  it('morning-health-check with node "all" uses fan-out tools for the whole fleet', async () => {
+    const result = await client.getPrompt({ name: "morning-health-check", arguments: { node: "all" } });
+    const text = String((result.messages[0].content as { text: string }).text);
+    expect(text).toContain('`homelab_piStatus` with `node: "all"`');
+    expect(text).toContain('`homelab_backupStatus` with `node: "all"`');
+    expect(text).not.toContain("to every tool call");
+    expect(text).toContain("do not restart");
+  });
+
   it("pre-reboot-checklist never reboots on its own", async () => {
     const result = await client.getPrompt({ name: "pre-reboot-checklist", arguments: {} });
     const text = String((result.messages[0].content as { text: string }).text);

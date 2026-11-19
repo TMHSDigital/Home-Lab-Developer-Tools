@@ -55,9 +55,11 @@ Add this to your MCP config's `env` block. The default node (from `HOMELAB_PI_*`
 1. Run `homelab_nodeStatus` with the node name to get uptime, CPU, memory, and disk.
 2. This works like `homelab_piStatus` but targets any registered node.
 3. Compare status across nodes in one call with `node: "all"`. `homelab_nodeStatus`,
-   `homelab_piStatus` and `homelab_serviceHealth` then query every node in parallel and
-   return one section per node, with an error line for nodes that are offline.
-   State-changing tools always take a single node.
+   `homelab_piStatus`, `homelab_serviceHealth`, `homelab_backupStatus`,
+   `homelab_aptUpgradable`, `homelab_certList`, `homelab_diskUsage`,
+   `homelab_ufwStatus`, `homelab_kernelInfo` and `homelab_healthCheck` then query
+   every node in parallel and return one section per node, with an error line for
+   nodes that are offline or fail. State-changing tools always take a single node.
 
 ### Execute Commands on Specific Nodes
 

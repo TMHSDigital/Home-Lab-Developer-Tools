@@ -117,7 +117,7 @@ Besides tools, the server exposes MCP resources and prompts, so any MCP client g
 | Kind | Name | Description |
 |------|------|-------------|
 | Resource | `homelab://nodes` | Managed nodes (name and host only) from `HOMELAB_PI_HOST` and `HOMELAB_NODES` |
-| Prompt | `morning-health-check` | Read-only daily check: hardware, containers, active alerts, backups, disk. Optional `node` |
+| Prompt | `morning-health-check` | Read-only daily check: hardware, containers, active alerts, backups, disk. Optional `node`; `node: "all"` checks every node |
 | Prompt | `pre-reboot-checklist` | Gathers state, backups and pending updates before a reboot; never reboots on its own. Optional `node` |
 | Prompt | `investigate-container` | Status, logs and error search for one container with a proposed fix. Requires `service`, optional `node` |
 

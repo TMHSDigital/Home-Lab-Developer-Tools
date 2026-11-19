@@ -16,7 +16,7 @@ export const nodeOrAllParam = {
     ),
 };
 
-type TextResult = { content: { type: "text"; text: string }[]; isError?: true };
+type TextResult = { content: { type: "text"; text: string }[]; isError?: boolean };
 
 function message(error: unknown): string {
   return error instanceof Error ? error.message.split("\n")[0] : String(error);
@@ -64,4 +64,24 @@ export async function forNodes(
   return failed === nodes.length
     ? { content: [{ type: "text", text }], isError: true }
     : { content: [{ type: "text", text }] };
+}
+
+/**
+ * Like forNodes, for tools whose single-node handler already builds a full
+ * result (with tool-specific error hints). One node: the handler's result
+ * unchanged. "all": the handler runs for every node in parallel, each
+ * result's text becomes that node's section, and a result with isError
+ * counts that node as failed. State-changing tools must not use this.
+ */
+export async function fanOut(
+  node: string | undefined,
+  handler: (node: string | undefined) => Promise<TextResult>,
+): Promise<TextResult> {
+  if (node !== ALL_NODES) return handler(node);
+  return forNodes(ALL_NODES, async (n) => {
+    const result = await handler(n);
+    const text = result.content.map((c) => c.text).join("\n");
+    if (result.isError) throw new Error(text);
+    return text;
+  });
 }

@@ -30,6 +30,7 @@ import { register as logSearch } from "../logSearch.js";
 import { register as certRenew } from "../certRenew.js";
 import { register as backupRun } from "../backupRun.js";
 import { register as nodeStatus } from "../nodeStatus.js";
+import { register as ufwStatus } from "../ufwStatus.js";
 import { register as piStatus, decodeThrottled, annotateStatus } from "../piStatus.js";
 import { register as alertSilences } from "../alertSilences.js";
 import { register as alertSilence, buildSilenceBody } from "../alertSilence.js";
@@ -338,6 +339,31 @@ describe('node: "all" fan-out', () => {
     const allDown = await handlerOf(serviceHealth)({ node: "all" });
     expect(allDown.isError).toBe(true);
     expect(allDown.content[0].text).toContain("0 of 2 nodes responded.");
+  });
+
+  it("fanOut tools keep each node's own error text and fail only when every node fails", async () => {
+    vi.mocked(listNodes).mockReturnValueOnce(fleet.slice(0, 2));
+    mockExecSSH
+      .mockResolvedValueOnce("Status: active")
+      .mockRejectedValueOnce(new CommandFailedError("ufw", 1, "sudo: a password is required"));
+    const result = await handlerOf(ufwStatus)({ node: "all" });
+    expect(result.isError).toBeUndefined();
+    expect(mockExecSSH.mock.calls.map((c) => c[1])).toEqual([undefined, "nas"]);
+    expect(result.content[0].text).toContain("1 of 2 nodes responded.");
+    expect(result.content[0].text).toContain("=== default (raspberrypi.local) ===\nStatus: active");
+    expect(result.content[0].text).toContain("=== nas (nas.local) ===\nError: sudo: a password is required");
+
+    vi.mocked(listNodes).mockReturnValueOnce(fleet.slice(0, 2));
+    mockExecSSH.mockRejectedValueOnce(new Error("down")).mockRejectedValueOnce(new Error("down"));
+    expect((await handlerOf(ufwStatus)({ node: "all" })).isError).toBe(true);
+  });
+
+  it("fanOut tools return the single-node result unchanged for a named node", async () => {
+    mockExecSSH.mockRejectedValueOnce(new CommandFailedError("restic", 1, "Fatal: unable to open config file"));
+    const result = await handlerOf(backupStatus)({ node: "nas" });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Check HOMELAB_BACKUP_REPO");
+    expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
   });
 
   it("keeps single-node behavior for a named node", async () => {

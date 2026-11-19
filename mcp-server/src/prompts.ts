@@ -15,6 +15,7 @@ function userMessage(text: string) {
 }
 
 export function morningHealthCheckText(node?: string): string {
+  if (node === "all") return fleetHealthCheckText();
   return [
     `Run a morning health check of my home lab.${nodeClause(node)}`,
     "",
@@ -25,6 +26,24 @@ export function morningHealthCheckText(node?: string): string {
     "5. Call `homelab_diskUsage` if any filesystem is above 80% used.",
     "",
     "Summarize in a short report: OK items in one line, then each problem with its likely cause and a suggested next step.",
+    "Read-only: do not restart, upgrade or change anything.",
+  ].join("\n");
+}
+
+/** Morning health check across every registered node, using `node: "all"`. */
+export function fleetHealthCheckText(): string {
+  return [
+    "Run a morning health check of every node in my home lab.",
+    "",
+    '1. Call `homelab_piStatus` with `node: "all"` for temperature, throttling, memory, disk and uptime per node.',
+    '2. Call `homelab_serviceHealth` with `node: "all"` and list any container that is unhealthy, restarting or exited.',
+    "3. Call `homelab_alertList` with `state: \"active\"` for firing alerts.",
+    '4. Call `homelab_backupStatus` with `node: "all"` and report each node\'s OK/STALE verdict line.',
+    '5. Call `homelab_aptUpgradable` and `homelab_certList` with `node: "all"` for pending updates and certificates.',
+    '6. Call `homelab_diskUsage` with that node for any node whose filesystem is above 80% used.',
+    "",
+    "Summarize per node: OK nodes in one line, then each problem with the node, its likely cause and a suggested next step.",
+    "Nodes reported as unreachable are problems too.",
     "Read-only: do not restart, upgrade or change anything.",
   ].join("\n");
 }
@@ -66,7 +85,8 @@ export function registerPrompts(server: McpServer): void {
     "morning-health-check",
     {
       title: "Morning health check",
-      description: "Read-only daily check of hardware, containers, alerts, backups and disk",
+      description:
+        'Read-only daily check of hardware, containers, alerts, backups and disk; node: "all" checks every node',
       argsSchema: { node: nodeArg },
     },
     ({ node }) => userMessage(morningHealthCheckText(node)),

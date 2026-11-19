@@ -1,10 +1,10 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
-import { nodeParam } from "../utils/node-param.js";
+import { fanOut, nodeOrAllParam } from "../utils/fan-out.js";
 import { READ_ONLY } from "../utils/annotations.js";
 import { DryRunError } from "../utils/errors.js";
 
-const inputSchema = { ...nodeParam };
+const inputSchema = { ...nodeOrAllParam };
 
 interface CheckResult {
   name: string;
@@ -57,43 +57,45 @@ export function register(server: McpServer): void {
       inputSchema,
       annotations: READ_ONLY,
     },
-    async (args) => {
-      let output: string;
-      try {
-        output = await execSSH(buildHealthCheckScript(), args.node);
-      } catch (error) {
-        if (error instanceof DryRunError) return errorResponse(error);
-        // Every check depends on SSH; report the cause and stop.
-        const reason = error instanceof Error ? error.message.split("\n")[0] : String(error);
-        const base = errorResponse(error);
+    async (input) =>
+      fanOut(input.node, async (node) => {
+        const args = { ...input, node };
+        let output: string;
+        try {
+          output = await execSSH(buildHealthCheckScript(), args.node);
+        } catch (error) {
+          if (error instanceof DryRunError) return errorResponse(error);
+          // Every check depends on SSH; report the cause and stop.
+          const reason = error instanceof Error ? error.message.split("\n")[0] : String(error);
+          const base = errorResponse(error);
+          return {
+            ...base,
+            content: [{
+              type: "text" as const,
+              text: `[FAIL] SSH connectivity: ${reason}\n\nRemaining checks skipped.`,
+            }],
+          };
+        }
+
+        const parsed = parseHealthCheckOutput(output);
+        if (parsed.length === 0) {
+          // Unexpected output: show it as-is rather than claim a result.
+          return { content: [{ type: "text" as const, text: output }] };
+        }
+
+        const checks: CheckResult[] = [
+          { name: "SSH connectivity", status: "pass", detail: "ok" },
+          ...parsed,
+        ];
+        const passed = checks.filter((c) => c.status === "pass").length;
+        const lines = checks.map(
+          (c) => `[${c.status === "pass" ? "PASS" : "FAIL"}] ${c.name}: ${c.detail}`,
+        );
+        lines.push("", `${passed}/${checks.length} checks passed`);
+
         return {
-          ...base,
-          content: [{
-            type: "text" as const,
-            text: `[FAIL] SSH connectivity: ${reason}\n\nRemaining checks skipped.`,
-          }],
+          content: [{ type: "text" as const, text: lines.join("\n") }],
         };
-      }
-
-      const parsed = parseHealthCheckOutput(output);
-      if (parsed.length === 0) {
-        // Unexpected output: show it as-is rather than claim a result.
-        return { content: [{ type: "text" as const, text: output }] };
-      }
-
-      const checks: CheckResult[] = [
-        { name: "SSH connectivity", status: "pass", detail: "ok" },
-        ...parsed,
-      ];
-      const passed = checks.filter((c) => c.status === "pass").length;
-      const lines = checks.map(
-        (c) => `[${c.status === "pass" ? "PASS" : "FAIL"}] ${c.name}: ${c.detail}`,
-      );
-      lines.push("", `${passed}/${checks.length} checks passed`);
-
-      return {
-        content: [{ type: "text" as const, text: lines.join("\n") }],
-      };
-    },
+      }),
   );
 }

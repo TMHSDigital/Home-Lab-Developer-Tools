@@ -161,6 +161,31 @@ describe("tool input schemas", () => {
     expect(schema.safeParse({ confirm: "yes" }).success).toBe(false);
   });
 
+  it('offers node: "all" exactly on the read-only fan-out tools', () => {
+    const FAN_OUT = [
+      "homelab_aptUpgradable",
+      "homelab_backupStatus",
+      "homelab_certList",
+      "homelab_diskUsage",
+      "homelab_healthCheck",
+      "homelab_kernelInfo",
+      "homelab_nodeStatus",
+      "homelab_piStatus",
+      "homelab_serviceHealth",
+      "homelab_ufwStatus",
+    ];
+    const offersAll = registered
+      .filter((r) => /"all"/.test((r.shape.node as z.ZodType | undefined)?.description ?? ""))
+      .map((r) => r.name)
+      .sort();
+    expect(offersAll).toEqual(FAN_OUT);
+    for (const r of registered.filter((t) => FAN_OUT.includes(t.name))) {
+      const source = readFileSync(join(toolsDir, `${r.file}.ts`), "utf8");
+      expect(source, r.file).toMatch(/\b(fanOut|forNodes)\(/);
+      expect(r.annotations, r.name).toMatchObject({ readOnlyHint: true });
+    }
+  });
+
   it("every tool accepts an optional node, except the node-specific tools", () => {
     const NODE_REQUIRED = ["homelab_nodeExec", "homelab_nodeStatus"];
     for (const r of registered) {
