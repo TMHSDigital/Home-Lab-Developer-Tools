@@ -30,6 +30,7 @@ import { register as logSearch } from "../logSearch.js";
 import { register as certRenew } from "../certRenew.js";
 import { register as backupRun } from "../backupRun.js";
 import { register as nodeStatus } from "../nodeStatus.js";
+import { register as piStatus, decodeThrottled, annotateStatus } from "../piStatus.js";
 import { register as alertSilences } from "../alertSilences.js";
 import { register as alertSilence, buildSilenceBody } from "../alertSilence.js";
 import { register as backupStatus, backupVerdict } from "../backupStatus.js";
@@ -344,6 +345,39 @@ describe('node: "all" fan-out', () => {
     const result = await handlerOf(nodeStatus)({ node: "nas" });
     expect(result.content[0].text).toBe("up");
     expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+  });
+});
+
+describe("piStatus", () => {
+  it("decodes throttle flags for now and since boot", () => {
+    expect(decodeThrottled(0x50005)).toEqual([
+      "Under-voltage: now YES, since boot YES",
+      "ARM frequency capped: now no, since boot no",
+      "Throttled: now YES, since boot YES",
+      "Soft temperature limit: now no, since boot no",
+    ]);
+    expect(decodeThrottled(0x80000)).toContain("Soft temperature limit: now no, since boot YES");
+    expect(decodeThrottled(0).every((l) => l.endsWith("now no, since boot no"))).toBe(true);
+  });
+
+  it("annotates the raw vcgencmd values and leaves N/A alone", () => {
+    const out = "=== ARM Clock ===\nfrequency(0)=2400000000\n\n=== Throttle Status ===\nthrottled=0x10000\n";
+    expect(annotateStatus(out)).toBe(
+      "=== ARM Clock ===\nfrequency(0)=2400000000 (2400 MHz)\n\n=== Throttle Status ===\nthrottled=0x10000\n" +
+        "Under-voltage: now no, since boot YES\nARM frequency capped: now no, since boot no\n" +
+        "Throttled: now no, since boot no\nSoft temperature limit: now no, since boot no\n",
+    );
+    expect(annotateStatus("=== Throttle Status ===\nN/A\n")).toBe("=== Throttle Status ===\nN/A\n");
+  });
+
+  it("asks for clock, voltage and throttle state with N/A fallbacks", async () => {
+    mockExecSSH.mockResolvedValueOnce("=== Core Voltage ===\nvolt=0.8600V\n\n=== Throttle Status ===\nthrottled=0x0\n");
+    const text = (await handlerOf(piStatus)({})).content[0].text;
+    expect(cmd()).toContain("vcgencmd measure_clock arm");
+    expect(cmd()).toContain("vcgencmd measure_volts core");
+    expect(cmd()).toContain("vcgencmd get_throttled; else echo 'N/A'");
+    expect(text).toContain("volt=0.8600V");
+    expect(text).toContain("Under-voltage: now no, since boot no");
   });
 });
 

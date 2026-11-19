@@ -6,7 +6,7 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 
 | Category | Tool | Description |
 |----------|------|-------------|
-| System | `homelab_piStatus` | CPU temp, memory, disk, uptime, throttle state |
+| System | `homelab_piStatus` | CPU temp, memory, disk, uptime, clock, voltage, decoded throttle flags |
 | System | `homelab_piReboot` | Safe reboot with pre-checks |
 | System | `homelab_diskUsage` | Disk usage breakdown by directory |
 | System | `homelab_aptUpdate` | Run apt update, list upgradable packages; optional upgrade (requires confirm=true) |

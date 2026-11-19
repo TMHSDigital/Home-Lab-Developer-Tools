@@ -88,7 +88,7 @@ All tools connect to the Pi (or any registered node) via SSH. All tools except `
 
 | Tool | Description |
 |------|-------------|
-| `homelab_piStatus` | CPU temp, memory, disk, uptime, throttle state |
+| `homelab_piStatus` | CPU temp, memory, disk, uptime, clock, voltage, decoded throttle flags |
 | `homelab_piReboot` | Safe reboot with pre-checks (requires confirm=true) |
 | `homelab_diskUsage` | Disk usage breakdown by directory |
 | `homelab_aptUpdate` | Run apt update, optionally upgrade |

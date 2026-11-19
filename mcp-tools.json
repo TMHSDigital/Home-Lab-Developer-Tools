@@ -6,7 +6,7 @@
   {"name": "homelab_sshTest", "description": "Test SSH connectivity to the Raspberry Pi", "category": "Connectivity & Diagnostics"},
   {"name": "homelab_healthCheck", "description": "Comprehensive self-test: SSH, Docker, required tools", "category": "Connectivity & Diagnostics"},
   {"name": "homelab_diagnostics", "description": "Collect debug info: OS, kernel, Docker, memory, disk, network", "category": "Connectivity & Diagnostics"},
-  {"name": "homelab_piStatus", "description": "Raspberry Pi status: CPU temp, memory, disk, uptime, throttle state", "category": "Raspberry Pi"},
+  {"name": "homelab_piStatus", "description": "Raspberry Pi status: CPU temp, memory, disk, uptime, clock, voltage, decoded throttle flags", "category": "Raspberry Pi"},
   {"name": "homelab_piReboot", "description": "Safely reboot the Raspberry Pi", "category": "Raspberry Pi"},
   {"name": "homelab_diskUsage", "description": "Get detailed disk usage breakdown", "category": "System & Security"},
   {"name": "homelab_kernelInfo", "description": "Kernel version, boot parameters, loaded modules", "category": "System & Security"},

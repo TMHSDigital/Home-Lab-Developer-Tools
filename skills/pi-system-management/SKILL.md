@@ -36,15 +36,16 @@ Optional:
 1. **Verify connectivity** -- call `homelab_sshTest` to confirm the Pi is reachable.
 2. **Gather system status** -- call `homelab_piStatus` to retrieve CPU temperature,
    clock speed, voltage status, throttling flags, uptime, and load averages.
-3. **Evaluate thermal health** -- parse `vcgencmd measure_temp` output and thermal
-   zone readings. Flag if temperature exceeds 80C (throttling threshold on Pi 5)
+3. **Evaluate thermal health** -- read the CPU Temperature section of
+   `homelab_piStatus`. Flag if temperature exceeds 80C (throttling threshold on Pi 5)
    or 85C (critical).
-4. **Check throttling flags** -- decode the `vcgencmd get_throttled` hex value:
-   - Bit 0: under-voltage detected
-   - Bit 1: arm frequency capped
-   - Bit 2: currently throttled
-   - Bit 3: soft temperature limit active
-   - Bits 16-19: same flags but "has occurred since boot"
+4. **Check throttling flags** -- `homelab_piStatus` prints the raw
+   `throttled=0x...` value followed by decoded lines such as
+   `Under-voltage: now no, since boot YES` for under-voltage, ARM frequency
+   capping, throttling and the soft temperature limit. Any `YES` needs
+   attention; "since boot" without "now" means it happened earlier. The ARM
+   Clock section shows the current frequency in MHz and Core Voltage the
+   core voltage. Non-Pi nodes show `N/A` for these.
 5. **Inspect memory** -- review free/available memory from `homelab_piStatus`.
    Flag if available memory drops below 256MB on a 8GB Pi.
 6. **Check disk usage** -- call `homelab_diskUsage` for all mounted filesystems.

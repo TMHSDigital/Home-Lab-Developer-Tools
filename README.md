@@ -164,7 +164,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 
 | Tool | What It Does |
 |---|---|
-| `homelab_piStatus` | CPU temp, memory, disk, uptime, throttle state |
+| `homelab_piStatus` | CPU temp, memory, disk, uptime, clock, voltage, decoded throttle flags |
 | `homelab_piReboot` | Safe reboot with pre-checks (requires confirm=true) |
 | `homelab_diskUsage` | Disk usage breakdown by directory |
 | `homelab_aptUpdate` | Run apt update, list upgradable packages; optional upgrade (requires confirm=true) |
