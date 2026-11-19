@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.7] - 2026-11-19
+
 ### Changed
 
 - `homelab_backupDiff` lists at most `limit` changed paths (default 100, 0 for statistics only) followed by restic's statistics and a note on how many paths were omitted, and allows 5 minutes instead of 30 seconds.
