@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.8] - 2026-11-19
+
 ### Fixed
 
 - The troubleshooting skill no longer restarts native systemd services (Cockpit, Samba, node_exporter) with `homelab_serviceRestart`, which runs `docker restart`: it uses `homelab_systemdServices`, `homelab_journalLogs` and `homelab_systemdControl`, checks container state with `homelab_serviceHealth` (which includes exited containers), and starts triage with `homelab_healthCheck` and `homelab_diagnostics`.
