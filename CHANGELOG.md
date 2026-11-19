@@ -248,6 +248,12 @@ See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/rele
 - All confirm-gated tools now use the shared `confirmParam`/`confirmCancelled` helpers for consistent messaging (standardizes "aborted" -> "cancelled" in `certRenew` and `nodeExec`).
 - `composePull` remains ungated (pull only downloads images, does not change running state).
 
+## [0.13.3] - 2026-05-22
+
+### Changed
+
+- Structure test requirement raised to PyYAML 6.0.3 or newer.
+
 ## [0.13.2] - 2026-04-26
 
 See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.13.2) for details.
@@ -259,6 +265,26 @@ See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/rele
 ## [0.13.0] - 2026-04-25
 
 See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.13.0) for details.
+
+## [0.12.1] - 2026-04-24
+
+### Added
+
+- `standards-version` frontmatter on every skill and rule.
+
+## [0.12.0] - 2026-04-09
+
+### Changed
+
+- `publish.yml` publishes to npm with trusted publishing (OIDC) instead of an `NPM_TOKEN` secret.
+- GitHub Pages site rebuilt with font preloads, and `site.json` install steps include a copyable MCP config.
+
+## [0.11.0] - 2026-04-08
+
+### Added
+
+- GitHub Pages site generated from `site.json`, `mcp-tools.json`, skills and rules by the shared site template, with dark/light mode, collapsible skill, rule and install sections, and a logo.
+- `AGENTS.md` with guidance for AI coding agents working on the repository.
 
 ## [0.10.0] - 2026-04-05
 

@@ -128,7 +128,7 @@ Service-to-file mapping (quick reference):
 
 ## Common Pitfalls
 
-- **Confirm gate** -- `homelab_composeUp`, `homelab_composeDown`, and `homelab_serviceRestart` require `confirm=true` to proceed. Calls without it return a cancellation message and do nothing.
+- **Confirm gate** -- `homelab_composeUp`, `homelab_composeDown`, and `homelab_serviceRestart` require `confirm=true` to proceed. A call with `confirm: false` returns a preview of the command and does nothing; omitting `confirm` is an input validation error.
 - **Directories instead of files** -- `stacks` takes compose file names such as
   `compose.monitoring.yml`, not paths like `/opt/homelab/docker/monitoring`.
 - **Pulling all stacks at once** -- omitting `stacks` pulls images for every

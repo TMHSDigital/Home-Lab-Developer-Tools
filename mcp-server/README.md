@@ -1,30 +1,30 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 55 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. All tools accept an optional `node` parameter to target specific nodes.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 55 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. Every tool except `homelab_nodeList` takes a `node` parameter to target a node from `HOMELAB_NODES` (optional, except for `homelab_nodeExec` and `homelab_nodeStatus` where it is required). Read-only status tools such as `homelab_piStatus`, `homelab_serviceHealth`, `homelab_backupStatus` and `homelab_diskUsage` also accept `node: "all"` to query every node in parallel. State-changing tools require `confirm: true` and return a preview with `confirm: false`.
 
 ## Tools
 
 | Category | Tool | Description |
 |----------|------|-------------|
 | System | `homelab_piStatus` | CPU temp, memory, disk, uptime, clock, voltage, decoded throttle flags |
-| System | `homelab_piReboot` | Safe reboot with pre-checks |
+| System | `homelab_piReboot` | Safe reboot with pre-checks (requires confirm=true) |
 | System | `homelab_diskUsage` | Disk usage breakdown by directory |
 | System | `homelab_aptUpdate` | Run apt update, list upgradable packages; optional upgrade (requires confirm=true) |
 | Containers | `homelab_serviceHealth` | Docker container health status |
 | Containers | `homelab_serviceLogs` | Tail container logs |
-| Containers | `homelab_serviceRestart` | Restart a container |
-| Compose | `homelab_composeUp` | Start compose stacks |
-| Compose | `homelab_composeDown` | Stop compose stacks |
+| Containers | `homelab_serviceRestart` | Restart a container (requires confirm=true) |
+| Compose | `homelab_composeUp` | Start compose stacks (requires confirm=true) |
+| Compose | `homelab_composeDown` | Stop compose stacks (requires confirm=true) |
 | Compose | `homelab_composePull` | Pull latest images |
 | Compose | `homelab_composePs` | List running containers |
 | Network | `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
 | Backup | `homelab_backupStatus` | Check latest restic snapshots |
-| Backup | `homelab_backupRun` | Trigger restic backup |
+| Backup | `homelab_backupRun` | Trigger restic backup (requires confirm=true) |
 | Backup | `homelab_backupList` | List all restic snapshots with filtering |
-| Backup | `homelab_backupRestore` | Restore files from a snapshot |
+| Backup | `homelab_backupRestore` | Restore files from a snapshot (requires confirm=true) |
 | Backup | `homelab_backupDiff` | Diff two restic snapshots |
 | Backup | `homelab_backupCheck` | Verify repository integrity with restic check |
-| Backup | `homelab_volumeBackup` | Back up a Docker volume to restic |
+| Backup | `homelab_volumeBackup` | Back up a Docker volume to restic (requires confirm=true) |
 | Monitoring | `homelab_prometheusQuery` | Run PromQL queries against Prometheus |
 | Monitoring | `homelab_grafanaSnapshot` | Export Grafana dashboard config by UID |
 | Monitoring | `homelab_uptimeKumaStatus` | Get Uptime Kuma monitor statuses |
@@ -50,12 +50,12 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | OS | `homelab_aptHistory` | Show recent apt install/upgrade/remove history |
 | OS | `homelab_kernelInfo` | Kernel version, boot parameters, loaded modules |
 | OS | `homelab_systemdServices` | List systemd units or get status of a specific unit |
-| OS | `homelab_systemdControl` | Start, stop, restart, reload, enable or disable a systemd unit |
+| OS | `homelab_systemdControl` | Start, stop, restart, reload, enable or disable a systemd unit (requires confirm=true) |
 | Certificates | `homelab_certCheck` | Check SSL certificate expiry, issuer, and fingerprint |
-| Certificates | `homelab_certRenew` | Trigger Let's Encrypt certificate renewal |
+| Certificates | `homelab_certRenew` | Trigger Let's Encrypt certificate renewal (requires confirm=true) |
 | Certificates | `homelab_certList` | List all managed certificates from certbot and NPM |
 | Multi-Node | `homelab_nodeList` | List all managed nodes and connection status |
-| Multi-Node | `homelab_nodeExec` | Execute a command on a specific node |
+| Multi-Node | `homelab_nodeExec` | Execute a command on a specific node (requires confirm=true) |
 | Multi-Node | `homelab_nodeStatus` | Get system status for a specific node |
 | Multi-Node | `homelab_inventorySync` | Discover nodes from Ansible inventory or Tailscale |
 | Diagnostics | `homelab_healthCheck` | Comprehensive self-test (SSH, Docker, curl, restic, certbot, systemd) |
@@ -78,7 +78,7 @@ Set environment variables:
 |----------|---------|-------------|
 | `HOMELAB_PI_HOST` | `raspberrypi.local` | Pi hostname or IP |
 | `HOMELAB_PI_USER` | `pi` | SSH username |
-| `HOMELAB_PI_KEY_PATH` | (empty) | Path to SSH private key (e.g. `~/.ssh/id_ed25519`) |
+| `HOMELAB_PI_KEY_PATH` | (empty) | Path to SSH private key (e.g. `~/.ssh/id_ed25519`). When empty, only the SSH agent (`SSH_AUTH_SOCK`) is used for authentication |
 | `HOMELAB_PI_PORT` | `22` | SSH port of the default node (1-65535) |
 | `HOMELAB_COMPOSE_DIR` | `/opt/homelab/docker` | Compose project directory on Pi |
 | `HOMELAB_COMPOSE_FILES` | (discovered) | Comma-separated compose files (in order) used when no `stacks` are passed. If unset, `compose.base.yml` and every `compose.*.yml` in the compose dir are used, falling back to `compose.yaml` / `docker-compose.yml` |
@@ -124,7 +124,25 @@ Besides tools, the server exposes MCP resources and prompts, so any MCP client g
 
 ## Usage with Cursor
 
-Add to `.cursor/mcp.json`:
+Add to `.cursor/mcp.json` (the same `mcpServers` block works in other MCP clients). With the published package:
+
+```json
+{
+  "mcpServers": {
+    "homelab": {
+      "command": "npx",
+      "args": ["-y", "@tmhs/homelab-mcp"],
+      "env": {
+        "HOMELAB_PI_HOST": "raspberrypi.local",
+        "HOMELAB_PI_USER": "pi",
+        "HOMELAB_PI_KEY_PATH": "~/.ssh/id_ed25519"
+      }
+    }
+  }
+}
+```
+
+From a local build instead:
 
 ```json
 {

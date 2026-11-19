@@ -107,6 +107,19 @@ describe("tool registration", () => {
     expect(read("CLAUDE.md")).toContain(`## MCP Tools (${n})`);
     expect(read("mcp-server/README.md")).toContain(`provides ${n} tools`);
   });
+
+  it("states the right subtotal for each README tool category", () => {
+    const readme = readFileSync(join(repoRoot, "README.md"), "utf8").replace(/\r\n/g, "\n");
+    const categories = [...readme.matchAll(/\*\*([^*\n]+)\*\* \((\d+)\)\n\n\| Tool \| What It Does \|\n\|---\|---\|\n((?:\|.*\n)+)/g)];
+    expect(categories.length).toBeGreaterThan(0);
+    let total = 0;
+    for (const [, name, count, rows] of categories) {
+      const listed = rows.trim().split("\n").length;
+      total += listed;
+      expect(listed, `README category ${name}`).toBe(Number(count));
+    }
+    expect(total).toBe(registered.length);
+  });
 });
 
 describe("tool annotations", () => {

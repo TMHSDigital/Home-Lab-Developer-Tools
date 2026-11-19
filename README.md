@@ -186,7 +186,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_composePull` | Pull latest images |
 | `homelab_composePs` | List running compose containers |
 
-**Monitoring** (5)
+**Monitoring** (7)
 
 | Tool | What It Does |
 |---|---|
@@ -405,19 +405,22 @@ Any client supporting MCP stdio transport can use the Home Lab MCP server. Point
 
 | Version | Theme | New Tools | New Skills | New Rules | Cumulative |
 |---|---|---|---|---|---|
-| **v0.1.0** | Foundation | 15 | 10 | 5 | 15 |
-| **v0.2.0** | **Extended Monitoring** | **+5** | **+2** | **--** | **20** |
-| **v0.3.0** | **DNS and Reverse Proxy** | **+5** | **+2** | **+1** | **25** |
-| **v0.4.0** | **Backup and Recovery** | **+4** | **+1** | **+1** | **29** |
-| **v0.5.0** | **Security Hardening** | **+4** | **+1** | **+2** | **33** |
-| **v0.6.0** | **Logs and Notifications** | **+4** | **+2** | **--** | **37** |
-| **v0.7.0** | **OS and Package Management** | **+4** | **+2** | **+1** | **41** |
-| **v0.8.0** | **SSL/TLS Certificates** | **+3** | **+1** | **--** | **44** |
-| **v0.9.0** | **Multi-Node Foundation** | **+4** | **+1** | **+1** | **48** |
-| **v0.10.0** | **Testing Infrastructure** | **+2** | **--** | **--** | **50** |
-| **v0.14.0** | **Security Hardening** | **--** | **--** | **--** | **50** |
-| v0.15.0 | Documentation Site | -- | -- | -- | 50 |
-| v1.0.0 | Stable Release | -- | -- | -- | 50 |
+| v0.1.0 | Foundation | 15 | 10 | 5 | 15 |
+| v0.2.0 | Extended Monitoring | +5 | +2 | -- | 20 |
+| v0.3.0 | DNS and Reverse Proxy | +5 | +2 | +1 | 25 |
+| v0.4.0 | Backup and Recovery | +4 | +1 | +1 | 29 |
+| v0.5.0 | Security Hardening | +4 | +1 | +2 | 33 |
+| v0.6.0 | Logs and Notifications | +4 | +2 | -- | 37 |
+| v0.7.0 | OS and Package Management | +4 | +2 | +1 | 41 |
+| v0.8.0 | SSL/TLS Certificates | +3 | +1 | -- | 44 |
+| v0.9.0 | Multi-Node Foundation | +4 | +1 | +1 | 48 |
+| v0.10.0 | Testing Infrastructure | +2 | -- | -- | 50 |
+| v0.11.0 - v0.16.1 | Docs site, command guard, hardening | -- | -- | -- | 50 |
+| v0.17.0 | AdGuard filter toggle | +1 | -- | -- | 51 |
+| v0.20.0 | Alertmanager silences | +2 | -- | -- | 53 |
+| v0.23.0 | Backup verification | +1 | -- | -- | 54 |
+| **v0.24.0** | **systemd unit control** | **+1** | **--** | **--** | **55** |
+| v1.0.0 | Stable Release (planned) | -- | -- | -- | -- |
 
 See [ROADMAP.md](ROADMAP.md) for detailed per-version tool, skill, and rule breakdowns.
 

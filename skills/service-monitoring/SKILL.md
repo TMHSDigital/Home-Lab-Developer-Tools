@@ -126,7 +126,7 @@ Default scrape targets:
 
 ## Common Pitfalls
 
-- **Confirm gate** -- `homelab_serviceRestart` and `homelab_composeUp` require `confirm=true` to proceed. Omitting it returns a cancellation message without restarting or redeploying anything.
+- **Confirm gate** -- `homelab_serviceRestart` and `homelab_composeUp` require `confirm=true` to proceed. A call with `confirm: false` returns a preview without restarting or redeploying anything; omitting `confirm` is an input validation error.
 - **Prometheus reload vs restart** -- Prometheus supports hot-reload via `POST
   /-/reload` for config changes. A full container restart is heavier and causes a
   brief metrics gap. Prefer reload when possible.

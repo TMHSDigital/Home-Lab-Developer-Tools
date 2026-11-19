@@ -46,12 +46,12 @@ description: One-line description of what the skill does
 
 The `name` and `description` fields are parsed by the site template build system to generate the GitHub Pages site. When adding a new skill:
 1. Create `skills/<skill-name>/SKILL.md` with frontmatter
-2. Update the `skills` count in `.cursor-plugin/plugin.json`
+2. Update the skill count in the `description` of `.cursor-plugin/plugin.json` and in README.md, CLAUDE.md and site.json
 3. Use `feat:` commit prefix
 
 ## Rules
 
-Rules are `.mdc` files in `rules/`. Each starts with YAML frontmatter containing `description` and `globs` fields.
+Rules are `.mdc` files in `rules/`. Each starts with YAML frontmatter containing the required `description` and `alwaysApply` fields; rules with `alwaysApply: false` also set `globs` with the file patterns they apply to.
 
 ## MCP Tools
 

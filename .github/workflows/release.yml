@@ -229,3 +229,10 @@ jobs:
           gh workflow run publish.yml \
             --ref main \
             -f tag="v${{ steps.new.outputs.version }}"
+
+      # The version bump commit carries [skip ci], so pages.yml does not run
+      # on it; redeploy the site so it shows the new version.
+      - name: Dispatch Pages deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run pages.yml --ref main

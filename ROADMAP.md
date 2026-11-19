@@ -14,10 +14,14 @@
 | v0.8.0 | SSL/TLS Certificates | +3 | +1 | -- | 44 |
 | v0.9.0 | Multi-Node Foundation | +4 | +1 | +1 | 48 |
 | v0.10.0 | Testing Infrastructure | +2 | -- | -- | 50 |
-| v0.11.0 | Documentation Site | -- | -- | -- | 50 |
-| v0.12.0 | Polish and Hardening | +2 | -- | -- | 52 |
-| v0.14.0 | Security Hardening | -- | -- | -- | 50 |
-| **v1.0.0** | **Stable Release** | -- | -- | -- | **52** |
+| v0.11.0 - v0.13.3 | Documentation Site and maintenance | -- | -- | -- | 50 |
+| v0.14.0 | Command Guard and Confirm Gates | -- | -- | -- | 50 |
+| v0.15.0 - v0.16.1 | Hardening and docs | -- | -- | -- | 50 |
+| v0.17.0 | AdGuard filter toggle | +1 | -- | -- | 51 |
+| v0.20.0 | Alertmanager silences | +2 | -- | -- | 53 |
+| v0.23.0 | Backup verification | +1 | -- | -- | 54 |
+| v0.24.0 | systemd unit control | +1 | -- | -- | 55 |
+| v1.0.0 | Stable Release (planned) | -- | -- | -- | -- |
 
 ---
 
@@ -217,7 +221,19 @@ Real test coverage before v1.0.
 
 ---
 
-## v0.14.0 - Security Hardening
+## v0.11.0 - v0.13.3 - Documentation Site and maintenance
+
+- [x] GitHub Pages site generated from `site.json`, `mcp-tools.json`, skills and rules by the shared site template (v0.11.0, v0.12.0)
+- [x] Dark/light mode and collapsible skill, rule and install sections on the site (v0.11.0)
+- [x] `publish.yml` moved to npm trusted publishing (OIDC, no `NPM_TOKEN`) (v0.12.0)
+- [x] `standards-version` frontmatter on skills and rules (v0.12.1)
+- [x] Dependency updates (v0.13.x)
+
+Not done from the original plan (still open): an interactive tool reference with per-parameter examples and output samples, skill and rule catalogs with example prompts and violations, and site search.
+
+---
+
+## v0.14.0 - Command Guard and Confirm Gates
 
 - [x] Runtime command safety guard in `execSSH` blocking catastrophic patterns
 - [x] `HOMELAB_DRY_RUN` env var for testing without SSH connections
@@ -229,40 +245,24 @@ Real test coverage before v1.0.
 
 ---
 
-## v0.11.0 - Documentation Site
+## v0.15.0 - v0.24.x - Hardening and new tools
 
-Upgrade GitHub Pages from placeholder to full tool reference.
+See [CHANGELOG.md](CHANGELOG.md) for the full list. Highlights:
 
-**Site features:**
-
-- [ ] Interactive tool reference with parameters, examples, and output samples
-- [ ] Skill catalog with trigger conditions and example prompts
-- [ ] Rule catalog with scope and example violations
-- [ ] Search functionality
-- [ ] Dark/light mode
-
-**Docs automation:**
-
-- [ ] Rule or CLAUDE.md section ensuring all release-related info (version numbers, tool counts, changelogs) is updated across README, CLAUDE.md, ROADMAP.md, plugin.json, package.json, and the docs site on every release
+- [x] `homelab_adguardFilterToggle` -- enable or disable an AdGuard filter list (confirm-gated, v0.17.0)
+- [x] `homelab_alertSilences` / `homelab_alertSilence` -- list, create and expire Alertmanager silences (v0.20.0)
+- [x] MCP tool annotations, confirm previews, configurable SSH port, `node: "all"` fan-out, MCP prompts and resources
+- [x] `homelab_backupCheck` and the OK/STALE verdict in `homelab_backupStatus` (v0.23.0)
+- [x] `homelab_systemdControl` -- confirm-gated systemd unit control (v0.24.0)
+- [x] Releases automated by `release.yml` (version bump, tag, GitHub release, npm publish)
 
 ---
 
-## v0.12.0 - Polish and Hardening
+## Planned
 
-Final quality pass before stable.
-
-**MCP tools (+2):**
-
-- [ ] `homelab_configExport` -- export current MCP server config (sanitized, no secrets)
-- [ ] `homelab_configValidate` -- validate environment setup and required Pi-side dependencies
-
-**Quality pass:**
-
-- [ ] All tools reviewed for error handling, timeout tuning, and output formatting
-- [ ] All skills reviewed for accuracy, completeness, and cross-linking
-- [ ] All rules reviewed for false positive rates
-- [ ] README, CLAUDE.md, ROADMAP.md, plugin.json, package.json fully in sync
-- [ ] CHANGELOG complete for all versions
+- [ ] `homelab_configValidate` -- validate environment setup and probe every configured service (#154)
+- [ ] `homelab_configExport` -- export the resolved MCP server config with secrets masked
+- [ ] Quality pass: tools (error handling, timeouts, output), skills (accuracy, cross-links), rules (false positives)
 
 ---
 
@@ -279,7 +279,7 @@ Production-ready, fully tested, fully documented.
 - [ ] No known bugs in issue tracker
 - [ ] CHANGELOG, README, CLAUDE.md, ROADMAP.md, plugin.json all version-synced
 
-**Final counts: ~52 MCP tools, ~22 skills, ~11 rules**
+**Current counts (v0.24): 55 MCP tools, 22 skills, 11 rules**
 
 ---
 
