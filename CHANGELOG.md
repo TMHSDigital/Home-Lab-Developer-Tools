@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27.2] - 2026-11-19
+
+See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.27.2) for details.
+
 ## [0.27.1] - 2026-11-19
 
 See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.27.1) for details.
