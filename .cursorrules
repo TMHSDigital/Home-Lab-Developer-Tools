@@ -30,7 +30,7 @@ Versions, tags, GitHub releases and npm publishing are automated by `release.yml
 7. After the release, update the GitHub repo About description if the counts changed: `gh repo edit --description "...N skills, N rules, and N MCP tools..."`.
 
 ## Publishing flow
-- Every push to `main` triggers `release.yml`, which bumps one shared version across `.cursor-plugin/plugin.json` and `mcp-server/` (package.json, package-lock.json, src/index.ts).
+- Every push to `main` triggers `release.yml`, which bumps one shared version across `.cursor-plugin/plugin.json` and `mcp-server/` (package.json, package-lock.json); the server reads its version from package.json at runtime.
 - `release.yml` pushes the bump commit and tag (`vX.Y.Z`) atomically, creates a GitHub Release, then dispatches `publish.yml`.
 - `publish.yml` builds, tests, and publishes to npm via trusted publishing (OIDC, no `NPM_TOKEN`). The npm trusted publisher is bound to this filename.
 - Release Drafter auto-drafts release notes from merged PRs (labels control categories).

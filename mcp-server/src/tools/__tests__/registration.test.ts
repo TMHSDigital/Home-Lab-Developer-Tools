@@ -95,17 +95,29 @@ describe("tool registration", () => {
     }
   });
 
-  it("states the current tool count everywhere it is published", () => {
+  it("states the current tool, skill and rule counts everywhere they are published", () => {
     const n = registered.length;
+    const skills = readdirSync(join(repoRoot, "skills"), { withFileTypes: true }).filter((d) => d.isDirectory()).length;
+    const rules = readdirSync(join(repoRoot, "rules")).filter((f) => f.endsWith(".mdc")).length;
     const read = (p: string) => readFileSync(join(repoRoot, p), "utf8");
     const plugin = JSON.parse(read(".cursor-plugin/plugin.json")) as { description: string };
     const pkg = JSON.parse(read("mcp-server/package.json")) as { description: string };
-    expect(plugin.description).toContain(`${n} MCP tools`);
+    expect(plugin.description).toContain(`${skills} skills, ${rules} rules, and ${n} MCP tools`);
     expect(pkg.description).toContain(`${n} tools`);
-    expect(read("README.md")).toContain(`11 rules &nbsp;&bull;&nbsp; ${n} MCP tools`);
+    expect(read("README.md")).toContain(`${skills} skills &nbsp;&bull;&nbsp; ${rules} rules &nbsp;&bull;&nbsp; ${n} MCP tools`);
     expect(read("README.md")).toContain(`badge/tools-${n}-`);
+    expect(read("README.md")).toContain(`**${n} MCP tools**`);
+    expect(read("README.md")).toContain(`<strong>${n} MCP Tools</strong>`);
+    expect(read("CLAUDE.md")).toContain(`It includes ${skills} skills, ${rules} rules, and a companion MCP server with ${n} tools`);
+    expect(read("CLAUDE.md")).toContain(`## Skills (${skills})`);
+    expect(read("CLAUDE.md")).toContain(`## Rules (${rules})`);
     expect(read("CLAUDE.md")).toContain(`## MCP Tools (${n})`);
     expect(read("mcp-server/README.md")).toContain(`provides ${n} tools`);
+    expect(read("AGENTS.md")).toContain(`${skills} skills and ${rules} rules`);
+    expect(read("AGENTS.md")).toContain(`with ${n} tools for live infrastructure management`);
+    expect(read("AGENTS.md")).toContain(`(${n} tools, manually maintained)`);
+    expect(read("site.json")).toContain(`${n} MCP tools`);
+    expect(read("site.json")).toContain(`${skills} skills and ${rules} rules`);
   });
 
   it("states the right subtotal for each README tool category", () => {

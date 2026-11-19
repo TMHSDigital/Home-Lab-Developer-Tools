@@ -196,20 +196,19 @@ npm install -g @tmhs/homelab-mcp
 
 ## Release Hygiene
 
-When preparing a new release version, ALL of the following files must be updated to reflect the new version number, tool/skill/rule counts, and any new entries:
+Versions are never edited by hand: `release.yml` bumps the one shared version in `.cursor-plugin/plugin.json`, `mcp-server/package.json` and `mcp-server/package-lock.json` (the server reads its version from `package.json` at runtime), and the release doc sync updates the `Version` field above. A change that ships only needs:
 
 | File | What to update |
 |------|----------------|
-| `mcp-server/package.json` | `version` field |
-| `mcp-server/src/index.ts` | `version` in McpServer constructor |
-| `.cursor-plugin/plugin.json` | `version` field, `description` tool/skill/rule counts |
-| `README.md` | Badge versions, stat line counts, tool/skill/rule tables, roadmap table |
-| `CLAUDE.md` | `Version` field, skill/rule/tool counts and tables |
-| `ROADMAP.md` | Move version from planned to completed, update status |
-| `CHANGELOG.md` | Add new version section with all changes |
-| GitHub repo About | Description with skill/rule/tool counts (`gh repo edit --description "..."`) |
+| `CHANGELOG.md` | A line under `[Unreleased]`; `release.yml` moves it under the new version |
+| `README.md`, `CLAUDE.md`, `mcp-server/README.md`, `mcp-tools.json` | Table rows for new tools, skills or rules |
+| Tool, skill and rule counts | `.cursor-plugin/plugin.json` and `mcp-server/package.json` descriptions, README stat line, badge and category heading, `CLAUDE.md`, `mcp-server/README.md`, `AGENTS.md`, `site.json` |
+| `ROADMAP.md` | Move finished items from Planned to the shipped version |
+| GitHub repo About | Counts in the description (`gh repo edit --description "..."`), after the release |
 
-Checklist before pushing a release:
+`registration.test.ts` fails when a tool is missing from a table or a count is wrong in any of those files.
+
+Checklist before pushing a change that ships:
 
 1. All new tools listed in `mcp-server/src/tool-registry.ts` (index.ts registers everything in it)
 2. All new tools have input validation tests
@@ -217,15 +216,13 @@ Checklist before pushing a release:
 4. All new rules have .mdc with required frontmatter
 5. Structure tests pass (`pytest tests/ -v`)
 6. MCP server builds and tests pass (`npm run build && npm test`)
-7. Version numbers match across all files listed above
-8. CHANGELOG.md entry added for the new version
-9. Regenerate `package-lock.json` (`cd mcp-server && npm install`) and commit it
-10. Update GitHub repo description: `gh repo edit --description "...N skills, N rules, and N MCP tools..."`
+7. CHANGELOG.md `[Unreleased]` entry added
+8. If dependencies changed, regenerate `package-lock.json` (`cd mcp-server && npm install`) and commit it
 
 Publishing pipeline (fully automated):
 
 1. Every push to `main` triggers `release.yml`. It releases only when shipped files (`mcp-server/` outside tests, `skills/`, `rules/`, `.cursor-plugin/`) changed since the last tag, and only after the build, Vitest and structure tests pass. The next version comes from commit messages (`feat:` = minor; `!` after any type, such as `feat!:`, or a `BREAKING CHANGE:` footer = major; anything else = patch)
-2. `release.yml` bumps the version in `.cursor-plugin/plugin.json`, `mcp-server/package.json`, `mcp-server/package-lock.json`, and `mcp-server/src/index.ts` (one shared version), syncs release docs, pushes the commit and tag atomically, creates the GitHub Release, then dispatches `publish.yml`
+2. `release.yml` bumps the version in `.cursor-plugin/plugin.json`, `mcp-server/package.json` and `mcp-server/package-lock.json` (one shared version; `index.ts` reads it from `package.json`), syncs release docs, pushes the commit and tag atomically, creates the GitHub Release, then dispatches `publish.yml`
 3. `publish.yml` builds, tests, and publishes to npm via trusted publishing (OIDC, no `NPM_TOKEN`); the npm trusted publisher is bound to this filename, so publishing must stay in `publish.yml`
 4. Never create tags, releases, or npm publishes manually
 

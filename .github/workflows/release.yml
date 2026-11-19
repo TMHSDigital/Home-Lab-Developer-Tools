@@ -133,13 +133,11 @@ jobs:
       - name: Update version files
         env:
           NEW_VERSION: ${{ steps.new.outputs.version }}
-          OLD_VERSION: ${{ steps.current.outputs.version }}
         run: |
           python3 -c "
           import json, os
 
           new_version = os.environ['NEW_VERSION']
-          old_version = os.environ['OLD_VERSION']
 
           path = '.cursor-plugin/plugin.json'
           with open(path) as f:
@@ -148,16 +146,6 @@ jobs:
           with open(path, 'w') as f:
               json.dump(data, f, indent=2)
               f.write('\n')
-
-          readme = 'README.md'
-          with open(readme) as f:
-              content = f.read()
-          content = content.replace(
-              f'version-{old_version}-',
-              f'version-{new_version}-'
-          )
-          with open(readme, 'w') as f:
-              f.write(content)
 
           # Keep the npm package version in lockstep with the plugin version
           for path in ('mcp-server/package.json', 'mcp-server/package-lock.json'):
@@ -169,14 +157,6 @@ jobs:
               with open(path, 'w') as f:
                   json.dump(data, f, indent=2, ensure_ascii=False)
                   f.write('\n')
-
-          import re
-          index = 'mcp-server/src/index.ts'
-          with open(index) as f:
-              content = f.read()
-          content = re.sub(r'version: \x22[0-9][^\x22]*\x22', f'version: \x22{new_version}\x22', content, count=1)
-          with open(index, 'w') as f:
-              f.write(content)
           "
 
       - name: Roll Unreleased changelog entries into the new version
