@@ -98,16 +98,20 @@ jobs:
         id: bump
         run: |
           last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          if [ -z "$last_tag" ]; then
-            commits=$(git log --oneline --format="%s")
-          else
-            commits=$(git log "$last_tag"..HEAD --oneline --format="%s")
+          range="HEAD"
+          if [ -n "$last_tag" ]; then
+            range="$last_tag..HEAD"
           fi
+          # Subjects decide feat/feat!; full messages (%B) are needed for a
+          # BREAKING CHANGE footer, which Conventional Commits puts in the body.
+          subjects=$(git log "$range" --format="%s")
+          messages=$(git log "$range" --format="%B")
 
           bump="patch"
-          if echo "$commits" | grep -qiE "^(feat|feature)(\(.+\))?!:|BREAKING CHANGE"; then
+          if echo "$subjects" | grep -qiE "^[a-z]+(\(.+\))?!:" \
+            || echo "$messages" | grep -qE "^BREAKING[ -]CHANGE:"; then
             bump="major"
-          elif echo "$commits" | grep -qiE "^(feat|feature)(\(.+\))?:"; then
+          elif echo "$subjects" | grep -qiE "^(feat|feature)(\(.+\))?:"; then
             bump="minor"
           fi
 
@@ -126,17 +130,7 @@ jobs:
           esac
           echo "version=$major.$minor.$patch" >> "$GITHUB_OUTPUT"
 
-      - name: Check if version changed
-        id: check
-        run: |
-          if [ "${{ steps.current.outputs.version }}" = "${{ steps.new.outputs.version }}" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Update version files
-        if: steps.check.outputs.skip == 'false'
         env:
           NEW_VERSION: ${{ steps.new.outputs.version }}
           OLD_VERSION: ${{ steps.current.outputs.version }}
@@ -186,7 +180,6 @@ jobs:
           "
 
       - name: Roll Unreleased changelog entries into the new version
-        if: steps.check.outputs.skip == 'false'
         run: |
           python3 - <<'PY'
           import datetime, re
@@ -202,14 +195,12 @@ jobs:
           PY
 
       - name: Sync release docs
-        if: steps.check.outputs.skip == 'false'
         uses: TMHSDigital/Developer-Tools-Directory/.github/actions/release-doc-sync@f10dd5e060ffcd30e44b950c09af970f96579ff8 # v1.20.0
         with:
           plugin-version: ${{ steps.new.outputs.version }}
           previous-version: ${{ steps.current.outputs.version }}
 
       - name: Commit and tag
-        if: steps.check.outputs.skip == 'false'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -221,7 +212,6 @@ jobs:
           git push --atomic origin main "refs/tags/v${{ steps.new.outputs.version }}"
 
       - name: Create GitHub Release
-        if: steps.check.outputs.skip == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -233,7 +223,6 @@ jobs:
       # must run there. Releases created with GITHUB_TOKEN do not trigger
       # other workflows, but workflow_dispatch does.
       - name: Dispatch npm publish
-        if: steps.check.outputs.skip == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
