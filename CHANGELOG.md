@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-11-19
+
 ### Added
 
 - `homelab_systemdControl` starts, stops, restarts, reloads, enables or disables a native systemd unit (requires confirm=true), validates the unit name, refuses to stop or disable the SSH unit, and reports whether the unit is active and enabled afterwards. The security-hardening, storage-management and ansible-workflows skills use it instead of free-form `systemctl` commands through `homelab_nodeExec`.
