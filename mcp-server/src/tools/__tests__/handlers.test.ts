@@ -35,7 +35,7 @@ import { register as alertSilence, buildSilenceBody } from "../alertSilence.js";
 import { register as backupStatus, backupVerdict } from "../backupStatus.js";
 import { register as backupCheck } from "../backupCheck.js";
 import { register as backupList } from "../backupList.js";
-import { register as backupDiff } from "../backupDiff.js";
+import { register as backupDiff, limitDiff } from "../backupDiff.js";
 import { register as backupRestore } from "../backupRestore.js";
 import { register as volumeBackup } from "../volumeBackup.js";
 import {
@@ -171,6 +171,41 @@ describe("restic tools", () => {
     const result = await handlerOf(backupDiff)({ snapshotA: "aaa", snapshotB: "bbb" });
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("HOMELAB_RESTIC_ENV_FILE");
+  });
+});
+
+describe("backupDiff", () => {
+  const diff = [
+    "comparing snapshot aaa to bbb:",
+    "",
+    ...Array.from({ length: 250 }, (_, i) => `${i % 3 === 0 ? "+" : i % 3 === 1 ? "-" : "M"}    /opt/data/file${i}`),
+    "",
+    "Files:         84 new,    83 removed,    83 changed",
+    "Dirs:           0 new,     0 removed",
+    "Others:         0 new,     0 removed",
+    "Data Blobs:    90 new,    80 removed",
+    "Tree Blobs:     3 new,     3 removed",
+    "  Added:   12.000 MiB",
+    "  Removed: 11.000 MiB",
+  ].join("\n");
+
+  it("lists the first `limit` changed paths and keeps the statistics", async () => {
+    mockExecSSH.mockResolvedValueOnce(diff);
+    const text = (await handlerOf(backupDiff)({ snapshotA: "aaa", snapshotB: "bbb", limit: 100 })).content[0].text;
+    expect(mockExecSSH.mock.calls[0][2]).toEqual({ timeoutMs: 300_000 });
+    expect(text).toContain("+    /opt/data/file0");
+    expect(text).toContain("/opt/data/file99\n");
+    expect(text).not.toContain("/opt/data/file100");
+    expect(text).toContain("Files:         84 new");
+    expect(text).toContain("  Removed: 11.000 MiB");
+    expect(text.endsWith("(150 of 250 changed paths omitted; raise limit to see more)")).toBe(true);
+  });
+
+  it("returns statistics only with limit 0 and everything when under the limit", () => {
+    const statsOnly = limitDiff(diff, 0);
+    expect(statsOnly).not.toMatch(/\/opt\/data\/file/);
+    expect(statsOnly).toContain("Tree Blobs:");
+    expect(limitDiff(diff, 1000)).toBe(diff);
   });
 });
 
