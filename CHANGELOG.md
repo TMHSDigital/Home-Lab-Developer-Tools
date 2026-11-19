@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Integration tests load tool modules before test execution and reset mock implementations and queued results between tests to prevent cold-import timeouts and cascading failures.
+
 ## [0.27.4] - 2026-11-19
 
 See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.27.4) for details.
