@@ -1,7 +1,18 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { nodeParam } from "../utils/node-param.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
+import { sectionScript, type Section } from "../utils/section-script.js";
 import { READ_ONLY } from "../utils/annotations.js";
+
+export const NETWORK_SECTIONS: Section[] = [
+  ["IP Addresses", "ip -4 addr show | awk '/inet /{print $NF, $2}'"],
+  ["Default Gateway", "ip route show default | grep . || echo 'No default route'"],
+  ["DNS", "grep nameserver /etc/resolv.conf || echo 'No nameserver entries in /etc/resolv.conf'"],
+  [
+    "Tailscale",
+    "if command -v tailscale >/dev/null 2>&1; then tailscale status; else echo 'Tailscale not installed'; fi",
+  ],
+];
 
 export function register(server: McpServer): void {
   server.registerTool(
@@ -13,19 +24,7 @@ export function register(server: McpServer): void {
     },
     async (args) => {
       try {
-        const output = await execSSH([
-          'echo "=== IP Addresses ==="',
-          "ip -4 addr show | grep inet | awk '{print $NF, $2}'",
-          'echo ""',
-          'echo "=== Default Gateway ==="',
-          "ip route | grep default",
-          'echo ""',
-          'echo "=== DNS ==="',
-          "cat /etc/resolv.conf | grep nameserver",
-          'echo ""',
-          'echo "=== Tailscale ==="',
-          "tailscale status 2>/dev/null || echo 'Tailscale not installed or not running'",
-        ].join(" && "), args.node);
+        const output = await execSSH(sectionScript(NETWORK_SECTIONS), args.node);
 
         return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {

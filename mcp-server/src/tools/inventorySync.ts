@@ -25,7 +25,9 @@ export function register(server: McpServer): void {
           const inventoryPath =
             nodeSetting(args.node, "HOMELAB_ANSIBLE_INVENTORY") || "/etc/ansible/hosts";
           const cmd =
-            `test -f '${inventoryPath}' && cat '${inventoryPath}' || echo 'Inventory file not found at ${inventoryPath}. Set HOMELAB_ANSIBLE_INVENTORY to the correct path.'`;
+            `if [ ! -e '${inventoryPath}' ]; then echo 'Inventory file not found at ${inventoryPath}. Set HOMELAB_ANSIBLE_INVENTORY to the correct path.'; ` +
+            `elif [ ! -r '${inventoryPath}' ]; then echo 'Inventory file ${inventoryPath} exists but is not readable by the SSH user.' >&2; exit 1; ` +
+            `else cat '${inventoryPath}'; fi`;
           const output = await execSSH(cmd, args.node);
           return {
             content: [{
@@ -35,8 +37,11 @@ export function register(server: McpServer): void {
           };
         }
 
+        // Only a missing binary is reported as "not installed"; a stopped or
+        // logged-out daemon keeps its own message (and exit status).
         const cmd =
-          "command -v tailscale >/dev/null 2>&1 && tailscale status 2>&1 || echo 'Tailscale is not installed or not in PATH.'";
+          "if ! command -v tailscale >/dev/null 2>&1; then echo 'Tailscale is not installed or not in PATH.'; " +
+          "else tailscale status 2>&1; fi";
         const output = await execSSH(cmd, args.node);
         return {
           content: [{

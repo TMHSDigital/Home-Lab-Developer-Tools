@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `homelab_piStatus`, `homelab_nodeStatus`, `homelab_networkInfo`, `homelab_diskUsage` and `homelab_kernelInfo` run each section independently: a failing probe (no default route, a stale network mount, Tailscale logged out) shows its own output and exit status instead of stopping the rest and failing the tool. Non-Pi nodes show `N/A` for the CPU temperature, and `homelab_inventorySync` tells an unreadable inventory from a missing one and a stopped Tailscale from a missing one.
+
 ## [0.24.4] - 2026-11-19
 
 ### Fixed
