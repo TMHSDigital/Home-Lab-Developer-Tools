@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `requirements-test.txt` now pins exact versions (`pytest==9.2.0`, `pyyaml==6.0.3`), so a new upstream release can no longer change the structure tests that gate CI and releases. Dependabot's pip updates keep the pins current.
+
 ## [0.22.2] - 2026-11-18
 
 The changes below shipped across 0.17.1 to 0.22.2 and were not sorted by version at the time. See the [GitHub releases](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases) for each version's notes.
