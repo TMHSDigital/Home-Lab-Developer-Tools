@@ -18,6 +18,7 @@ import { register as prometheusQuery } from "../prometheusQuery.js";
 import { register as grafanaSnapshot } from "../grafanaSnapshot.js";
 import { register as uptimeKumaStatus } from "../uptimeKumaStatus.js";
 import { register as adguardStats } from "../adguardStats.js";
+import { register as adguardQueryLog } from "../adguardQueryLog.js";
 import { register as npmProxyHosts } from "../npmProxyHosts.js";
 import { register as certCheck } from "../certCheck.js";
 import { register as inventorySync } from "../inventorySync.js";
@@ -382,12 +383,31 @@ describe("prometheusQuery", () => {
     expect(cmd()).toContain("localhost:9090/api/v1/query?query=up%7Bjob%3D%22node%22%7D");
   });
 
+  it("encodes single quotes and other characters encodeURIComponent leaves bare", async () => {
+    mockExecSSH.mockResolvedValueOnce('{"status":"success"}');
+    await handlerOf(prometheusQuery)({ query: "count(up{job='node'})*2!", time: "2026-11-18T10:00:00Z" });
+    const url = /'(http:[^']*)'/.exec(cmd())?.[1];
+    expect(url).toBe(
+      "http://localhost:9090/api/v1/query?query=count%28up%7Bjob%3D%27node%27%7D%29%2A2%21&time=2026-11-18T10%3A00%3A00Z",
+    );
+    expect(cmd().match(/'/g)).toHaveLength(2);
+  });
+
   it("maps connection and HTTP errors", async () => {
     const h = handlerOf(prometheusQuery);
     mockExecSSH.mockRejectedValueOnce(failed(7));
     expect((await h({ query: "up" })).content[0].text).toContain("Could not connect to Prometheus on port 9090");
     mockExecSSH.mockRejectedValueOnce(failed(22));
     expect((await h({ query: "up(" })).content[0].text).toContain("Check the PromQL expression");
+  });
+});
+
+describe("adguardQueryLog", () => {
+  it("encodes the search term, including single quotes", async () => {
+    mockExecSSH.mockResolvedValueOnce('{"data":[]}');
+    await handlerOf(adguardQueryLog)({ count: 25, search: "o'reilly (x)" });
+    expect(cmd()).toContain("/control/querylog?limit=25&search=o%27reilly%20%28x%29'");
+    expect(cmd()).not.toContain("o'reilly");
   });
 });
 

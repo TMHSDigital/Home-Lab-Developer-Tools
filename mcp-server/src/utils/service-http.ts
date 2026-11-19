@@ -6,6 +6,18 @@
 import { execSSH, errorResponse, nodeSetting } from "./ssh-api.js";
 import { CommandFailedError } from "./errors.js";
 
+/**
+ * Percent-encode a URL query value for a single-quoted curl URL.
+ * encodeURIComponent leaves ! ' ( ) * as-is; a bare ' would end the shell
+ * quoting, so those are encoded too.
+ */
+export function encodeQueryValue(value: string): string {
+  return encodeURIComponent(value).replace(
+    /[!'()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
+}
+
 export interface ServiceDef {
   /** Human-readable service name used in messages. */
   name: string;

@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
-import { SERVICES, servicePort, curlErrorResponse } from "../utils/service-http.js";
+import { SERVICES, servicePort, curlErrorResponse, encodeQueryValue } from "../utils/service-http.js";
 import { completeJson } from "../utils/json-output.js";
 import { READ_ONLY } from "../utils/annotations.js";
 
@@ -55,8 +55,8 @@ export function register(server: McpServer): void {
       let port = SERVICE.defaultPort;
       try {
         port = servicePort(SERVICE, args.node);
-        const encoded = encodeURIComponent(args.query);
-        const timeParam = args.time ? `&time=${encodeURIComponent(args.time)}` : "";
+        const encoded = encodeQueryValue(args.query);
+        const timeParam = args.time ? `&time=${encodeQueryValue(args.time)}` : "";
         const output = await execSSH(
           `curl -sf 'http://localhost:${port}/api/v1/query?query=${encoded}${timeParam}'`,
           args.node,
