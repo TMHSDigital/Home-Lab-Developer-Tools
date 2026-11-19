@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-11-19
+
 ### Added
 
 - `node: "all"` also works on `homelab_backupStatus`, `homelab_aptUpgradable`, `homelab_certList`, `homelab_diskUsage`, `homelab_ufwStatus`, `homelab_kernelInfo` and `homelab_healthCheck`, returning one section per node. The `morning-health-check` prompt with `node: "all"` checks the whole fleet.
