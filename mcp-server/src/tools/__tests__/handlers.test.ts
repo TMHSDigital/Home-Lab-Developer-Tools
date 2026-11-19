@@ -453,7 +453,7 @@ describe("serviceHealth", () => {
     mockExecSSH.mockResolvedValueOnce("");
     const result = await handlerOf(serviceHealth)({ service: "missing" });
     expect(result.content[0].text).toBe('No containers matched "missing".');
-    expect(cmd()).toContain("--filter 'name=missing'");
+    expect(cmd()).toContain("--filter 'name=^/?missing$'");
     expect(mockExecSSH).toHaveBeenCalledTimes(1);
   });
 
@@ -465,7 +465,7 @@ describe("serviceHealth", () => {
   it("quotes the service filter as one shell argument", async () => {
     mockExecSSH.mockResolvedValueOnce("");
     await handlerOf(serviceHealth)({ service: "web'$(id)" });
-    expect(cmd()).toContain("--filter 'name=web'\\''$(id)'");
+    expect(cmd()).toContain("--filter 'name=^/?web'\\''\\$\\(id\\)$'");
   });
 
   it("keeps the container table and reports a problem-free running set", async () => {
@@ -478,6 +478,17 @@ describe("serviceHealth", () => {
   it("does not report malformed output as healthy", async () => {
     mockExecSSH.mockResolvedValueOnce("not JSON");
     expect((await handlerOf(serviceHealth)({})).isError).toBe(true);
+  });
+});
+
+describe("serviceHealth exact names", () => {
+  it("anchors the name filter and escapes regex characters", async () => {
+    mockExecSSH.mockResolvedValueOnce("");
+    await handlerOf(serviceHealth)({ service: "grafana" });
+    expect(cmd()).toContain("--filter 'name=^/?grafana$'");
+    mockExecSSH.mockResolvedValueOnce("");
+    await handlerOf(serviceHealth)({ service: "app.v2" });
+    expect(cmd(1)).toContain("--filter 'name=^/?app\\.v2$'");
   });
 });
 

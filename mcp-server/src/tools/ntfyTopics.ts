@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { sinceSchema, toNtfySince } from "../utils/since-param.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { SERVICES, servicePort, setting, curlErrorResponse } from "../utils/service-http.js";
@@ -27,11 +28,9 @@ const inputSchema = {
       "Topic, or comma-separated topics (e.g. 'alerts,backups'). Defaults to HOMELAB_NTFY_TOPICS. " +
         "Ntfy has no 'all topics' subscription, so at least one topic is required",
     ),
-  since: z
-    .string()
+  since: sinceSchema("Time window for recent messages (e.g. 30m, 1h, 1d, or an ISO date)")
     .optional()
-    .default("1h")
-    .describe("Time window for recent messages (e.g. '1h', '30m', '1d')"),
+    .default("1h"),
 };
 
 export function register(server: McpServer): void {
@@ -56,7 +55,7 @@ export function register(server: McpServer): void {
             ),
           );
         }
-        const cmd = `curl -sf 'http://localhost:${port}/${topicPath}/json?since=${args.since}&poll=1'`;
+        const cmd = `curl -sf 'http://localhost:${port}/${topicPath}/json?since=${toNtfySince(args.since ?? "1h")}&poll=1'`;
         const output = await execSSH(cmd, args.node);
         return { content: [{ type: "text" as const, text: output || "No recent messages found." }] };
       } catch (error) {

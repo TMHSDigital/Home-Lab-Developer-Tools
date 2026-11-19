@@ -9,7 +9,7 @@ const inputSchema = {
   service: z
     .string()
     .optional()
-    .describe("Specific container name to check, or omit for all"),
+    .describe("Exact container name to check, or omit for all"),
 };
 
 const containerSchema = z.object({
@@ -21,7 +21,11 @@ const containerSchema = z.object({
 
 /** Container table and problem summary for one node. */
 async function healthReport(service: string | undefined, node: string | undefined): Promise<string> {
-  const filter = service ? `--filter 'name=${service.replace(/'/g, "'\\''")}'` : "";
+  // docker's name filter is a regex substring match ("grafana" also
+  // matches "grafana-renderer"); anchor it so `service` is an exact name
+  // like in serviceLogs and serviceRestart. Names may carry a leading "/".
+  const exact = service ? `^/?${service.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$` : "";
+  const filter = service ? `--filter 'name=${exact.replace(/'/g, "'\\''")}'` : "";
   const ps = await execSSH(`docker ps -a ${filter} --format '{{json .}}'`, node);
 
   const containers = ps.trim()

@@ -19,16 +19,15 @@ const inputSchema = {
   ...confirmParam,
 };
 
-interface AdguardFilter {
-  url: string;
-  name: string;
-  enabled: boolean;
-}
+const filterSchema = z.object({ url: z.string(), name: z.string(), enabled: z.boolean() }).passthrough();
 
-interface FilteringStatus {
-  filters?: AdguardFilter[] | null;
-  whitelist_filters?: AdguardFilter[] | null;
-}
+const filteringStatusSchema = z.object({
+  filters: z.array(filterSchema).nullish(),
+  whitelist_filters: z.array(filterSchema).nullish(),
+});
+
+type AdguardFilter = z.infer<typeof filterSchema>;
+type FilteringStatus = z.infer<typeof filteringStatusSchema>;
 
 /** Wrap a value in single quotes for the remote shell. */
 export function shellQuote(value: string): string {
@@ -84,7 +83,13 @@ export function register(server: McpServer): void {
         const base = `http://localhost:${port}/control/filtering`;
 
         const statusOutput = await execSSH(`curl -sf ${auth} '${base}/status'`, args.node);
-        const status = JSON.parse(statusOutput) as FilteringStatus;
+        const parsed = filteringStatusSchema.safeParse(JSON.parse(statusOutput));
+        if (!parsed.success) {
+          return errorResponse(
+            new Error(`Unexpected response from ${SERVICE.name} /control/filtering/status: no filter list in the expected shape.`),
+          );
+        }
+        const status: FilteringStatus = parsed.data;
         const match = findFilter(status, args.url);
         if (!match) {
           return errorResponse(

@@ -1,3 +1,4 @@
+import { toJournalSince, toNtfySince } from "../../utils/since-param.js";
 import { describe, it, expect, afterEach } from "vitest";
 import { buildAptHistoryCommand } from "../aptHistory.js";
 import { STATE_FILTERS } from "../alertList.js";
@@ -174,5 +175,20 @@ describe("aptHistory command", () => {
     expect(cmd.trim().endsWith("| tail -n 25")).toBe(true);
     // -h drops the filename prefix zgrep adds when given several files
     expect(cmd).toContain("zgrep -hE");
+  });
+});
+
+describe("since conversions", () => {
+  it("turns durations into journalctl relative times and ISO dates into journalctl dates", () => {
+    expect(toJournalSince("30m")).toBe("-30m");
+    expect(toJournalSince("7d")).toBe("-7d");
+    expect(toJournalSince("2026-11-18")).toBe("2026-11-18");
+    expect(toJournalSince("2026-11-18T10:00:00Z")).toBe("2026-11-18 10:00:00 UTC");
+  });
+
+  it("passes durations to ntfy and turns dates into Unix seconds", () => {
+    expect(toNtfySince("1h")).toBe("1h");
+    expect(toNtfySince("2026-11-18")).toBe(String(Date.UTC(2026, 10, 18) / 1000));
+    expect(toNtfySince("2026-11-18T10:00:00Z")).toBe(String(Date.UTC(2026, 10, 18, 10) / 1000));
   });
 });

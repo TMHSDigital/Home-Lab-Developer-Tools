@@ -78,7 +78,7 @@ Optional:
 
 2. Let me search for OOM kill events in the system journal.
 
-   *Calls `homelab_journalLogs` with priority 3, since "2 hours ago"*
+   *Calls `homelab_journalLogs` with priority 3, since "2h"*
 
    Found an OOM killer entry at 14:23 targeting the Grafana process. Your Pi ran out of memory.
 

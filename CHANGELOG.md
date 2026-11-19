@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `since` uses one format everywhere (`30m`, `24h`, `7d` or an ISO date): `homelab_journalLogs` and `homelab_ntfyTopics` now validate it like the log tools and convert it for journalctl and ntfy. Free-form journalctl values such as "1 hour ago" are no longer accepted.
+- `homelab_serviceHealth` with `service` matches the exact container name (it matched substrings, so `grafana` also listed `grafana-renderer`).
+- `homelab_adguardFilterToggle` reports an unexpected AdGuard status response instead of failing obscurely, and `homelab_certList` reports an oversized NPM response instead of returning cut JSON.
+
 ## [0.27.2] - 2026-11-19
 
 See [release notes](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases/tag/v0.27.2) for details.

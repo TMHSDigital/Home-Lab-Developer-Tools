@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
 import { forNodes, nodeOrAllParam } from "../utils/fan-out.js";
-import { sectionScript, CPU_TEMP_COMMAND } from "../utils/section-script.js";
+import { sectionScript, BASE_STATUS_SECTIONS } from "../utils/section-script.js";
 import { READ_ONLY } from "../utils/annotations.js";
 
 /** Run a vcgencmd subcommand, or print N/A on nodes without it (non-Pi hardware). */
@@ -10,10 +10,7 @@ function vcgencmd(args: string): string {
 }
 
 export const STATUS_COMMAND = sectionScript([
-  ["Uptime", "uptime"],
-  ["CPU Temperature", CPU_TEMP_COMMAND],
-  ["Memory", "free -h | head -2"],
-  ["Disk", "df -h / | tail -1"],
+  ...BASE_STATUS_SECTIONS,
   ["ARM Clock", vcgencmd("measure_clock arm")],
   ["Core Voltage", vcgencmd("measure_volts core")],
   ["Throttle Status", vcgencmd("get_throttled")],

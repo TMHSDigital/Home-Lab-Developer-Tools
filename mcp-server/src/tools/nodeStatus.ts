@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH } from "../utils/ssh-api.js";
 import { forNodes } from "../utils/fan-out.js";
-import { sectionScript, CPU_TEMP_COMMAND } from "../utils/section-script.js";
+import { sectionScript, BASE_STATUS_SECTIONS } from "../utils/section-script.js";
 import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
@@ -18,12 +18,8 @@ export function register(server: McpServer): void {
       annotations: READ_ONLY,
     },
     async (args) => {
-      const cmd = sectionScript([
-        ["Uptime", "uptime"],
-        ["CPU Temperature", CPU_TEMP_COMMAND],
-        ["Memory", "free -h | head -2"],
-        ["Disk", "df -h / | tail -1"],
-      ]);
+      // Same sections as piStatus without the Pi-only vcgencmd probes.
+      const cmd = sectionScript(BASE_STATUS_SECTIONS);
 
       return forNodes(args.node, (node) => execSSH(cmd, node));
     },

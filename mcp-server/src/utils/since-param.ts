@@ -22,3 +22,24 @@ export function toDockerSince(since: string): string {
   const days = /^(\d+)d$/.exec(since);
   return days ? `${Number(days[1]) * 24}h` : since;
 }
+
+/**
+ * Convert to a value `journalctl --since` accepts: durations become
+ * relative times ("30m" -> "-30m"), and ISO dates use a space instead of
+ * "T" and "UTC" instead of "Z".
+ */
+export function toJournalSince(since: string): string {
+  if (/^\d+[smhd]$/.test(since)) return `-${since}`;
+  return since.replace("T", " ").replace(/Z$/, " UTC");
+}
+
+/**
+ * Convert to a value ntfy's `since` parameter accepts: durations pass
+ * through, dates become a Unix timestamp in seconds.
+ */
+export function toNtfySince(since: string): string {
+  if (/^\d+[smhd]$/.test(since)) return since;
+  const ms = Date.parse(/T/.test(since) || since.length > 10 ? since : `${since}T00:00:00Z`);
+  if (!Number.isFinite(ms)) throw new Error(`Cannot convert since value "${since}" to a timestamp.`);
+  return String(Math.floor(ms / 1000));
+}

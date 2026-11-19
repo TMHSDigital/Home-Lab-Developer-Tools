@@ -31,3 +31,11 @@ const THERMAL_ZONE = "/sys/class/thermal/thermal_zone0/temp";
 export const CPU_TEMP_COMMAND =
   `if [ -r ${THERMAL_ZONE} ]; then awk '{printf "%.1f C\\n", $1/1000}' ${THERMAL_ZONE}; ` +
   "else echo 'N/A'; fi";
+
+/** Status sections every node reports; piStatus adds the Pi-only vcgencmd ones. */
+export const BASE_STATUS_SECTIONS: Section[] = [
+  ["Uptime", "uptime"],
+  ["CPU Temperature", CPU_TEMP_COMMAND],
+  ["Memory", "free -h | head -2"],
+  ["Disk", "df -h / | tail -1"],
+];

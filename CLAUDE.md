@@ -182,6 +182,7 @@ npm install -g @tmhs/homelab-mcp
 - Never use em dashes. Use regular dashes (-) or double dashes (--).
 - Never use emojis.
 - Tool names follow `homelab_camelCase`.
+- Shared parameter names: `since` always uses `sinceSchema` from `utils/since-param.ts` (converted per backend); new tools size their output with `limit` (existing `lines` and `count` stay as they are); `service` is an exact container name.
 - Each tool file exports a `register(server)` function that calls `server.registerTool(name, { description, inputSchema, annotations }, handler)` (never the deprecated `server.tool()`). Annotations come from `utils/annotations.ts`: `READ_ONLY`, `changesState(idempotent)`, or `destructive(idempotent)` for confirm-gated tools; `registration.test.ts` enforces them.
 - All SSH interaction goes through `execSSH()` from `utils/ssh-api.ts`.
 - Skills use kebab-case directory names with YAML frontmatter (`name`, `description`, `tools`).

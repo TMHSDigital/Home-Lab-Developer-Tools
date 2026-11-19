@@ -3,6 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { READ_ONLY } from "../utils/annotations.js";
+import { sinceSchema, toJournalSince } from "../utils/since-param.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -17,10 +18,7 @@ const inputSchema = {
     .max(7)
     .optional()
     .describe("Syslog priority level 0-7 (0=emerg, 3=err, 4=warning, 6=info, 7=debug)"),
-  since: z
-    .string()
-    .optional()
-    .describe("Time specification like '1 hour ago', '2024-01-01', 'today'"),
+  since: sinceSchema("Only entries newer than this (e.g. 30m, 24h, 7d, or an ISO date)").optional(),
   lines: z
     .number()
     .int()
@@ -44,7 +42,7 @@ export function register(server: McpServer): void {
         const parts = ["journalctl", "--no-pager", `-n ${args.lines}`];
         if (args.unit) parts.push(`--unit '${args.unit}'`);
         if (args.priority !== undefined) parts.push(`--priority ${args.priority}`);
-        if (args.since) parts.push(`--since '${args.since}'`);
+        if (args.since) parts.push(`--since '${toJournalSince(args.since)}'`);
         const output = await execSSH(parts.join(" "), args.node);
         return { content: [{ type: "text" as const, text: output || "No journal entries matched the filters." }] };
       } catch (error) {

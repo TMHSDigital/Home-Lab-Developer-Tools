@@ -4,6 +4,7 @@ import { CommandFailedError } from "../utils/errors.js";
 import { SERVICES, servicePort, npmGet } from "../utils/service-http.js";
 import { fanOut, nodeOrAllParam } from "../utils/fan-out.js";
 import { READ_ONLY } from "../utils/annotations.js";
+import { completeJson } from "../utils/json-output.js";
 
 const inputSchema = { ...nodeOrAllParam };
 
@@ -45,7 +46,7 @@ export function register(server: McpServer): void {
 
         try {
           const npmPort = servicePort(SERVICES.npm, args.node);
-          const certsOutput = await npmGet("/nginx/certificates", npmPort, args.node);
+          const certsOutput = completeJson(await npmGet("/nginx/certificates", npmPort, args.node));
           sections.push("\n=== Nginx Proxy Manager Certificates ===\n" + certsOutput);
         } catch (error) {
           const reason =

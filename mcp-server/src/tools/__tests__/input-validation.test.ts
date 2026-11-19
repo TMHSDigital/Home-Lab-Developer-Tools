@@ -697,11 +697,16 @@ describe("input validation schemas", () => {
     });
 
     it("accepts all filters", () => {
-      const result = schema.parse({ unit: "docker.service", priority: 3, since: "1 hour ago", lines: 200 });
+      const result = schema.parse({ unit: "docker.service", priority: 3, since: "1h", lines: 200 });
       expect(result.unit).toBe("docker.service");
       expect(result.priority).toBe(3);
-      expect(result.since).toBe("1 hour ago");
+      expect(result.since).toBe("1h");
       expect(result.lines).toBe(200);
+    });
+
+    it("uses the shared since format", () => {
+      expect(schema.parse({ since: "2026-11-18T10:00:00Z" }).since).toBe("2026-11-18T10:00:00Z");
+      expect(() => schema.parse({ since: "1 hour ago; reboot" })).toThrow();
     });
 
     it("rejects priority out of range", () => {
