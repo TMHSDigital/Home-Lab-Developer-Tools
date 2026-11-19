@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-11-19
+
 ### Changed
 
 - `homelab_piStatus` reports the ARM clock (with MHz) and core voltage, and decodes the `get_throttled` value into readable lines (under-voltage, frequency capping, throttling, soft temperature limit; now and since boot). Non-Pi nodes show `N/A`.
