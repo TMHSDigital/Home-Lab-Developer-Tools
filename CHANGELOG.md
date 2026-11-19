@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.2] - 2026-11-19
+
 ### Changed
 
 - `homelab_npmProxyHosts` and `homelab_npmCerts` log in to Nginx Proxy Manager and run their query in one SSH round trip instead of two (`homelab_certList`: two instead of three). A login response without a token now gives an error naming `HOMELAB_NPM_EMAIL` and `HOMELAB_NPM_PASSWORD`, and passwords containing quotes are passed intact.
