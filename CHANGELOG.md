@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `homelab_logSearch` with `service` returns an error naming the container when it does not exist, instead of reporting "No matches found".
+
 ## [0.24.1] - 2026-11-19
 
 ### Fixed

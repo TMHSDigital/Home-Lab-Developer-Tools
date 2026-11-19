@@ -49,8 +49,13 @@ export function register(server: McpServer): void {
         // every container's full history. -e keeps patterns that start with
         // "-" from being parsed as grep options.
         const since = `--since ${toDockerSince(args.since)}`;
+        // The pipeline's status is tail's, so a missing container would look
+        // like "no matches"; check that it exists first.
+        const exists = args.service
+          ? `docker inspect --type container -f . '${args.service}' >/dev/null 2>&1 || { echo "No such container: ${args.service}" >&2; exit 1; }; `
+          : "";
         const cmd = args.service
-          ? `${pat}; docker logs ${since} '${args.service}' 2>&1 | grep -i -e "$pat" | tail -${args.lines}`
+          ? `${exists}${pat}; docker logs ${since} '${args.service}' 2>&1 | grep -i -e "$pat" | tail -${args.lines}`
           : `${pat}; docker ps --format '{{.Names}}' | while read name; do matches=$(docker logs ${since} "$name" 2>&1 | grep -i -e "$pat" | tail -${args.lines}); if [ -n "$matches" ]; then echo "=== $name ==="; echo "$matches"; echo; fi; done`;
         const output = await execSSH(cmd, args.node, { timeoutMs: TIMEOUTS.medium });
         return {

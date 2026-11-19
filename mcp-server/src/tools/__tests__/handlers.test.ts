@@ -561,6 +561,15 @@ describe("logSearch", () => {
       expect(cmd()).toContain('grep -i -e "$pat"');
     }
   });
+
+  it("reports an error for a container that does not exist", async () => {
+    mockExecSSH.mockRejectedValueOnce(new CommandFailedError("docker", 1, "No such container: grafanna"));
+    const result = await handlerOf(logSearch)({ pattern: "timeout", service: "grafanna" });
+    expect(cmd()).toMatch(/^docker inspect --type container -f \. 'grafanna' >\/dev\/null 2>&1 \|\| \{ echo "No such container: grafanna" >&2; exit 1; \}; /);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("No such container: grafanna");
+    expect(result.content[0].text).not.toContain("No matches found");
+  });
 });
 
 describe("backupRun", () => {
