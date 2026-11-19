@@ -9,6 +9,8 @@ tools:
   - homelab_logSearch
   - homelab_healthCheck
   - homelab_diagnostics
+  - homelab_systemdServices
+  - homelab_systemdControl
 standards-version: 1.10.0
 ---
 
@@ -34,12 +36,13 @@ Use this skill when the user wants to:
 ## Workflow
 
 1. **Triage** -- determine the scope of the problem:
-   - Single container? Call `homelab_serviceLogs` for that service and `homelab_composePs` for container state.
+   - Call `homelab_healthCheck` first for a quick pass/fail on SSH, Docker, curl, restic, certbot and systemd; call `homelab_diagnostics` when you need a full debug bundle (OS, kernel, Docker, memory, disk, network).
+   - Single container? Call `homelab_serviceLogs` for that service and `homelab_serviceHealth` for container state.
    - All services down? Call `homelab_piStatus` to check if the Pi itself is healthy.
    - Network issue? Call `homelab_networkInfo` to inspect interfaces, routes, and DNS.
    - Call `homelab_sshTest` first -- if SSH is unreachable, the Pi may be offline or network is down.
 2. **Container crash debugging**:
-   - Check container status with `homelab_composePs` -- look for `Restarting`, `Exited`, or `unhealthy`.
+   - Check container status with `homelab_serviceHealth` (it lists stopped containers too) -- look for `Restarting`, `Exited`, or `unhealthy`.
    - Pull logs with `homelab_serviceLogs` for the specific container.
    - Common crash causes:
      - **OOM killed** -- check `docker inspect <container> | grep OOMKilled` and increase `mem_limit` in compose.
@@ -61,14 +64,14 @@ Use this skill when the user wants to:
    - Check temperature: `vcgencmd measure_temp` -- throttling starts at 80C, hard limit at 85C.
      - Solution: ensure the active cooler or heatsink is properly mounted and fan is running.
    - Check CPU frequency: `vcgencmd measure_clock arm` -- reduced frequency indicates throttling.
-5. **Systemd service failures**:
-   - Check service status: `systemctl status <service>`
-   - View journal: `journalctl -u <service> --no-pager -n 50`
+5. **Systemd service failures** (native services, not containers):
+   - Check service status: call `homelab_systemdServices` with `unit: "<service>"`.
+   - View the journal: call `homelab_journalLogs` with `unit: "<service>"`.
    - Common failures:
      - **Cockpit**: check `cockpit.socket` is enabled, port 9090 is not blocked.
      - **Samba**: config syntax error in smb.conf. Test with `testparm`.
      - **node_exporter**: port 9100 conflict or service disabled after update.
-   - Restart: call `homelab_serviceRestart` for the failed service.
+   - Restart: call `homelab_systemdControl` with `unit: "<service>"`, `action: "restart"` and `confirm: true`. Do not use `homelab_serviceRestart` here; it runs `docker restart` and only works for containers.
 6. **Compose stack issues**:
    - Pull latest images: call `homelab_composePull` to check for updates.
    - Recreate containers: call `homelab_composeDown` then `homelab_composeUp`.
@@ -93,7 +96,7 @@ Use this skill when the user wants to:
 
 **Agent response**:
 
-1. Call `homelab_composePs` to confirm Grafana's state -- expect `Restarting` or `Exited`.
+1. Call `homelab_serviceHealth` with `service: "grafana"` to confirm its state -- expect `Restarting` or `Exited`.
 2. Call `homelab_serviceLogs` for Grafana to find the error:
    - If OOM: increase `mem_limit` in `/opt/homelab/docker/grafana/docker-compose.yml`.
    - If permission error: check that the Grafana data volume has correct ownership (UID 472).
@@ -114,9 +117,15 @@ Use this skill when the user wants to:
 | `homelab_sshTest` | First check -- is the Pi even reachable? |
 | `homelab_piStatus` | System health, CPU, memory, throttling indicators |
 | `homelab_serviceHealth` | Check if specific services are up or down |
-| `homelab_serviceLogs` | Pull container or service logs for error messages |
-| `homelab_serviceRestart` | Restart a failed service or container |
-| `homelab_composePs` | Container state for a compose stack |
+| `homelab_healthCheck` | Quick pass/fail self-test of SSH, Docker and core tools |
+| `homelab_diagnostics` | Full debug bundle: OS, kernel, Docker, memory, disk, network |
+| `homelab_serviceLogs` | Pull container logs for error messages |
+| `homelab_logSearch` | Search container logs for a pattern |
+| `homelab_serviceRestart` | Restart a failed container (`docker restart`) |
+| `homelab_systemdServices` | Status of a native systemd unit (Cockpit, Samba, node_exporter) |
+| `homelab_journalLogs` | systemd journal for a unit |
+| `homelab_systemdControl` | Restart a failed native systemd unit (`confirm: true`) |
+| `homelab_composePs` | Running containers and port mappings for the compose project |
 | `homelab_composeUp` | Recreate containers after config fixes |
 | `homelab_composeDown` | Stop a stack cleanly before redeployment |
 | `homelab_composePull` | Pull latest images to fix known bugs |
@@ -126,7 +135,7 @@ Use this skill when the user wants to:
 
 ## Common Pitfalls
 
-- **Confirm gate on restart and redeploy** -- `homelab_serviceRestart`, `homelab_composeUp`, and `homelab_composeDown` require `confirm=true`. If a restart call returns "cancelled", the gate is the reason.
+- **Confirm gate on restart and redeploy** -- `homelab_serviceRestart`, `homelab_systemdControl`, `homelab_composeUp`, and `homelab_composeDown` require `confirm=true`. If a restart call returns "cancelled", the gate is the reason.
 - **Reading only the last few log lines** -- some errors are logged at startup, not at the crash. Always pull enough log history to see the initial error.
 - **Restarting without diagnosing** -- blindly restarting a crashing container just resets the restart counter. Find the root cause in logs first.
 - **Ignoring Pi throttling** -- performance degradation and random service failures can be caused by undervoltage or overheating. Always check `homelab_piStatus` for hardware issues.
