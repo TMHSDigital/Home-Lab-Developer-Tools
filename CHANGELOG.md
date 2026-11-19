@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `homelab_backupCheck` verifies restic repository integrity with `restic check`, optionally reading a subset of the data (`readDataSubset`, e.g. `5%`), using the repository password settings and a long timeout.
+
+### Changed
+
+- `homelab_backupStatus` starts with an `OK` or `STALE` verdict computed from the newest snapshot's age (`maxAgeHours`, default 26) and lists snapshots as compact one-line entries. The morning-health-check and pre-reboot-checklist prompts use the verdict.
+
 ## [0.22.2] - 2026-11-18
 
 The changes below shipped across 0.17.1 to 0.22.2 and were not sorted by version at the time. See the [GitHub releases](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases) for each version's notes.

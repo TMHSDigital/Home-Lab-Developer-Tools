@@ -10,6 +10,7 @@ import { register as alertSilences } from "../alertSilences.js";
 import { register as aptHistory } from "../aptHistory.js";
 import { register as aptUpdate } from "../aptUpdate.js";
 import { register as aptUpgradable } from "../aptUpgradable.js";
+import { register as backupCheck } from "../backupCheck.js";
 import { register as backupDiff } from "../backupDiff.js";
 import { register as backupList } from "../backupList.js";
 import { register as backupRestore } from "../backupRestore.js";
@@ -62,6 +63,7 @@ const REGISTRARS: Record<string, (server: never) => void> = {
   aptHistory,
   aptUpdate,
   aptUpgradable,
+  backupCheck,
   backupDiff,
   backupList,
   backupRestore,
@@ -581,6 +583,33 @@ describe("input validation schemas", () => {
         confirm: true,
       });
       expect(result.include).toBe("/opt/homelab/docker/");
+    });
+  });
+
+  describe("backupCheck", () => {
+    const schema = schemaOf("backupCheck");
+
+    it("accepts no subset, a percentage or a part", () => {
+      expect(schema.parse({}).readDataSubset).toBeUndefined();
+      expect(schema.parse({ readDataSubset: "5%" }).readDataSubset).toBe("5%");
+      expect(schema.parse({ readDataSubset: "2.5%" }).readDataSubset).toBe("2.5%");
+      expect(schema.parse({ readDataSubset: "1/10" }).readDataSubset).toBe("1/10");
+    });
+
+    it("rejects malformed or unsafe subsets", () => {
+      for (const bad of ["", "5", "500%", "0/10", "1/0", "5%'; rm -rf ~", "all"]) {
+        expect(() => schema.parse({ readDataSubset: bad }), bad).toThrow();
+      }
+    });
+  });
+
+  describe("backupStatus maxAgeHours", () => {
+    const schema = schemaOf("backupStatus");
+
+    it("defaults to 26 hours and rejects non-positive values", () => {
+      expect(schema.parse({}).maxAgeHours).toBe(26);
+      expect(schema.parse({ maxAgeHours: 48 }).maxAgeHours).toBe(48);
+      expect(() => schema.parse({ maxAgeHours: 0 })).toThrow();
     });
   });
 

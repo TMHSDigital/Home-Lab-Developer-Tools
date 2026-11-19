@@ -33,6 +33,7 @@
   {"name": "homelab_backupList", "description": "List all restic backup snapshots", "category": "Backups"},
   {"name": "homelab_backupRestore", "description": "Restore files from a restic backup snapshot", "category": "Backups"},
   {"name": "homelab_backupDiff", "description": "Show difference between two backup snapshots", "category": "Backups"},
+  {"name": "homelab_backupCheck", "description": "Verify restic repository integrity", "category": "Backups"},
   {"name": "homelab_volumeBackup", "description": "Back up a Docker volume to restic", "category": "Backups"},
   {"name": "homelab_certCheck", "description": "Check SSL certificate expiry, issuer, and fingerprint", "category": "TLS & Reverse Proxy"},
   {"name": "homelab_certRenew", "description": "Trigger Let's Encrypt certificate renewal", "category": "TLS & Reverse Proxy"},

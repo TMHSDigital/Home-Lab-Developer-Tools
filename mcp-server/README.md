@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 53 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. All tools accept an optional `node` parameter to target specific nodes.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 54 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. All tools accept an optional `node` parameter to target specific nodes.
 
 ## Tools
 
@@ -23,6 +23,7 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | Backup | `homelab_backupList` | List all restic snapshots with filtering |
 | Backup | `homelab_backupRestore` | Restore files from a snapshot |
 | Backup | `homelab_backupDiff` | Diff two restic snapshots |
+| Backup | `homelab_backupCheck` | Verify repository integrity with restic check |
 | Backup | `homelab_volumeBackup` | Back up a Docker volume to restic |
 | Monitoring | `homelab_prometheusQuery` | Run PromQL queries against Prometheus |
 | Monitoring | `homelab_grafanaSnapshot` | Export Grafana dashboard config by UID |

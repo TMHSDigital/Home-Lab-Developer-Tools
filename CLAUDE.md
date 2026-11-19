@@ -6,7 +6,7 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 53 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 54 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
@@ -82,7 +82,7 @@ Home-Lab-Developer-Tools/
 | resource-limits | compose*.yml | Flag containers without memory or CPU limits |
 | inventory-consistency | hosts, inventory*, .env* | Flag nodes in config missing from HOMELAB_NODES registry |
 
-## MCP Tools (53)
+## MCP Tools (54)
 
 All tools connect to the Pi (or any registered node) via SSH. All tools except `homelab_nodeList` accept a `node` parameter to target a specific node from the `HOMELAB_NODES` registry (optional everywhere except `homelab_nodeExec` and `homelab_nodeStatus`, where it is required). The read-only `homelab_nodeStatus`, `homelab_piStatus` and `homelab_serviceHealth` also accept `node: "all"` to query every node in parallel (`utils/fan-out.ts`); state-changing tools stay single-node.
 
@@ -113,11 +113,12 @@ All tools connect to the Pi (or any registered node) via SSH. All tools except `
 | `homelab_npmProxyHosts` | List NPM proxy host configurations |
 | `homelab_npmCerts` | List SSL certificates and expiry dates |
 | `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
-| `homelab_backupStatus` | Check latest restic snapshots |
+| `homelab_backupStatus` | Check latest restic snapshots with an OK/STALE age verdict |
 | `homelab_backupRun` | Trigger restic backup (requires confirm=true) |
 | `homelab_backupList` | List all restic snapshots with path, tag, host filtering |
 | `homelab_backupRestore` | Restore files from a snapshot (requires confirm=true) |
 | `homelab_backupDiff` | Show differences between two restic snapshots |
+| `homelab_backupCheck` | Verify restic repository integrity (optional data subset) |
 | `homelab_volumeBackup` | Back up a Docker volume to restic (requires confirm=true) |
 | `homelab_ufwStatus` | List UFW firewall rules and status |
 | `homelab_fail2banStatus` | List fail2ban jails, banned IPs, and ban counts |

@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 53 MCP tools</strong>
+  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 54 MCP tools</strong>
 </p>
 
 ---
@@ -43,7 +43,7 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
 | **22 Skills** (SKILL.md) | Yes | Yes | Yes | - |
 | **11 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **53 MCP tools** | Yes | Yes | Yes | Yes |
+| **54 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -131,7 +131,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-53-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-54-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2022.12-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -156,7 +156,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>53 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>54 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -215,15 +215,16 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 |---|---|
 | `homelab_networkInfo` | IP addresses, DNS, Tailscale status |
 
-**Backup** (6)
+**Backup** (7)
 
 | Tool | What It Does |
 |---|---|
-| `homelab_backupStatus` | Check latest restic snapshots |
+| `homelab_backupStatus` | Check latest restic snapshots with an OK/STALE age verdict |
 | `homelab_backupRun` | Trigger restic backup (requires confirm=true) |
 | `homelab_backupList` | List all restic snapshots with path, tag, host filtering |
 | `homelab_backupRestore` | Restore files from a snapshot (requires confirm=true) |
 | `homelab_backupDiff` | Show differences between two snapshots |
+| `homelab_backupCheck` | Verify repository integrity with restic check |
 | `homelab_volumeBackup` | Back up a Docker volume to restic (requires confirm=true) |
 
 **Security** (4)

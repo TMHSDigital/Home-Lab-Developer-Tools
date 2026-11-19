@@ -6,6 +6,7 @@ tools:
   - homelab_backupRun
   - homelab_backupList
   - homelab_backupDiff
+  - homelab_backupCheck
   - homelab_journalLogs
 standards-version: 1.10.0
 ---
@@ -59,10 +60,13 @@ Optional:
    - Configure retention: `--keep-daily 7 --keep-weekly 4 --keep-monthly 6`
 
    **Verifying backups:**
-   - Call `homelab_backupStatus` to check last run
-   - List snapshots with restic to confirm recent entries
-   - Run `restic check` to verify repository integrity
-   - Optionally run `restic diff` between latest snapshots to review changes
+   - Call `homelab_backupStatus`; its first line is `OK` or `STALE` based on the
+     newest snapshot's age (`maxAgeHours`, default 26)
+   - Call `homelab_backupList` to confirm recent entries per path or tag
+   - Call `homelab_backupCheck` to verify repository integrity; pass
+     `readDataSubset` (e.g. `5%`) to also read part of the data. It takes the
+     repository lock, so avoid running it during the scheduled backup window
+   - Optionally call `homelab_backupDiff` between the latest snapshots to review changes
 
    **Running a manual backup:**
    - Call `homelab_backupRun` to trigger an immediate backup
@@ -141,7 +145,8 @@ Retention policy defaults:
 | Tool                    | Purpose                                         |
 |--------------------------|------------------------------------------------|
 | `homelab_sshTest`        | Validate SSH connectivity                      |
-| `homelab_backupStatus`   | Get last backup time, snapshot count, errors    |
+| `homelab_backupStatus`   | OK/STALE verdict and the latest snapshots       |
+| `homelab_backupCheck`    | Verify repository integrity with restic check  |
 | `homelab_backupRun`      | Trigger an immediate backup                    |
 | `homelab_journalLogs`    | Review backup service and timer runs and errors |
 | `homelab_composeDown`    | Stop services before restore operations        |

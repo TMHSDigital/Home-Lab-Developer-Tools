@@ -30,7 +30,8 @@ import { register as backupRun } from "../backupRun.js";
 import { register as nodeStatus } from "../nodeStatus.js";
 import { register as alertSilences } from "../alertSilences.js";
 import { register as alertSilence, buildSilenceBody } from "../alertSilence.js";
-import { register as backupStatus } from "../backupStatus.js";
+import { register as backupStatus, backupVerdict } from "../backupStatus.js";
+import { register as backupCheck } from "../backupCheck.js";
 import { register as backupList } from "../backupList.js";
 import { register as backupDiff } from "../backupDiff.js";
 import { register as backupRestore } from "../backupRestore.js";
@@ -149,6 +150,7 @@ describe("alert silences", () => {
 describe("restic tools", () => {
   it.each([
     ["backupStatus", backupStatus, {}],
+    ["backupCheck", backupCheck, {}],
     ["backupList", backupList, {}],
     ["backupDiff", backupDiff, { snapshotA: "aaa", snapshotB: "bbb" }],
     ["backupRestore", backupRestore, { snapshot: "aaa", target: "/tmp/r", confirm: true }],
@@ -167,6 +169,48 @@ describe("restic tools", () => {
     const result = await handlerOf(backupDiff)({ snapshotA: "aaa", snapshotB: "bbb" });
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("HOMELAB_RESTIC_ENV_FILE");
+  });
+});
+
+describe("backup verification", () => {
+  const now = new Date("2026-11-18T12:00:00Z");
+  const snaps = (...times: string[]) =>
+    JSON.stringify(times.map((time, i) => ({ short_id: `s${i}`, time, hostname: "pi", paths: ["/opt"], tags: null })));
+
+  it("reports OK for a fresh snapshot, using the newest one", () => {
+    const json = snaps("2026-11-10T03:00:00Z", "2026-11-18T07:00:00Z");
+    expect(backupVerdict(json, 26, now)).toBe(
+      "OK: latest snapshot 5h old (2026-11-18T07:00:00.000Z, limit 26h)",
+    );
+  });
+
+  it("reports STALE for an old snapshot and when there are none", () => {
+    expect(backupVerdict(snaps("2026-11-15T12:00:00Z"), 26, now)).toMatch(/^STALE: latest snapshot 3d old/);
+    expect(backupVerdict("[]", 26, now)).toBe("STALE: no snapshots found in the repository.");
+    expect(backupVerdict("null", 26, now)).toMatch(/^STALE: no snapshots/);
+  });
+
+  it("backupStatus puts the verdict above the snapshot list", async () => {
+    mockExecSSH.mockResolvedValueOnce(snaps(new Date(Date.now() - 3_600_000).toISOString()));
+    const text = (await handlerOf(backupStatus)({ count: 5, maxAgeHours: 26 })).content[0].text;
+    expect(cmd()).toContain("snapshots --latest 5 --json");
+    expect(text.split("\n")[0]).toMatch(/^OK: latest snapshot 1h old/);
+    expect(text).toContain('"id":"s0"');
+  });
+
+  it("backupCheck runs restic check with a long timeout and an optional data subset", async () => {
+    mockExecSSH.mockResolvedValueOnce("no errors were found");
+    const result = await handlerOf(backupCheck)({ readDataSubset: "5%" });
+    expect(cmd()).toContain(`-r '/mnt/backup/restic' check --read-data-subset='5%' 2>&1`);
+    expect(mockExecSSH.mock.calls[0][2]).toEqual({ timeoutMs: 1_800_000 });
+    expect(result.content[0].text).toBe("no errors were found");
+  });
+
+  it("backupCheck reports a failed check as an error", async () => {
+    mockExecSSH.mockRejectedValueOnce(new CommandFailedError("restic", 1, "error: pack abc: not found"));
+    const result = await handlerOf(backupCheck)({});
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("pack abc");
   });
 });
 
