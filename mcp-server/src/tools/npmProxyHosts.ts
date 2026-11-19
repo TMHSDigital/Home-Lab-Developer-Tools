@@ -1,8 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { execSSH } from "../utils/ssh-api.js";
 import { completeJson } from "../utils/json-output.js";
 import { nodeParam } from "../utils/node-param.js";
-import { SERVICES, servicePort, getNpmToken, curlErrorResponse } from "../utils/service-http.js";
+import { SERVICES, servicePort, npmGet, curlErrorResponse } from "../utils/service-http.js";
 import { READ_ONLY } from "../utils/annotations.js";
 
 const SERVICE = SERVICES.npm;
@@ -19,12 +18,7 @@ export function register(server: McpServer): void {
       let port = SERVICE.defaultPort;
       try {
         port = servicePort(SERVICE, args.node);
-        const token = await getNpmToken(port, args.node);
-        const output = await execSSH(
-          `curl -sf -H 'Authorization: Bearer ${token}' ` +
-            `'http://localhost:${port}/api/nginx/proxy-hosts'`,
-          args.node,
-        );
+        const output = await npmGet("/nginx/proxy-hosts", port, args.node);
 
         return { content: [{ type: "text" as const, text: completeJson(output) }] };
       } catch (error) {

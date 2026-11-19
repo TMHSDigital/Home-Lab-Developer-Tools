@@ -1,8 +1,9 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { SERVICES, servicePort, curlErrorResponse, setting } from "../service-http.js";
+import { spawnSync } from "node:child_process";
+import { SERVICES, servicePort, curlErrorResponse, setting, npmGetCommand } from "../service-http.js";
 import { CommandFailedError } from "../errors.js";
 
-const KEYS = ["HOMELAB_NPM_PORT", "HOMELAB_NODES", "HOMELAB_ADGUARD_USER"];
+const KEYS = ["HOMELAB_NPM_PORT", "HOMELAB_NODES", "HOMELAB_ADGUARD_USER", "HOMELAB_NPM_PASSWORD"];
 
 afterEach(() => {
   for (const k of KEYS) delete process.env[k];
@@ -70,5 +71,34 @@ describe("curlErrorResponse", () => {
   it("passes other errors through", () => {
     const r = curlErrorResponse(new Error("boom"), SERVICES.ntfy, 8080);
     expect(text(r)).toBe("boom");
+  });
+});
+
+describe("npmGetCommand", () => {
+  const run = (script: string) => spawnSync("sh", ["-c", script], { encoding: "utf8" });
+  const hasSh = !run("true").error;
+  // Stub curl: the login returns a token; any other call prints its arguments.
+  const stub = (login: string) =>
+    `curl() { case "$*" in *"/api/tokens"*) printf '%s' '${login}';; *) printf '%s\\n' "$@";; esac; }; `;
+
+  it.skipIf(!hasSh)("logs in and reuses the token in the same script", () => {
+    process.env.HOMELAB_NPM_PASSWORD = "it's-a-secret";
+    const r = run(stub('{"token":"eyJ.abc.def","expires":"2026-12-01"}') + npmGetCommand("/nginx/proxy-hosts", 81));
+    expect(r.status).toBe(0);
+    expect(r.stdout).toContain("Authorization: Bearer eyJ.abc.def");
+    expect(r.stdout).toContain("http://localhost:81/api/nginx/proxy-hosts");
+  });
+
+  it.skipIf(!hasSh)("passes a password with quotes to curl intact", () => {
+    process.env.HOMELAB_NPM_PASSWORD = "it's-a-secret";
+    const script = npmGetCommand("/x", 81).replace(/^resp=\$\(curl /, "resp=$(printf '%s\\n' ");
+    const r = run(script.split("; token=")[0] + '; printf "%s" "$resp"');
+    expect(r.stdout).toContain('"secret":"it\'s-a-secret"');
+  });
+
+  it.skipIf(!hasSh)("fails with exit 65 and a clear message when the login has no token", () => {
+    const r = run(stub("<html>login</html>") + npmGetCommand("/nginx/certificates", 81));
+    expect(r.status).toBe(65);
+    expect(r.stderr).toContain("login returned no token");
   });
 });

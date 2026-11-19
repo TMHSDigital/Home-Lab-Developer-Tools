@@ -20,6 +20,8 @@ import { register as uptimeKumaStatus } from "../uptimeKumaStatus.js";
 import { register as adguardStats } from "../adguardStats.js";
 import { register as adguardQueryLog } from "../adguardQueryLog.js";
 import { register as npmProxyHosts } from "../npmProxyHosts.js";
+import { register as certList } from "../certList.js";
+import { register as npmCerts } from "../npmCerts.js";
 import { register as certCheck } from "../certCheck.js";
 import { register as inventorySync } from "../inventorySync.js";
 import { register as composePs } from "../composePs.js";
@@ -283,7 +285,6 @@ describe("bounded JSON output", () => {
     ["prometheusQuery", () => prometheusQuery, { query: "up" }],
     ["npmProxyHosts", () => npmProxyHosts, {}],
   ] as const)("%s reports cut JSON instead of returning it", async (name, get, args) => {
-    if (name === "npmProxyHosts") mockExecSSH.mockResolvedValueOnce('{"token":"t"}');
     mockExecSSH.mockResolvedValueOnce('[output truncated: showing last 10 of 2000000 bytes]\n"x": 1}]');
     const result = await handlerOf(get())({ ...args });
     expect(result.isError).toBe(true);
@@ -594,20 +595,41 @@ describe("adguardStats", () => {
 });
 
 describe("npmProxyHosts", () => {
-  it("logs in, then lists proxy hosts with the token", async () => {
-    mockExecSSH.mockResolvedValueOnce('{"token":"tok-1"}').mockResolvedValueOnce('[{"id":1}]');
+  it("logs in and lists proxy hosts in one SSH round trip", async () => {
+    mockExecSSH.mockResolvedValueOnce('[{"id":1}]');
     const result = await handlerOf(npmProxyHosts)({});
     expect(result.content[0].text).toBe('[{"id":1}]');
-    expect(cmd(0)).toContain("/api/tokens");
-    expect(cmd(1)).toContain("Authorization: Bearer tok-1");
-    expect(cmd(1)).toContain("/api/nginx/proxy-hosts");
+    expect(mockExecSSH).toHaveBeenCalledTimes(1);
+    expect(cmd()).toContain("'http://localhost:81/api/tokens'");
+    expect(cmd()).toContain(`curl -sf -H "Authorization: Bearer $token" 'http://localhost:81/api/nginx/proxy-hosts'`);
   });
 
-  it("reports a non-JSON login response", async () => {
-    mockExecSSH.mockResolvedValueOnce("<html>login</html>");
+  it("reports a login response without a token", async () => {
+    mockExecSSH.mockRejectedValueOnce(
+      new CommandFailedError("npm", 65, "Nginx Proxy Manager login returned no token. Check HOMELAB_NPM_EMAIL and HOMELAB_NPM_PASSWORD."),
+    );
     const result = await handlerOf(npmProxyHosts)({});
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("non-JSON");
+    expect(result.content[0].text).toContain("returned no token");
+  });
+});
+
+describe("npmCerts and certList", () => {
+  it("npmCerts uses one SSH round trip", async () => {
+    mockExecSSH.mockResolvedValueOnce('[{"id":2}]');
+    const result = await handlerOf(npmCerts)({});
+    expect(result.content[0].text).toBe('[{"id":2}]');
+    expect(mockExecSSH).toHaveBeenCalledTimes(1);
+    expect(cmd()).toContain("/api/nginx/certificates'");
+  });
+
+  it("certList uses two round trips: certbot, then NPM login and query", async () => {
+    mockExecSSH.mockResolvedValueOnce("No certificates found.").mockResolvedValueOnce('[{"id":3}]');
+    const text = (await handlerOf(certList)({})).content[0].text;
+    expect(mockExecSSH).toHaveBeenCalledTimes(2);
+    expect(cmd(1)).toContain("/api/tokens'");
+    expect(cmd(1)).toContain("/api/nginx/certificates'");
+    expect(text).toContain("=== Nginx Proxy Manager Certificates ===\n[{\"id\":3}]");
   });
 });
 

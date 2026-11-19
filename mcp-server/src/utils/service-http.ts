@@ -97,18 +97,34 @@ export function grafanaAuth(node?: string): string {
   return `-u 'admin:admin'`;
 }
 
-/** Log in to Nginx Proxy Manager and return an API token. */
-export async function getNpmToken(port: number, node?: string): Promise<string> {
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, "'\\''")}'`;
+}
+
+/** Exit status of the NPM script when the login response has no token. */
+export const NPM_NO_TOKEN_EXIT = 65;
+
+/**
+ * Remote script that logs in to Nginx Proxy Manager and GETs `path` with
+ * the token in the same SSH session, so each NPM call is one round trip.
+ * curl failures keep their exit status (7, 22, 28) for curlErrorResponse.
+ */
+export function npmGetCommand(path: string, port: number, node?: string): string {
   const email = setting(node, "HOMELAB_NPM_EMAIL", "admin@example.com");
   const password = setting(node, "HOMELAB_NPM_PASSWORD", "changeme");
   const payload = JSON.stringify({ identity: email, secret: password });
-  const output = await execSSH(
-    `curl -sf -X POST -H 'Content-Type: application/json' ` +
-      `-d '${payload}' 'http://localhost:${port}/api/tokens'`,
-    node,
-  );
-  const parsed = JSON.parse(output);
-  return parsed.token;
+  const base = `http://localhost:${port}/api`;
+  return [
+    `resp=$(curl -sf -X POST -H 'Content-Type: application/json' -d ${shellQuote(payload)} '${base}/tokens') || exit $?`,
+    `token=$(printf '%s' "$resp" | sed -n 's/.*"token" *: *"\\([^"]*\\)".*/\\1/p')`,
+    `if [ -z "$token" ]; then echo 'Nginx Proxy Manager login returned no token. Check HOMELAB_NPM_EMAIL and HOMELAB_NPM_PASSWORD.' >&2; exit ${NPM_NO_TOKEN_EXIT}; fi`,
+    `curl -sf -H "Authorization: Bearer $token" '${base}${path}'`,
+  ].join("; ");
+}
+
+/** Log in to Nginx Proxy Manager and GET an API path in one SSH round trip. */
+export function npmGet(path: string, port: number, node?: string): Promise<string> {
+  return execSSH(npmGetCommand(path, port, node), node);
 }
 
 export interface CurlErrorOptions {

@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { CommandFailedError } from "../utils/errors.js";
-import { SERVICES, servicePort, getNpmToken } from "../utils/service-http.js";
+import { SERVICES, servicePort, npmGet } from "../utils/service-http.js";
 import { fanOut, nodeOrAllParam } from "../utils/fan-out.js";
 import { READ_ONLY } from "../utils/annotations.js";
 
@@ -45,13 +45,7 @@ export function register(server: McpServer): void {
 
         try {
           const npmPort = servicePort(SERVICES.npm, args.node);
-          const token = await getNpmToken(npmPort, args.node);
-
-          const certsOutput = await execSSH(
-            `curl -sf -H 'Authorization: Bearer ${token}' ` +
-              `'http://localhost:${npmPort}/api/nginx/certificates'`,
-            args.node,
-          );
+          const certsOutput = await npmGet("/nginx/certificates", npmPort, args.node);
           sections.push("\n=== Nginx Proxy Manager Certificates ===\n" + certsOutput);
         } catch (error) {
           const reason =
