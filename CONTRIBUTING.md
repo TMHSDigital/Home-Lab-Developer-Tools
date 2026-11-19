@@ -132,14 +132,15 @@ Describe which `homelab_*` MCP tools this skill uses.
 
 ## Adding an MCP Tool
 
-1. Create a new `.ts` file in `mcp-server/src/tools/`
-2. Follow this pattern:
+1. Create a new `.ts` file in `mcp-server/src/tools/`. The file name is the tool name without the `homelab_` prefix (`fooBar.ts` registers `homelab_fooBar`).
+2. Follow this pattern for a read-only tool:
 
 ```typescript
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
+import { READ_ONLY } from "../utils/annotations.js";
 
 const inputSchema = {
   ...nodeParam,
@@ -147,16 +148,17 @@ const inputSchema = {
 };
 
 export function register(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "homelab_toolName",
-    "What this tool does",
-    inputSchema,
+    {
+      description: "What this tool does",
+      inputSchema,
+      annotations: READ_ONLY,
+    },
     async (args) => {
       try {
         const output = await execSSH("command", args.node);
-        return {
-          content: [{ type: "text" as const, text: output }],
-        };
+        return { content: [{ type: "text" as const, text: output }] };
       } catch (error) {
         return errorResponse(error);
       }
@@ -165,8 +167,51 @@ export function register(server: McpServer): void {
 }
 ```
 
-3. Register the tool in `src/index.ts`
-4. Add input validation tests in `src/tools/__tests__/input-validation.test.ts`
+   A tool that changes running state must be confirm-gated: spread `confirmParam` into the schema, return `confirmCancelled(...)` with a preview when `confirm` is not `true`, and use the `destructive(idempotent)` annotation:
+
+```typescript
+import { confirmParam, confirmCancelled } from "../utils/confirm-param.js";
+import { destructive } from "../utils/annotations.js";
+
+const inputSchema = {
+  ...nodeParam,
+  service: z.string().min(1).describe("Container name"),
+  ...confirmParam,
+};
+
+export function register(server: McpServer): void {
+  server.registerTool(
+    "homelab_toolName",
+    {
+      description: "What this tool does (requires confirm=true)",
+      inputSchema,
+      annotations: destructive(false),
+    },
+    async (args) => {
+      const command = `docker restart '${args.service}'`;
+      if (!args.confirm) {
+        return confirmCancelled("Restart", { node: args.node, commands: () => [command] });
+      }
+      try {
+        const output = await execSSH(command, args.node);
+        return { content: [{ type: "text" as const, text: output }] };
+      } catch (error) {
+        return errorResponse(error);
+      }
+    },
+  );
+}
+```
+
+   Use `changesState(idempotent)` only for tools that change state without removing anything and are not gated (today `homelab_composePull` and `homelab_ntfySend`). Never use the deprecated `server.tool()` overload; `registration.test.ts` rejects it.
+
+3. Register the tool in `mcp-server/src/index.ts` (import and `register...(server)` call).
+4. Add tests in `mcp-server/src/tools/__tests__/`: input validation cases in `input-validation.test.ts`, a handler test in `handlers.test.ts` for the command it runs and how it reports errors, and for a gated tool an entry in `confirm-gates.test.ts` and in the gated lists of `registration.test.ts`, `CLAUDE.md` and `SECURITY.md`.
+5. Update the docs that `registration.test.ts` checks:
+   - Add the tool to the tool tables in `README.md`, `CLAUDE.md` and `mcp-server/README.md`, and to `mcp-tools.json`.
+   - Update the tool count in `.cursor-plugin/plugin.json` (description), `mcp-server/package.json` (description), `README.md` (stat line, badge and category heading), `CLAUDE.md` (`## MCP Tools (N)`), `mcp-server/README.md`, `AGENTS.md` and `site.json`.
+   - Add a line to the `[Unreleased]` section of `CHANGELOG.md`.
+6. Run `cd mcp-server && npm run build && npm test && npm run typecheck`. To run the live tests against a real Pi as well, set `HOMELAB_TEST_PI=true` with the usual `HOMELAB_PI_*` settings.
 
 ## Pull Request Process
 
