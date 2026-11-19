@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.3] - 2026-11-19
+
 ### Fixed
 
 - `homelab_composePull` with `stacks` no longer requires `compose.base.yml`: it uses the same project file resolution and stack-name validation as `homelab_composeUp` and pulls only the services of the requested stacks.
