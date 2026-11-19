@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.4] - 2026-11-19
+
 ### Fixed
 
 - `HOMELAB_DRY_RUN` no longer produces false results: `execSSH` raises a typed `DryRunError` instead of returning a description as if it were output, so `homelab_sshTest` no longer reports OK, `homelab_piReboot` no longer reports a sent reboot, and the NPM and AdGuard tools no longer report authentication errors. Every tool returns the command it would run; multi-step tools stop at the first one, `homelab_nodeList` shows nodes as not probed, and `node: "all"` shows each node's plan.
