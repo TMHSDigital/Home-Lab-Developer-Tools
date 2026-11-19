@@ -205,7 +205,7 @@ export function register(server: McpServer): void {
 
    Use `changesState(idempotent)` only for tools that change state without removing anything and are not gated (today `homelab_composePull` and `homelab_ntfySend`). Never use the deprecated `server.tool()` overload; `registration.test.ts` rejects it.
 
-3. Register the tool in `mcp-server/src/index.ts` (import and `register...(server)` call).
+3. Add the tool to `TOOLS` in `mcp-server/src/tool-registry.ts` (import plus one map entry). `index.ts` registers every entry, and the input-validation and confirm-gate tests read the same map.
 4. Add tests in `mcp-server/src/tools/__tests__/`: input validation cases in `input-validation.test.ts`, a handler test in `handlers.test.ts` for the command it runs and how it reports errors, and for a gated tool an entry in `confirm-gates.test.ts` and in the gated lists of `registration.test.ts`, `CLAUDE.md` and `SECURITY.md`.
 5. Update the docs that `registration.test.ts` checks:
    - Add the tool to the tool tables in `README.md`, `CLAUDE.md` and `mcp-server/README.md`, and to `mcp-tools.json`.

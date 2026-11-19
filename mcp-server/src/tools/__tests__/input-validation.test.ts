@@ -1,112 +1,20 @@
 import { describe, it, expect } from "vitest";
 import { z } from "zod";
-import { register as adguardFilters } from "../adguardFilters.js";
-import { register as adguardFilterToggle } from "../adguardFilterToggle.js";
-import { register as adguardQueryLog } from "../adguardQueryLog.js";
-import { register as adguardStats } from "../adguardStats.js";
-import { register as alertList } from "../alertList.js";
-import { register as alertSilence } from "../alertSilence.js";
-import { register as alertSilences } from "../alertSilences.js";
-import { register as aptHistory } from "../aptHistory.js";
-import { register as aptUpdate } from "../aptUpdate.js";
-import { register as aptUpgradable } from "../aptUpgradable.js";
-import { register as backupCheck } from "../backupCheck.js";
-import { register as backupDiff } from "../backupDiff.js";
-import { register as backupList } from "../backupList.js";
-import { register as backupRestore } from "../backupRestore.js";
-import { register as backupRun } from "../backupRun.js";
-import { register as backupStatus } from "../backupStatus.js";
-import { register as certCheck } from "../certCheck.js";
-import { register as certList } from "../certList.js";
-import { register as certRenew } from "../certRenew.js";
-import { register as composeDown } from "../composeDown.js";
-import { register as composeUp } from "../composeUp.js";
-import { register as containerScan } from "../containerScan.js";
-import { register as diagnostics } from "../diagnostics.js";
-import { register as diskUsage } from "../diskUsage.js";
-import { register as fail2banStatus } from "../fail2banStatus.js";
-import { register as grafanaSnapshot } from "../grafanaSnapshot.js";
-import { register as healthCheck } from "../healthCheck.js";
-import { register as inventorySync } from "../inventorySync.js";
-import { register as journalLogs } from "../journalLogs.js";
-import { register as kernelInfo } from "../kernelInfo.js";
-import { register as logSearch } from "../logSearch.js";
-import { register as nodeExec } from "../nodeExec.js";
-import { register as nodeList } from "../nodeList.js";
-import { register as nodeStatus } from "../nodeStatus.js";
-import { register as npmCerts } from "../npmCerts.js";
-import { register as npmProxyHosts } from "../npmProxyHosts.js";
-import { register as ntfySend } from "../ntfySend.js";
-import { register as ntfyTopics } from "../ntfyTopics.js";
-import { register as openPorts } from "../openPorts.js";
-import { register as piReboot } from "../piReboot.js";
-import { register as prometheusQuery } from "../prometheusQuery.js";
-import { register as serviceLogs } from "../serviceLogs.js";
-import { register as serviceRestart } from "../serviceRestart.js";
-import { register as speedtestResults } from "../speedtestResults.js";
-import { register as systemdServices } from "../systemdServices.js";
-import { register as systemdControl } from "../systemdControl.js";
-import { register as ufwStatus } from "../ufwStatus.js";
-import { register as volumeBackup } from "../volumeBackup.js";
+import { TOOLS } from "../../tool-registry.js";
 
 /**
  * Schemas are captured from each tool's real register() call, so these
  * tests fail when a tool's actual input schema changes.
  */
-const REGISTRARS: Record<string, (server: never) => void> = {
-  adguardFilters,
-  adguardFilterToggle,
-  adguardQueryLog,
-  adguardStats,
-  alertList,
-  alertSilence,
-  alertSilences,
-  aptHistory,
-  aptUpdate,
-  aptUpgradable,
-  backupCheck,
-  backupDiff,
-  backupList,
-  backupRestore,
-  backupRun,
-  backupStatus,
-  certCheck,
-  certList,
-  certRenew,
-  composeDown,
-  composeUp,
-  containerScan,
-  diagnostics,
-  diskUsage,
-  fail2banStatus,
-  grafanaSnapshot,
-  healthCheck,
-  inventorySync,
-  journalLogs,
-  kernelInfo,
-  logSearch,
-  nodeExec,
-  nodeList,
-  nodeStatus,
-  npmCerts,
-  npmProxyHosts,
-  ntfySend,
-  ntfyTopics,
-  openPorts,
-  piReboot,
-  prometheusQuery,
-  serviceLogs,
-  serviceRestart,
-  speedtestResults,
-  systemdServices,
-  systemdControl,
-  ufwStatus,
-  volumeBackup,
-};
+const REGISTRARS: Record<string, (server: never) => void> = TOOLS;
+
+/** Tools that at least one test below captured a schema for. */
+const covered = new Set<string>();
 
 function schemaOf(tool: string) {
   const register = REGISTRARS[tool];
   if (!register) throw new Error(`unknown tool ${tool}`);
+  covered.add(tool);
   let shape: z.ZodRawShape | undefined;
   const fakeServer = {
     registerTool: (_name: string, config: { inputSchema: z.ZodRawShape }) => {
@@ -118,6 +26,51 @@ function schemaOf(tool: string) {
   return z.object(shape);
 }
 describe("input validation schemas", () => {
+  describe("composePull", () => {
+    const schema = schemaOf("composePull");
+
+    it("accepts no stacks or a list of stack files", () => {
+      expect(schema.parse({}).stacks).toBeUndefined();
+      expect(schema.parse({ stacks: ["compose.apps.yml"] }).stacks).toEqual(["compose.apps.yml"]);
+    });
+
+    it("rejects a non-array stacks value", () => {
+      expect(() => schema.parse({ stacks: "compose.apps.yml" })).toThrow();
+      expect(() => schema.parse({ stacks: [1] })).toThrow();
+    });
+  });
+
+  describe("serviceHealth", () => {
+    const schema = schemaOf("serviceHealth");
+
+    it("accepts an optional service filter and node all", () => {
+      expect(schema.parse({}).service).toBeUndefined();
+      expect(schema.parse({ service: "grafana", node: "all" }).service).toBe("grafana");
+    });
+
+    it("rejects a non-string service", () => {
+      expect(() => schema.parse({ service: 5 })).toThrow();
+    });
+  });
+
+  describe("uptimeKumaStatus", () => {
+    const schema = schemaOf("uptimeKumaStatus");
+
+    it("accepts a valid slug and defaults beats to 1", () => {
+      const parsed = schema.parse({ slug: "home-lab-2" });
+      expect(parsed.slug).toBe("home-lab-2");
+      expect(parsed.beats).toBe(1);
+    });
+
+    it("rejects slugs with other characters and out-of-range beats", () => {
+      for (const slug of ["Home", "a/b", "a b", "x'y"]) {
+        expect(() => schema.parse({ slug }), slug).toThrow();
+      }
+      expect(() => schema.parse({ beats: 0 })).toThrow();
+      expect(() => schema.parse({ beats: 101 })).toThrow();
+    });
+  });
+
   describe("serviceLogs", () => {
     const schema = schemaOf("serviceLogs");
 
@@ -1055,5 +1008,20 @@ describe("input validation schemas", () => {
       const result = schema.parse({ node: "nas" });
       expect(result.node).toBe("nas");
     });
+  });
+});
+
+describe("input validation coverage", () => {
+  it("has at least one case for every tool that takes more than a node", () => {
+    const missing = Object.keys(REGISTRARS).filter((tool) => {
+      let shape: z.ZodRawShape = {};
+      REGISTRARS[tool]({
+        registerTool: (_n: string, config: { inputSchema: z.ZodRawShape }) => {
+          shape = config.inputSchema;
+        },
+      } as never);
+      return Object.keys(shape).some((k) => k !== "node") && !covered.has(tool);
+    });
+    expect(missing).toEqual([]);
   });
 });

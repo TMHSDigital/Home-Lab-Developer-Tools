@@ -31,6 +31,7 @@ Home-Lab-Developer-Tools/
   mcp-server/
     src/
       index.ts               # MCP server entry point
+      tool-registry.ts       # TOOLS map: every tool's register(); index.ts and tests use it
       tools/                 # One file per MCP tool
       utils/
         ssh-api.ts           # SSH connection helpers
@@ -210,7 +211,7 @@ When preparing a new release version, ALL of the following files must be updated
 
 Checklist before pushing a release:
 
-1. All new tools registered in `mcp-server/src/index.ts`
+1. All new tools listed in `mcp-server/src/tool-registry.ts` (index.ts registers everything in it)
 2. All new tools have input validation tests
 3. All new skills have SKILL.md with required frontmatter and sections
 4. All new rules have .mdc with required frontmatter

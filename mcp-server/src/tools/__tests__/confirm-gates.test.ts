@@ -17,35 +17,8 @@ vi.mock("../../utils/ssh-api.js", async (importOriginal) => ({
 }));
 
 import { execSSH } from "../../utils/ssh-api.js";
-import * as piReboot from "../piReboot.js";
-import * as backupRun from "../backupRun.js";
-import * as backupRestore from "../backupRestore.js";
-import * as volumeBackup from "../volumeBackup.js";
-import * as certRenew from "../certRenew.js";
-import * as nodeExec from "../nodeExec.js";
-import * as serviceRestart from "../serviceRestart.js";
-import * as composeUp from "../composeUp.js";
-import * as composeDown from "../composeDown.js";
-import * as aptUpdate from "../aptUpdate.js";
-import * as adguardFilterToggle from "../adguardFilterToggle.js";
-import * as alertSilence from "../alertSilence.js";
-import * as systemdControl from "../systemdControl.js";
+import { TOOLS } from "../../tool-registry.js";
 
-const MODULES: Record<string, { register: (server: never) => void }> = {
-  piReboot,
-  backupRun,
-  backupRestore,
-  volumeBackup,
-  certRenew,
-  nodeExec,
-  serviceRestart,
-  composeUp,
-  composeDown,
-  aptUpdate,
-  adguardFilterToggle,
-  alertSilence,
-  systemdControl,
-};
 
 const mockExecSSH = vi.mocked(execSSH);
 
@@ -85,9 +58,9 @@ function captureHandler(register: Register): Handler {
 }
 
 async function load(file: string) {
-  const mod = MODULES[file];
-  if (!mod) throw new Error(`no module for ${file}`);
-  return captureHandler(mod.register as Register);
+  const register = TOOLS[file];
+  if (!register) throw new Error(`no tool ${file}`);
+  return captureHandler(register as Register);
 }
 
 describe("confirm gate", () => {

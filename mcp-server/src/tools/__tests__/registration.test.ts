@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
+import { TOOLS } from "../../tool-registry.js";
 
 /**
  * Registers every tool module on a fake server and checks the result
@@ -71,15 +72,13 @@ describe("tool registration", () => {
     }
   });
 
-  it("registers every tool in index.ts", () => {
-    const index = readFileSync(join(toolsDir, "../index.ts"), "utf8");
+  it("lists every tool in the registry that index.ts registers", () => {
+    expect(Object.keys(TOOLS).sort()).toEqual(registered.map((r) => r.file).sort());
     for (const r of registered) {
-      expect(index).toContain(`from "./tools/${r.file}.js"`);
+      expect(TOOLS[r.file], r.file).toBe(modules[`../${r.file}.ts`].register);
     }
-    const calls = (index.match(/^\s*register[A-Za-z0-9]+\(server\);/gm) ?? []).filter(
-      (c) => !/register(Resources|Prompts)\(/.test(c),
-    );
-    expect(calls.length).toBe(registered.length);
+    const index = readFileSync(join(toolsDir, "../index.ts"), "utf8");
+    expect(index).toContain("for (const register of Object.values(TOOLS)) register(server);");
   });
 
   it("is listed in the README, CLAUDE.md and mcp-tools.json", () => {
