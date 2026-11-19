@@ -69,9 +69,6 @@ export function register(server: McpServer): void {
           resticCommand(`snapshots --latest ${args.count} --json`, args.node),
           args.node,
         );
-        if (output.startsWith("[dry-run]")) {
-          return { content: [{ type: "text" as const, text: output }] };
-        }
 
         const json = completeJson(output);
         const text = [

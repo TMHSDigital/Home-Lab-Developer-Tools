@@ -24,7 +24,6 @@ async function healthReport(service: string | undefined, node: string | undefine
   const filter = service ? `--filter 'name=${service.replace(/'/g, "'\\''")}'` : "";
   const ps = await execSSH(`docker ps -a ${filter} --format '{{json .}}'`, node);
 
-  if (ps.startsWith("[dry-run]")) return ps;
   const containers = ps.trim()
     ? ps.trim().split("\n").map((line) => containerSchema.parse(JSON.parse(line)))
     : [];

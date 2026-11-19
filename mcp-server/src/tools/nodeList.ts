@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, listNodes, errorResponse } from "../utils/ssh-api.js";
 import { READ_ONLY } from "../utils/annotations.js";
+import { DryRunError } from "../utils/errors.js";
 
 const inputSchema = {};
 
@@ -35,6 +36,9 @@ export function register(server: McpServer): void {
         const probe = probes[i];
         if (probe.status === "fulfilled") return `${node.name} (${node.port === 22 ? node.host : `${node.host}:${node.port}`}) -- online`;
         const error = probe.reason;
+        if (error instanceof DryRunError) {
+          return `${node.name} (${node.port === 22 ? node.host : `${node.host}:${node.port}`}) -- not probed (dry run)`;
+        }
         const reason = error instanceof Error ? error.message.split("\n")[0] : String(error);
         return `${node.name} (${node.port === 22 ? node.host : `${node.host}:${node.port}`}) -- offline (${reason})`;
       });

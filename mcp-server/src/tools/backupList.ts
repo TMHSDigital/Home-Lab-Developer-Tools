@@ -72,9 +72,6 @@ export function register(server: McpServer): void {
           resticCommand(`snapshots${extra} --json`, args.node),
           args.node,
         );
-        if (output.startsWith("[dry-run]")) {
-          return { content: [{ type: "text" as const, text: output }] };
-        }
 
         const text = summarizeSnapshots(completeJson(output), args.count ?? 20);
         return { content: [{ type: "text" as const, text }] };

@@ -70,9 +70,6 @@ export function register(server: McpServer): void {
       try {
         port = servicePort(SERVICE, args.node);
         const output = await execSSH(`curl -sf 'http://localhost:${port}/api/v2/silences'`, args.node);
-        if (output.startsWith("[dry-run]")) {
-          return { content: [{ type: "text" as const, text: output }] };
-        }
         return { content: [{ type: "text" as const, text: summarizeSilences(completeJson(output), args.state) }] };
       } catch (error) {
         return curlErrorResponse(error, SERVICE, port);

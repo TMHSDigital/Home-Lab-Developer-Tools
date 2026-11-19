@@ -47,6 +47,21 @@ export class CommandFailedError extends SSHError {
   }
 }
 
+/**
+ * Raised by execSSH in HOMELAB_DRY_RUN mode instead of returning output, so
+ * no tool can mistake the plan for real command output. errorResponse turns
+ * it into a normal (non-error) result describing the planned command.
+ */
+export class DryRunError extends SSHError {
+  public readonly host: string;
+
+  constructor(host: string, command: string) {
+    super(`[dry-run] would execute on ${host}: ${command}`, command);
+    this.name = "DryRunError";
+    this.host = host;
+  }
+}
+
 export class UnsafeCommandError extends SSHError {
   constructor(command: string, pattern: string) {
     super(

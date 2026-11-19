@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { assertCommandSafe, execSSH } from "../ssh-api.js";
-import { UnsafeCommandError } from "../errors.js";
+import { UnsafeCommandError, DryRunError } from "../errors.js";
 
 describe("assertCommandSafe", () => {
   afterEach(() => {
@@ -87,13 +87,13 @@ describe("execSSH dry-run mode", () => {
     delete process.env.HOMELAB_PI_HOST;
   });
 
-  it("resolves to dry-run string without connecting", async () => {
+  it("rejects with a DryRunError describing the command, without connecting", async () => {
     process.env.HOMELAB_DRY_RUN = "true";
     process.env.HOMELAB_PI_HOST = "raspberrypi.local";
 
-    const result = await execSSH("uptime");
-    expect(result).toContain("[dry-run]");
-    expect(result).toContain("uptime");
+    const error = await execSSH("uptime").catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(DryRunError);
+    expect((error as DryRunError).message).toBe("[dry-run] would execute on raspberrypi.local: uptime");
   });
 
   it("still rejects unsafe commands in dry-run mode", async () => {

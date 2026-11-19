@@ -103,7 +103,7 @@ Set environment variables:
 | `HOMELAB_NTFY_PORT` | `8080` | Ntfy server port override |
 | `HOMELAB_NODES` | (empty) | JSON object mapping node names to SSH config (`host` required; `user`, `keyPath`, `port` optional, `port` defaults to 22) for multi-node support. An optional `env` object overrides `HOMELAB_*` settings for that node (for example `HOMELAB_COMPOSE_DIR`, `HOMELAB_BACKUP_REPO`, service ports and credentials). Invalid JSON or an entry without `host` is reported as an error |
 | `HOMELAB_ANSIBLE_INVENTORY` | `/etc/ansible/hosts` | Ansible inventory file path for node discovery |
-| `HOMELAB_DRY_RUN` | (unset) | When set to `true`, `1`, `yes`, or `on`, `execSSH` prints the command without connecting |
+| `HOMELAB_DRY_RUN` | (unset) | When set to `true`, `1`, `yes`, or `on`, tools return the command they would run (the first one, for multi-step tools) without connecting |
 | `HOMELAB_MAX_OUTPUT_BYTES` | `1048576` | Max bytes of command output kept per call; longer output is truncated to the last N bytes with a marker |
 | `HOMELAB_ALLOW_DANGEROUS_COMMANDS` | (unset) | Set to `true` to bypass the runtime command safety guard |
 | `HOMELAB_UPTIME_KUMA_SLUG` | `default` | Status page slug used by `homelab_uptimeKumaStatus` when no `slug` is passed |

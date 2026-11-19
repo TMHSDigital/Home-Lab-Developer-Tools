@@ -9,6 +9,7 @@ import {
   SSHTimeoutError,
   CommandFailedError,
   UnsafeCommandError,
+  DryRunError,
 } from "./errors.js";
 
 const DANGEROUS_PATTERNS: Array<[RegExp, string]> = [
@@ -291,8 +292,7 @@ export async function execSSH(
   assertCommandSafe(command);
 
   if (isDryRun()) {
-    const cfg = getNodeConfig(node);
-    return `[dry-run] would execute on ${cfg.host}: ${command}`;
+    throw new DryRunError(getNodeConfig(node).host, command);
   }
 
   const { host, port, username, keyPath } = getNodeConfig(node);
@@ -411,10 +411,16 @@ export async function checkSSHAvailable(): Promise<void> {
   }
 }
 
+/** Text for a dry-run result; later steps of multi-step tools depend on real output. */
+export const DRY_RUN_NOTE = "Nothing was run (HOMELAB_DRY_RUN). Tools that run several commands stop at the first one.";
+
 export function errorResponse(error: unknown): {
   content: { type: "text"; text: string }[];
-  isError: true;
+  isError?: true;
 } {
+  if (error instanceof DryRunError) {
+    return { content: [{ type: "text" as const, text: `${error.message}\n${DRY_RUN_NOTE}` }] };
+  }
   if (error instanceof SSHError) {
     const parts: string[] = [`[${error.name}] ${error.message}`];
 

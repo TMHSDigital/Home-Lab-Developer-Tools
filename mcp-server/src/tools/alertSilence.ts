@@ -116,9 +116,6 @@ export function register(server: McpServer): void {
       try {
         port = servicePort(SERVICE, args.node);
         const output = await execSSH(silenceCommand(args, new Date()), args.node);
-        if (output.startsWith("[dry-run]")) {
-          return { content: [{ type: "text" as const, text: output }] };
-        }
         if (args.action === "expire") {
           return { content: [{ type: "text" as const, text: `Silence ${args.id} expired.` }] };
         }

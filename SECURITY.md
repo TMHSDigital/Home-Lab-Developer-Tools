@@ -33,7 +33,7 @@ To bypass the guard (not recommended): set `HOMELAB_ALLOW_DANGEROUS_COMMANDS=tru
 
 ## Dry-Run Mode
 
-Set `HOMELAB_DRY_RUN=true` to make `execSSH` print what it would execute without opening an SSH connection. Unsafe commands are still rejected in dry-run mode.
+Set `HOMELAB_DRY_RUN=true` to make tools return the command they would execute (the first one, for tools that run several) without opening an SSH connection. Unsafe commands are still rejected in dry-run mode.
 
 ## Best Practices
 

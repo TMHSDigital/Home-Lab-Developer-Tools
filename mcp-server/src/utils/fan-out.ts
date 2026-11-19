@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { errorResponse, listNodes } from "./ssh-api.js";
+import { DryRunError } from "./errors.js";
 
 /** Value of `node` that runs a read-only tool on every registered node. */
 export const ALL_NODES = "all";
@@ -49,10 +50,15 @@ export async function forNodes(
   );
   const sections = nodes.map((n, i) => {
     const r = results[i];
-    const body = r.status === "fulfilled" ? r.value : `Error: ${message(r.reason)}`;
+    const body =
+      r.status === "fulfilled"
+        ? r.value
+        : r.reason instanceof DryRunError
+          ? r.reason.message
+          : `Error: ${message(r.reason)}`;
     return `=== ${n.name} (${n.host}) ===\n${body}`;
   });
-  const failed = results.filter((r) => r.status === "rejected").length;
+  const failed = results.filter((r) => r.status === "rejected" && !(r.reason instanceof DryRunError)).length;
   const summary = `${nodes.length - failed} of ${nodes.length} nodes responded.`;
   const text = `${summary}\n\n${sections.join("\n\n")}`;
   return failed === nodes.length

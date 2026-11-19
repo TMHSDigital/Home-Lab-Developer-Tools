@@ -364,12 +364,6 @@ describe("serviceHealth", () => {
     expect(result.content[0].text).toContain("No container problems detected.");
   });
 
-  it("preserves the dry-run description without claiming a health result", async () => {
-    const description = "[dry-run] would execute on raspberrypi.local: docker ps -a";
-    mockExecSSH.mockResolvedValueOnce(description);
-    expect((await handlerOf(serviceHealth)({})).content[0].text).toBe(description);
-  });
-
   it("does not report malformed output as healthy", async () => {
     mockExecSSH.mockResolvedValueOnce("not JSON");
     expect((await handlerOf(serviceHealth)({})).isError).toBe(true);

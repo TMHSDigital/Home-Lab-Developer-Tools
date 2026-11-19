@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { execSSH, errorResponse } from "../utils/ssh-api.js";
 import { nodeParam } from "../utils/node-param.js";
 import { READ_ONLY } from "../utils/annotations.js";
+import { DryRunError } from "../utils/errors.js";
 
 const inputSchema = { ...nodeParam };
 
@@ -61,6 +62,7 @@ export function register(server: McpServer): void {
       try {
         output = await execSSH(buildHealthCheckScript(), args.node);
       } catch (error) {
+        if (error instanceof DryRunError) return errorResponse(error);
         // Every check depends on SSH; report the cause and stop.
         const reason = error instanceof Error ? error.message.split("\n")[0] : String(error);
         const base = errorResponse(error);
@@ -75,7 +77,7 @@ export function register(server: McpServer): void {
 
       const parsed = parseHealthCheckOutput(output);
       if (parsed.length === 0) {
-        // For example dry-run mode: show what would have run.
+        // Unexpected output: show it as-is rather than claim a result.
         return { content: [{ type: "text" as const, text: output }] };
       }
 
