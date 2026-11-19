@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `HOMELAB_NODES` entries named `default` or `all` are now rejected with a configuration error that names the reserved word. Before, a registry `default` was listed next to the env host and probed on the wrong machine, and a registry `all` could never be targeted because `all` is the fan-out keyword.
+
 ## [0.22.2] - 2026-11-18
 
 The changes below shipped across 0.17.1 to 0.22.2 and were not sorted by version at the time. See the [GitHub releases](https://github.com/TMHSDigital/Home-Lab-Developer-Tools/releases) for each version's notes.

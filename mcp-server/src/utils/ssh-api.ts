@@ -122,9 +122,12 @@ export function nodeSetting(node: string | undefined, key: string): string | und
   return value === undefined || value === "" ? undefined : value;
 }
 
+/** Node names the tools give their own meaning: the env host and the fan-out keyword. */
+const RESERVED_NODE_NAMES = ["default", "all"];
+
 /**
- * Parse HOMELAB_NODES. Invalid JSON or entries without a host raise an
- * SSHError naming the problem instead of silently dropping every node.
+ * Parse HOMELAB_NODES. Invalid JSON, reserved names or entries without a host
+ * raise an SSHError naming the problem instead of silently dropping every node.
  */
 function getNodesRegistry(): Map<string, NodeConfig> {
   const registry = new Map<string, NodeConfig>();
@@ -146,6 +149,12 @@ function getNodesRegistry(): Map<string, NodeConfig> {
   }
 
   for (const [name, cfg] of Object.entries(parsed as Record<string, unknown>)) {
+    if (RESERVED_NODE_NAMES.includes(name)) {
+      throw new SSHError(
+        `HOMELAB_NODES entry "${name}" uses a reserved node name ("default" is the host from HOMELAB_PI_HOST, ` +
+          `"all" targets every node). Rename the entry.`,
+      );
+    }
     if (typeof cfg !== "object" || cfg === null || Array.isArray(cfg)) {
       throw new SSHError(`HOMELAB_NODES entry "${name}" must be an object.`);
     }

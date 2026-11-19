@@ -136,6 +136,15 @@ describe("node registry", () => {
     expect(() => getNodeConfig("nas")).toThrow(/"nas" is missing "host"/);
   });
 
+  it.each(["default", "all"])("rejects the reserved node name %j", (name) => {
+    process.env.HOMELAB_PI_HOST = "a.local";
+    process.env.HOMELAB_NODES = JSON.stringify({ [name]: { host: "b.local" } });
+    expect(() => getNodeConfig("nas")).toThrow(new RegExp(`HOMELAB_NODES entry "${name}" uses a reserved node name`));
+    expect(() => getNodeConfig(name)).toThrow(SSHError);
+    expect(() => getNodeConfig()).not.toThrow();
+    expect(() => listNodes()).toThrow(/reserved node name/);
+  });
+
   it("throws for unknown nodes and lists the available ones", () => {
     process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local" } });
     expect(() => getNodeConfig("typo")).toThrow(/Unknown node "typo"\. Available nodes: default, nas/);
