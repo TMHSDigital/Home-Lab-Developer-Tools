@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-11-19
+
 ### Added
 
 - `homelab_backupCheck` verifies restic repository integrity with `restic check`, optionally reading a subset of the data (`readDataSubset`, e.g. `5%`), using the repository password settings and a long timeout.
