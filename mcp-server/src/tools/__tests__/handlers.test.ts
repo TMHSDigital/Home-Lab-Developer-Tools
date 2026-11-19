@@ -32,6 +32,7 @@ import { register as logSearch } from "../logSearch.js";
 import { register as certRenew } from "../certRenew.js";
 import { register as backupRun } from "../backupRun.js";
 import { register as nodeStatus } from "../nodeStatus.js";
+import { register as piReboot } from "../piReboot.js";
 import { register as ufwStatus } from "../ufwStatus.js";
 import { register as piStatus, decodeThrottled, annotateStatus } from "../piStatus.js";
 import { register as alertSilences } from "../alertSilences.js";
@@ -372,6 +373,20 @@ describe('node: "all" fan-out', () => {
     const result = await handlerOf(nodeStatus)({ node: "nas" });
     expect(result.content[0].text).toBe("up");
     expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+  });
+});
+
+describe("piReboot", () => {
+  it("lists the running containers before rebooting so they can be checked afterwards", async () => {
+    mockExecSSH
+      .mockResolvedValueOnce("adguard\ngrafana\n")
+      .mockResolvedValueOnce("up 3 days")
+      .mockResolvedValueOnce("");
+    const text = (await handlerOf(piReboot)({ confirm: true })).content[0].text;
+    expect(text).toContain("Warning: 2 running container(s) will be stopped.");
+    expect(text).toContain("Running containers before reboot: adguard, grafana");
+    expect(text).toContain("post-reboot-verify");
+    expect(cmd(2)).toBe("sudo shutdown -r +0");
   });
 });
 

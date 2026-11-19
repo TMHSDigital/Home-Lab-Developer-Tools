@@ -22,21 +22,21 @@ export function register(server: McpServer): void {
         return confirmCancelled("Reboot", {
           node: args.node,
           commands: () => ["sudo shutdown -r +0"],
-          note: "Before rebooting it counts running containers and reads the uptime.",
+          note: "Before rebooting it lists running containers and reads the uptime.",
         });
       }
 
       try {
-
-        const containers = await execSSH(
-          "docker ps --format '{{.Names}}' 2>/dev/null | wc -l",
-          args.node,
-        );
-        const count = parseInt(containers, 10) || 0;
+        const names = (await execSSH("docker ps --format '{{.Names}}' 2>/dev/null | sort", args.node))
+          .split("\n")
+          .map((n) => n.trim())
+          .filter(Boolean);
 
         let preCheck = "";
-        if (count > 0) {
-          preCheck = `Warning: ${count} running container(s) will be stopped.\n`;
+        if (names.length > 0) {
+          preCheck =
+            `Warning: ${names.length} running container(s) will be stopped.\n` +
+            `Running containers before reboot: ${names.join(", ")}\n`;
         }
 
         const uptime = await execSSH("uptime -p", args.node);
@@ -46,7 +46,13 @@ export function register(server: McpServer): void {
         await execSSH("sudo shutdown -r +0", args.node);
 
         return {
-          content: [{ type: "text" as const, text: preCheck + "Reboot command sent." }],
+          content: [{
+            type: "text" as const,
+            text:
+              preCheck +
+              "Reboot command sent. Use the post-reboot-verify prompt with the container list above " +
+              "to check that the node and its containers came back.",
+          }],
         };
       } catch (error) {
         return errorResponse(error);

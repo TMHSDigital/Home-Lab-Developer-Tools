@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `post-reboot-verify` prompt: a read-only check that a node came back after a reboot (SSH retries, container comparison, failed units, uptime and throttle flags). `homelab_piReboot` now lists the containers that were running before the reboot so the prompt can compare.
+
 ## [0.26.2] - 2026-11-19
 
 ### Changed

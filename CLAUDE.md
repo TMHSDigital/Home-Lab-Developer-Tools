@@ -144,7 +144,7 @@ All tools connect to the Pi (or any registered node) via SSH. All tools except `
 | `homelab_diagnostics` | Collect debug info bundle (OS, kernel, Docker, memory, disk, network) |
 | `homelab_sshTest` | Test SSH connectivity |
 
-The server also registers one MCP resource (`homelab://nodes`, node names and hosts only) and three prompts (`morning-health-check`, `pre-reboot-checklist`, `investigate-container`) in `mcp-server/src/resources.ts` and `mcp-server/src/prompts.ts`. Prompts must never perform state-changing actions on their own.
+The server also registers one MCP resource (`homelab://nodes`, node names and hosts only) and four prompts (`morning-health-check`, `pre-reboot-checklist`, `post-reboot-verify`, `investigate-container`) in `mcp-server/src/resources.ts` and `mcp-server/src/prompts.ts`. Prompts must never perform state-changing actions on their own.
 
 ## Development
 

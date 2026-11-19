@@ -67,6 +67,7 @@ describe("prompts", () => {
     expect(prompts.map((p) => p.name).sort()).toEqual([
       "investigate-container",
       "morning-health-check",
+      "post-reboot-verify",
       "pre-reboot-checklist",
     ]);
   });
@@ -86,6 +87,19 @@ describe("prompts", () => {
     expect(text).toContain('`homelab_backupStatus` with `node: "all"`');
     expect(text).not.toContain("to every tool call");
     expect(text).toContain("do not restart");
+  });
+
+  it("post-reboot-verify compares the containers from before the reboot and is read-only", async () => {
+    const result = await client.getPrompt({
+      name: "post-reboot-verify",
+      arguments: { node: "nas", containers: "grafana, adguard" },
+    });
+    const text = String((result.messages[0].content as { text: string }).text);
+    expect(text).toContain("homelab_sshTest");
+    expect(text).toContain("before the reboot: grafana, adguard");
+    expect(text).toContain('node: "nas"');
+    expect(text).toContain("Read-only");
+    expect(text).not.toMatch(/call `homelab_(piReboot|serviceRestart|composeUp|systemdControl)`/);
   });
 
   it("pre-reboot-checklist never reboots on its own", async () => {

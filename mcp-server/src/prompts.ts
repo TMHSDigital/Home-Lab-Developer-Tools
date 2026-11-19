@@ -60,6 +60,28 @@ export function preRebootChecklistText(node?: string): string {
     "",
     "List the risks and the containers that will restart. Do not call `homelab_piReboot`;",
     "only reboot if I explicitly confirm afterwards (it requires `confirm: true`).",
+    "After the reboot, use the `post-reboot-verify` prompt with the container list piReboot prints.",
+  ].join("\n");
+}
+
+export function postRebootVerifyText(node?: string, containers?: string): string {
+  const expected = (containers ?? "")
+    .split(",")
+    .map((c) => c.trim())
+    .filter(Boolean);
+  return [
+    `Verify that the Pi came back cleanly after a reboot.${nodeClause(node)}`,
+    "",
+    "1. Call `homelab_sshTest`. If it fails, wait about 30 seconds and try again, up to 5 times; if it still fails, stop and report that the node did not come back.",
+    "2. Call `homelab_serviceHealth` and list containers that are not running or not healthy.",
+    expected.length > 0
+      ? `3. Compare with the containers that were running before the reboot: ${expected.join(", ")}. List any that are missing or not running (a container with \`restart: no\` will not start on its own).`
+      : "3. If `homelab_piReboot` listed the containers running before the reboot, compare and list any that are missing or not running.",
+    "4. Call `homelab_systemdServices` and report failed units.",
+    "5. Call `homelab_piStatus` and check the uptime (it should be a few minutes) and the decoded throttle flags.",
+    "",
+    "Summarize: came back OK, or each problem with a suggested next step.",
+    "Read-only: do not start, restart or change anything unless I confirm.",
   ].join("\n");
 }
 
@@ -100,6 +122,22 @@ export function registerPrompts(server: McpServer): void {
       argsSchema: { node: nodeArg },
     },
     ({ node }) => userMessage(preRebootChecklistText(node)),
+  );
+
+  server.registerPrompt(
+    "post-reboot-verify",
+    {
+      title: "Post-reboot verification",
+      description: "Check that a node and its containers came back after a reboot; read-only",
+      argsSchema: {
+        node: nodeArg,
+        containers: z
+          .string()
+          .optional()
+          .describe("Comma-separated containers that were running before the reboot (from homelab_piReboot)"),
+      },
+    },
+    ({ node, containers }) => userMessage(postRebootVerifyText(node, containers)),
   );
 
   server.registerPrompt(
