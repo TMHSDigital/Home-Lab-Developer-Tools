@@ -424,10 +424,53 @@ describe("grafanaSnapshot", () => {
 });
 
 describe("uptimeKumaStatus", () => {
+  const page = JSON.stringify({
+    publicGroupList: [{ monitorList: [{ id: 1, name: "Grafana" }, { id: 2, name: "AdGuard" }, { id: 3, name: "NPM" }] }],
+  });
+  const beats = (id: number, latest: number) =>
+    Array.from({ length: 100 }, (_, i) => ({
+      status: i === 99 ? latest : 1,
+      time: `2026-11-18 ${String(Math.floor(i / 60)).padStart(2, "0")}:${String(i % 60).padStart(2, "0")}:00`,
+      msg: i === 99 && latest === 0 ? "connect ECONNREFUSED" : "",
+      ping: 10 + id,
+    }));
+  const heartbeats = JSON.stringify({
+    heartbeatList: { 1: beats(1, 1), 2: beats(2, 0), 3: beats(3, 1) },
+    uptimeList: { "1_24": 1, "2_24": 0.9876, "3_24": 0.999 },
+  });
+  const body = `${page}\n@@HEARTBEATS@@\n${heartbeats}`;
+
   it("queries the requested status page slug", async () => {
-    mockExecSSH.mockResolvedValueOnce('{"heartbeatList":{}}');
+    mockExecSSH.mockResolvedValueOnce(body);
     await handlerOf(uptimeKumaStatus)({ slug: "homelab" });
+    expect(cmd()).toContain("localhost:3001/api/status-page/homelab'");
     expect(cmd()).toContain("localhost:3001/api/status-page/heartbeat/homelab");
+  });
+
+  it("returns one line per monitor, problems first, instead of 300 raw heartbeats", async () => {
+    mockExecSSH.mockResolvedValueOnce(body);
+    const text = (await handlerOf(uptimeKumaStatus)({})).content[0].text;
+    expect(text.split("\n")).toEqual([
+      "3 monitors: 2 UP, 1 DOWN.",
+      "AdGuard (id 2): DOWN, last check 2026-11-18 01:39:00, ping 12 ms, 24h uptime 98.8%, message: connect ECONNREFUSED",
+      "Grafana (id 1): UP, last check 2026-11-18 01:39:00, ping 11 ms, 24h uptime 100.0%",
+      "NPM (id 3): UP, last check 2026-11-18 01:39:00, ping 13 ms, 24h uptime 99.9%",
+    ]);
+    expect(text.length).toBeLessThan(500);
+  });
+
+  it("adds a short status history when beats > 1", async () => {
+    mockExecSSH.mockResolvedValueOnce(body);
+    const text = (await handlerOf(uptimeKumaStatus)({ beats: 3 })).content[0].text;
+    expect(text).toContain("AdGuard (id 2): DOWN");
+    expect(text).toContain("history (oldest first): UUD");
+  });
+
+  it("reports a truncated response instead of returning cut JSON", async () => {
+    mockExecSSH.mockResolvedValueOnce("[output truncated: showing last 100 of 2000000 bytes]\n...");
+    const result = await handlerOf(uptimeKumaStatus)({});
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("HOMELAB_MAX_OUTPUT_BYTES");
   });
 
   it("explains a missing status page", async () => {
