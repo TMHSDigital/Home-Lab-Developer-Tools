@@ -124,8 +124,15 @@ export function nodeSetting(node: string | undefined, key: string): string | und
 }
 
 /**
- * Parse HOMELAB_NODES. Invalid JSON or entries without a host raise an
- * SSHError naming the problem instead of silently dropping every node.
+ * Node names with a fixed meaning: "default" is the HOMELAB_PI_* node and
+ * "all" asks read-only tools to fan out to every node.
+ */
+export const RESERVED_NODE_NAMES = ["default", "all"] as const;
+
+/**
+ * Parse HOMELAB_NODES. Invalid JSON, reserved names or entries without a
+ * host raise an SSHError naming the problem instead of silently dropping
+ * or shadowing nodes.
  */
 function getNodesRegistry(): Map<string, NodeConfig> {
   const registry = new Map<string, NodeConfig>();
@@ -147,6 +154,12 @@ function getNodesRegistry(): Map<string, NodeConfig> {
   }
 
   for (const [name, cfg] of Object.entries(parsed as Record<string, unknown>)) {
+    if ((RESERVED_NODE_NAMES as readonly string[]).includes(name)) {
+      throw new SSHError(
+        `HOMELAB_NODES entry "${name}" uses a reserved name ("default" is the HOMELAB_PI_* node, ` +
+          '"all" targets every node). Rename it.',
+      );
+    }
     if (typeof cfg !== "object" || cfg === null || Array.isArray(cfg)) {
       throw new SSHError(`HOMELAB_NODES entry "${name}" must be an object.`);
     }
@@ -167,13 +180,11 @@ function getNodesRegistry(): Map<string, NodeConfig> {
 }
 
 export function getNodeConfig(node?: string): NodeConfig {
-  if (!node) return getDefaultConfig();
+  if (!node || node === "default") return getDefaultConfig();
 
   const registry = getNodesRegistry();
   const cfg = registry.get(node);
   if (cfg) return cfg;
-
-  if (node === "default") return getDefaultConfig();
 
   throw new SSHError(
     `Unknown node "${node}". Available nodes: ${listNodes().map((n) => n.name).join(", ")}. ` +

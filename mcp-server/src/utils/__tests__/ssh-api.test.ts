@@ -79,6 +79,12 @@ describe("node registry", () => {
     expect(listNodes()).toEqual([{ name: "default", host: "raspberrypi.local", port: 22 }]);
   });
 
+  it.each(["default", "all"])("rejects the reserved node name %s", (name) => {
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local" }, [name]: { host: "b.local" } });
+    expect(() => listNodes()).toThrow(new RegExp(`HOMELAB_NODES entry "${name}" uses a reserved name`));
+    expect(() => getNodeConfig("nas")).toThrow(/reserved name/);
+  });
+
   it("maps user and username and defaults the user to pi", () => {
     process.env.HOMELAB_NODES = JSON.stringify({
       nas: { host: "nas.local", user: "admin", keyPath: "~/.ssh/k" },

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `HOMELAB_NODES` entries named `default` or `all` are rejected with a configuration error instead of being silently shadowed (listed twice, probed on the wrong host, or unreachable through fan-out).
+
 ## [0.26.0] - 2026-11-19
 
 ### Added
