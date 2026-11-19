@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.6] - 2026-11-19
+
 ### Changed
 
 - `homelab_uptimeKumaStatus` returns one line per monitor (name, latest status, last check, ping, 24h uptime; problems first) instead of the raw status-page body with about 100 heartbeats per monitor, and reports an oversized response instead of returning cut JSON. The new `beats` parameter adds a short status history.
