@@ -9,7 +9,7 @@ import { registerPrompts } from "./prompts.js";
 
 const server = new McpServer({
   name: "homelab-mcp",
-  version: "0.27.0",
+  version: "0.27.1",
 });
 
 for (const register of Object.values(TOOLS)) register(server);
