@@ -746,7 +746,9 @@ describe("logSearch", () => {
   it("reports an error for a container that does not exist", async () => {
     mockExecSSH.mockRejectedValueOnce(new CommandFailedError("docker", 1, "No such container: grafanna"));
     const result = await handlerOf(logSearch)({ pattern: "timeout", service: "grafanna" });
-    expect(cmd()).toMatch(/^docker inspect --type container -f \. 'grafanna' >\/dev\/null 2>&1 \|\| \{ echo "No such container: grafanna" >&2; exit 1; \}; /);
+    expect(cmd().startsWith(
+      "docker inspect --type container -f . 'grafanna' >/dev/null 2>&1 || { printf 'No such container: %s\\n' 'grafanna' >&2; exit 1; }; ",
+    )).toBe(true);
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("No such container: grafanna");
     expect(result.content[0].text).not.toContain("No matches found");
