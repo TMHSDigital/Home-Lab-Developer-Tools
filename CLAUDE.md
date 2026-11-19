@@ -6,7 +6,7 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 54 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 55 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
@@ -82,7 +82,7 @@ Home-Lab-Developer-Tools/
 | resource-limits | compose*.yml | Flag containers without memory or CPU limits |
 | inventory-consistency | hosts, inventory*, .env* | Flag nodes in config missing from HOMELAB_NODES registry |
 
-## MCP Tools (54)
+## MCP Tools (55)
 
 All tools connect to the Pi (or any registered node) via SSH. All tools except `homelab_nodeList` accept a `node` parameter to target a specific node from the `HOMELAB_NODES` registry (optional everywhere except `homelab_nodeExec` and `homelab_nodeStatus`, where it is required). The read-only `homelab_nodeStatus`, `homelab_piStatus` and `homelab_serviceHealth` also accept `node: "all"` to query every node in parallel (`utils/fan-out.ts`); state-changing tools stay single-node.
 
@@ -132,6 +132,7 @@ All tools connect to the Pi (or any registered node) via SSH. All tools except `
 | `homelab_aptHistory` | Show recent apt install/upgrade/remove history |
 | `homelab_kernelInfo` | Kernel version, boot parameters, loaded modules |
 | `homelab_systemdServices` | List systemd units or get status of a specific unit |
+| `homelab_systemdControl` | Start, stop, restart, reload, enable or disable a systemd unit (requires confirm=true) |
 | `homelab_certCheck` | Check SSL certificate expiry, issuer, and fingerprint |
 | `homelab_certRenew` | Trigger Let's Encrypt certificate renewal |
 | `homelab_certList` | List all managed certificates from certbot and NPM |
@@ -187,7 +188,7 @@ npm install -g @tmhs/homelab-mcp
 
 ## Security
 
-- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, `homelab_adguardFilterToggle`, `homelab_alertSilence`, and `homelab_aptUpdate` when `upgrade=true`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`; pass `confirmCancelled` a preview (`node` plus a lazy `commands` builder) so a call without `confirm` shows the target node and the masked command it would run, and runs nothing.
+- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, `homelab_adguardFilterToggle`, `homelab_alertSilence`, `homelab_systemdControl`, and `homelab_aptUpdate` when `upgrade=true`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`; pass `confirmCancelled` a preview (`node` plus a lazy `commands` builder) so a call without `confirm` shows the target node and the masked command it would run, and runs nothing.
 - `execSSH()` runs `assertCommandSafe()` before opening any SSH connection. This blocks catastrophic patterns (`rm -rf /`, `mkfs` on block devices, fork bombs, `poweroff`, etc.). Override with `HOMELAB_ALLOW_DANGEROUS_COMMANDS=true`.
 - `HOMELAB_DRY_RUN=true` makes `execSSH` return a description string instead of connecting. The command guard still runs in dry-run mode.
 - No personal SSH usernames, hostnames, or key names in code or docs. Use `pi` / `raspberrypi.local` / `~/.ssh/id_ed25519` as generic defaults.

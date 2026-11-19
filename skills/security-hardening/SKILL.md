@@ -8,6 +8,7 @@ tools:
   - homelab_containerScan
   - homelab_journalLogs
   - homelab_nodeExec
+  - homelab_systemdControl
 standards-version: 1.10.0
 ---
 
@@ -70,7 +71,7 @@ Use this skill when the user wants to:
      maxretry = 5
      bantime = 3600
      ```
-   - Restart fail2ban via `homelab_nodeExec` with `node: "default"` (or the target node), `command: "sudo systemctl restart fail2ban"` and `confirm: true`, then confirm with `homelab_fail2banStatus`.
+   - Restart fail2ban via `homelab_systemdControl` with `unit: "fail2ban"`, `action: "restart"` and `confirm: true`, then confirm with `homelab_fail2banStatus`.
 4. **SSH lockdown**:
    - Disable password auth, disable root login, restrict users (see `ssh-management` skill for detailed steps).
    - Reload sshd after changes via `homelab_nodeExec` with `node: "default"` (or the target node), `command: "sudo sshd -t && sudo systemctl reload ssh"` and `confirm: true`.
@@ -135,7 +136,8 @@ Use this skill when the user wants to:
 | `homelab_piStatus` | System overview before hardening |
 | `homelab_networkInfo` | Inspect open ports, interfaces, and firewall state |
 | `homelab_serviceHealth` | Confirm services survive firewall and config changes |
-| `homelab_nodeExec` | Restart or reload native services (fail2ban, ssh) via systemctl (`confirm: true`) |
+| `homelab_systemdControl` | Restart or reload native services such as fail2ban (`confirm: true`) |
+| `homelab_nodeExec` | Validate and reload sshd in one step (`sudo sshd -t && sudo systemctl reload ssh`, `confirm: true`) |
 | `homelab_serviceRestart` | Restart a Docker container (for example Nginx Proxy Manager) after config updates |
 | `homelab_journalLogs` | Check fail2ban journal entries (`unit: "fail2ban"`) for ban activity or errors |
 | `homelab_composePs` | Verify container state after security changes |

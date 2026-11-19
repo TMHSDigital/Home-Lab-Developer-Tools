@@ -144,7 +144,8 @@ System-level maintenance beyond apt update.
 - [x] `homelab_aptUpgradable` -- list upgradable packages with version details
 - [x] `homelab_aptHistory` -- show recent apt install/upgrade history
 - [x] `homelab_kernelInfo` -- kernel version, loaded modules, boot params
-- [x] `homelab_systemdServices` -- list systemd units, enable/disable/status
+- [x] `homelab_systemdServices` -- list systemd units or show one unit's status (read-only)
+- [x] `homelab_systemdControl` -- start/stop/restart/reload/enable/disable a unit (confirm-gated, added later)
 
 **Skills (+2):**
 

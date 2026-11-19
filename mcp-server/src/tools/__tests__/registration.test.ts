@@ -53,6 +53,7 @@ const GATED_REQUIRED = [
   "homelab_composeDown",
   "homelab_adguardFilterToggle",
   "homelab_alertSilence",
+  "homelab_systemdControl",
 ];
 
 describe("tool registration", () => {

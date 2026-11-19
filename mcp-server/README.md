@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 54 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. All tools accept an optional `node` parameter to target specific nodes.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 55 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. All tools accept an optional `node` parameter to target specific nodes.
 
 ## Tools
 
@@ -50,6 +50,7 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | OS | `homelab_aptHistory` | Show recent apt install/upgrade/remove history |
 | OS | `homelab_kernelInfo` | Kernel version, boot parameters, loaded modules |
 | OS | `homelab_systemdServices` | List systemd units or get status of a specific unit |
+| OS | `homelab_systemdControl` | Start, stop, restart, reload, enable or disable a systemd unit |
 | Certificates | `homelab_certCheck` | Check SSL certificate expiry, issuer, and fingerprint |
 | Certificates | `homelab_certRenew` | Trigger Let's Encrypt certificate renewal |
 | Certificates | `homelab_certList` | List all managed certificates from certbot and NPM |

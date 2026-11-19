@@ -6,6 +6,7 @@ tools:
   - homelab_volumeBackup
   - homelab_journalLogs
   - homelab_nodeExec
+  - homelab_systemdControl
 standards-version: 1.10.0
 ---
 
@@ -45,7 +46,7 @@ Use this skill when the user wants to:
      ```
    - Create the directory and set ownership: `sudo mkdir -p /srv/samba/sharename && sudo chown -R nobody:smbgroup /srv/samba/sharename`
    - Add a Samba user: `sudo smbpasswd -a <username>`
-   - Restart Samba: `sudo systemctl restart smbd`
+   - Restart Samba: `homelab_systemdControl` with `unit: "smbd"`, `action: "restart"` and `confirm: true`
    - Test from Windows: `net use Z: \\pi5\sharename /user:<username>`
 3. **Syncthing configuration** (if requested):
    - Syncthing runs as a Docker container from `/opt/homelab/docker/syncthing/`.
@@ -129,7 +130,8 @@ Use this skill when the user wants to:
 | `homelab_composeDown` | Stop stacks before major volume operations |
 | `homelab_journalLogs` | Debug Samba (`unit: "smbd"`) via the systemd journal |
 | `homelab_serviceLogs` | Debug the Syncthing container |
-| `homelab_nodeExec` | Restart smbd after config changes (`sudo systemctl restart smbd`, `confirm: true`) |
+| `homelab_systemdControl` | Restart smbd after config changes (`action: "restart"`, `confirm: true`) |
+| `homelab_nodeExec` | Run other one-off commands on the node (`confirm: true`) |
 | `homelab_serviceRestart` | Restart the Syncthing container |
 | `homelab_backupStatus` | Check if backups are consuming excessive space |
 

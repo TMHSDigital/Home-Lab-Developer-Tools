@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 54 MCP tools</strong>
+  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 55 MCP tools</strong>
 </p>
 
 ---
@@ -43,7 +43,7 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
 | **22 Skills** (SKILL.md) | Yes | Yes | Yes | - |
 | **11 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **54 MCP tools** | Yes | Yes | Yes | Yes |
+| **55 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -131,7 +131,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-54-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-55-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2022.12-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -156,7 +156,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>54 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>55 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -258,7 +258,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_certRenew` | Trigger Let's Encrypt certificate renewal (requires confirm=true) |
 | `homelab_certList` | List all managed certificates from certbot and NPM |
 
-**OS / Packages** (4)
+**OS / Packages** (5)
 
 | Tool | What It Does |
 |---|---|
@@ -266,6 +266,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_aptHistory` | Show recent apt install/upgrade/remove history |
 | `homelab_kernelInfo` | Kernel version, boot parameters, loaded modules |
 | `homelab_systemdServices` | List systemd units or get status of a specific unit |
+| `homelab_systemdControl` | Start, stop, restart, reload, enable or disable a systemd unit (requires confirm=true) |
 
 **Multi-Node** (4)
 

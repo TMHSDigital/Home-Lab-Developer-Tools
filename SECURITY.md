@@ -15,7 +15,7 @@ This project connects to remote hosts via SSH. Security considerations:
 - SSH private keys must never be committed to the repository
 - The `.env` file containing connection details is gitignored
 - MCP tools execute commands on remote hosts -- review tool actions before running
-- Tools with destructive or state-changing actions require explicit `confirm=true` parameters: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, `homelab_adguardFilterToggle`, `homelab_alertSilence`, and `homelab_aptUpdate` when `upgrade=true`. Called without it, they return a preview of the command and run nothing
+- Tools with destructive or state-changing actions require explicit `confirm=true` parameters: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, `homelab_adguardFilterToggle`, `homelab_alertSilence`, `homelab_systemdControl`, and `homelab_aptUpdate` when `upgrade=true`. Called without it, they return a preview of the command and run nothing
 
 ## Runtime Command Guard
 

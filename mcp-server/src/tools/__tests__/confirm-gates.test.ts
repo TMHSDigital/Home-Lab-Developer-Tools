@@ -29,6 +29,7 @@ import * as composeDown from "../composeDown.js";
 import * as aptUpdate from "../aptUpdate.js";
 import * as adguardFilterToggle from "../adguardFilterToggle.js";
 import * as alertSilence from "../alertSilence.js";
+import * as systemdControl from "../systemdControl.js";
 
 const MODULES: Record<string, { register: (server: never) => void }> = {
   piReboot,
@@ -43,6 +44,7 @@ const MODULES: Record<string, { register: (server: never) => void }> = {
   aptUpdate,
   adguardFilterToggle,
   alertSilence,
+  systemdControl,
 };
 
 const mockExecSSH = vi.mocked(execSSH);
@@ -66,6 +68,7 @@ const GATED: Array<[tool: string, file: string, args: Record<string, unknown>, e
   ["homelab_aptUpdate", "aptUpdate", { upgrade: true }, "apt-get upgrade -y"],
   ["homelab_adguardFilterToggle", "adguardFilterToggle", { url: "https://l.example/a.txt", enabled: false }, "/control/filtering/status"],
   ["homelab_alertSilence", "alertSilence", { action: "expire", id: "8e6c1b9a-6d1f-4c1e-9a43-0f5d2b7a9c10" }, "-X DELETE"],
+  ["homelab_systemdControl", "systemdControl", { unit: "smbd", action: "restart" }, "sudo systemctl restart 'smbd'"],
 ];
 
 type Handler = (args: Record<string, unknown>) => Promise<{ content: { text: string }[] }>;
@@ -127,6 +130,29 @@ describe("confirm gate", () => {
     const handler = await load("nodeExec");
     const text = (await handler({ node: "nas", command: "sudo poweroff", confirm: false })).content[0].text;
     expect(text).toContain("would be blocked");
+  });
+
+  it("systemdControl refuses to stop or disable sshd, even with confirm", async () => {
+    const handler = await load("systemdControl");
+    for (const unit of ["ssh", "sshd.service", "ssh.socket"]) {
+      for (const action of ["stop", "disable"]) {
+        const result = (await handler({ unit, action, confirm: true })) as { content: { text: string }[]; isError?: boolean };
+        expect(result.isError).toBe(true);
+        expect(result.content[0].text).toContain("Refusing");
+      }
+    }
+    expect(mockExecSSH).not.toHaveBeenCalled();
+    await handler({ unit: "ssh", action: "reload", confirm: true });
+    expect(String(mockExecSSH.mock.calls[0][0])).toContain("sudo systemctl reload 'ssh'");
+  });
+
+  it("systemdControl reports the unit state after the action", async () => {
+    const handler = await load("systemdControl");
+    mockExecSSH.mockResolvedValueOnce("active: active\nenabled: enabled");
+    const text = (await handler({ unit: "smbd", action: "restart", confirm: true })).content[0].text;
+    expect(String(mockExecSSH.mock.calls[0][0])).toContain("systemctl is-active 'smbd'");
+    expect(text).toContain("systemctl restart smbd done.");
+    expect(text).toContain("active: active");
   });
 
   it("reports invalid arguments in the preview", async () => {

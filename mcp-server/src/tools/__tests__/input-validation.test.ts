@@ -45,6 +45,7 @@ import { register as serviceLogs } from "../serviceLogs.js";
 import { register as serviceRestart } from "../serviceRestart.js";
 import { register as speedtestResults } from "../speedtestResults.js";
 import { register as systemdServices } from "../systemdServices.js";
+import { register as systemdControl } from "../systemdControl.js";
 import { register as ufwStatus } from "../ufwStatus.js";
 import { register as volumeBackup } from "../volumeBackup.js";
 
@@ -98,6 +99,7 @@ const REGISTRARS: Record<string, (server: never) => void> = {
   serviceRestart,
   speedtestResults,
   systemdServices,
+  systemdControl,
   ufwStatus,
   volumeBackup,
 };
@@ -583,6 +585,23 @@ describe("input validation schemas", () => {
         confirm: true,
       });
       expect(result.include).toBe("/opt/homelab/docker/");
+    });
+  });
+
+  describe("systemdControl", () => {
+    const schema = schemaOf("systemdControl");
+
+    it("accepts unit names with instance and type suffixes", () => {
+      for (const unit of ["smbd", "cockpit.socket", "getty@tty1.service", "restic-backup.timer", "dev-sda1.mount"]) {
+        expect(schema.parse({ unit, action: "restart", confirm: true }).unit).toBe(unit);
+      }
+    });
+
+    it("rejects unsafe unit names and unknown actions", () => {
+      for (const unit of ["", "smbd; reboot", "a b", "x'y", "$(id)", "../etc"]) {
+        expect(() => schema.parse({ unit, action: "restart", confirm: true }), unit).toThrow();
+      }
+      expect(() => schema.parse({ unit: "smbd", action: "mask", confirm: true })).toThrow();
     });
   });
 

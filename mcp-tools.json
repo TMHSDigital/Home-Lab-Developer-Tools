@@ -11,6 +11,7 @@
   {"name": "homelab_diskUsage", "description": "Get detailed disk usage breakdown", "category": "System & Security"},
   {"name": "homelab_kernelInfo", "description": "Kernel version, boot parameters, loaded modules", "category": "System & Security"},
   {"name": "homelab_systemdServices", "description": "List systemd units or get status of a specific unit", "category": "System & Security"},
+  {"name": "homelab_systemdControl", "description": "Start, stop, restart, reload, enable or disable a systemd unit (requires confirm=true)", "category": "System & Security"},
   {"name": "homelab_aptUpdate", "description": "Run apt update and list upgradable packages", "category": "System & Security"},
   {"name": "homelab_aptUpgradable", "description": "List upgradable packages with versions", "category": "System & Security"},
   {"name": "homelab_aptHistory", "description": "Show recent apt install, upgrade, and remove history", "category": "System & Security"},

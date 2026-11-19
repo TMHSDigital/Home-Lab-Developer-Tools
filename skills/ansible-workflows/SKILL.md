@@ -5,6 +5,7 @@ tools:
   - homelab_inventorySync
   - homelab_nodeList
   - homelab_nodeExec
+  - homelab_systemdControl
 standards-version: 1.10.0
 ---
 
@@ -109,7 +110,7 @@ Use this skill when the user wants to:
 | `homelab_piStatus` | Verify system state after provisioning |
 | `homelab_serviceHealth` | Confirm deployed services are running |
 | `homelab_serviceLogs` / `homelab_journalLogs` | Debug container / systemd service startup failures post-deployment |
-| `homelab_serviceRestart` / `homelab_nodeExec` | Restart a container, or a systemd service via `systemctl` (`confirm: true`), if an Ansible handler did not trigger |
+| `homelab_serviceRestart` / `homelab_systemdControl` | Restart a container, or a native systemd unit (`confirm: true`), if an Ansible handler did not trigger |
 | `homelab_aptUpdate` | Check for package updates before running apt tasks |
 | `homelab_composeUp` | Bring up Docker stacks deployed by playbooks |
 | `homelab_composePs` | Verify container state after compose deployment |
