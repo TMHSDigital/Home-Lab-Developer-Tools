@@ -4,7 +4,7 @@ import { nodeSetting } from "./ssh-api.js";
  * Shared compose file selection for composeUp, composeDown, composePull and
  * composePs.
  *
- * Resolution order when no `stacks` are passed:
+ * Resolution order for the project's file list:
  * 1. HOMELAB_COMPOSE_FILES (comma-separated, used in the given order)
  * 2. Discovery in the compose directory on the node: compose.base.yml first,
  *    then the reference stack files in their historical order (monitoring,
@@ -79,20 +79,13 @@ function discoverySnippet(dir: string): string {
 }
 
 /**
- * Build the full remote command: cd into the compose dir, pick the files,
- * and run `docker compose <files> <action>`.
- *
- * When `stacks` is given, compose.base.yml is passed first followed by each
- * requested file (unchanged behavior).
+ * Build the full remote command for the whole project: cd into the compose
+ * dir, pick the files, and run `docker compose <files> <action>`. For a
+ * subset of stack files use buildStackCommand.
  */
-export function buildComposeCommand(action: string, stacks?: string[], node?: string): string {
+export function buildComposeCommand(action: string, node?: string): string {
   const dir = composeDir(node);
   const cd = `cd ${dir} || exit 1`;
-
-  if (stacks && stacks.length > 0) {
-    const files = ["-f compose.base.yml", ...stacks.map((s) => `-f ${s}`)].join(" ");
-    return `${cd}; docker compose ${files} ${action}`;
-  }
 
   const configured = configuredComposeFiles(node);
   if (configured) {

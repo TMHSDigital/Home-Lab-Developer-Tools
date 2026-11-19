@@ -23,7 +23,7 @@ function upCommand(stacks: string[] | undefined, node?: string): string {
   // Orphan removal is only safe when the whole project is brought up.
   return stacks && stacks.length > 0
     ? buildStackCommand(["up -d $services 2>&1"], stacks, node)
-    : buildComposeCommand("up -d --remove-orphans 2>&1", undefined, node);
+    : buildComposeCommand("up -d --remove-orphans 2>&1", node);
 }
 
 export function register(server: McpServer): void {

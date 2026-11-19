@@ -36,13 +36,6 @@ describe("compose file selection", () => {
     else process.env.HOMELAB_COMPOSE_FILES = saved.files;
   });
 
-  it("passes compose.base.yml plus requested stacks when stacks are given", () => {
-    delete process.env.HOMELAB_COMPOSE_DIR;
-    expect(buildComposeCommand("pull", ["compose.monitoring.yml"])).toBe(
-      "cd /opt/homelab/docker || exit 1; docker compose -f compose.base.yml -f compose.monitoring.yml pull",
-    );
-  });
-
   it("uses HOMELAB_COMPOSE_FILES in order when set", () => {
     process.env.HOMELAB_COMPOSE_DIR = "/srv/stack";
     process.env.HOMELAB_COMPOSE_FILES = "docker-compose.yml, override.yml";

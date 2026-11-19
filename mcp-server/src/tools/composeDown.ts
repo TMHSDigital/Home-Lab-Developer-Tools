@@ -33,7 +33,7 @@ function downCommand(args: { node?: string; stacks?: string[]; removeVolumes?: b
   // other stacks as orphans; stop and remove only this stack's services.
   return subset
     ? buildStackCommand(["stop $services 2>&1", "rm -f $services 2>&1"], args.stacks!, args.node)
-    : buildComposeCommand(`down${volFlag} 2>&1`, undefined, args.node);
+    : buildComposeCommand(`down${volFlag} 2>&1`, args.node);
 }
 
 export function register(server: McpServer): void {

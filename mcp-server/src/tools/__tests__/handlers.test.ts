@@ -23,6 +23,7 @@ import { register as npmProxyHosts } from "../npmProxyHosts.js";
 import { register as certCheck } from "../certCheck.js";
 import { register as inventorySync } from "../inventorySync.js";
 import { register as composePs } from "../composePs.js";
+import { register as composePull } from "../composePull.js";
 import { register as serviceHealth } from "../serviceHealth.js";
 import { register as systemdServices } from "../systemdServices.js";
 import { register as logSearch } from "../logSearch.js";
@@ -669,6 +670,39 @@ describe("adguardFilterToggle", () => {
     const payload = buildSetUrlPayload({ url: "u", name: "Bob's list", enabled: true }, false, false);
     expect(shellQuote(payload)).toBe(`'${payload.replace(/'/g, "'\\''")}'`);
     expect(shellQuote("a'b")).toBe("'a'\\''b'");
+  });
+});
+
+describe("composePull", () => {
+  it("pulls a stack's services without requiring compose.base.yml", async () => {
+    mockExecSSH.mockResolvedValueOnce("pulled");
+    await handlerOf(composePull)({ stacks: ["compose.apps.yml"] });
+    const command = cmd();
+    expect(command).not.toMatch(/docker compose -f compose\.base\.yml -f compose\.apps\.yml pull/);
+    expect(command).toContain("if [ -f compose.base.yml ]; then");
+    expect(command).toContain("else services=$(docker compose -f compose.apps.yml config --services)");
+    expect(command.endsWith("docker compose $files pull $services 2>&1")).toBe(true);
+    expect(mockExecSSH.mock.calls[0][2]).toEqual({ timeoutMs: 1_800_000 });
+  });
+
+  it("uses HOMELAB_COMPOSE_FILES as the project for a stack pull", async () => {
+    process.env.HOMELAB_COMPOSE_FILES = "compose.apps.yml";
+    mockExecSSH.mockResolvedValueOnce("pulled");
+    await handlerOf(composePull)({ stacks: ["compose.apps.yml"] });
+    expect(cmd()).toContain('files=" -f compose.apps.yml"');
+  });
+
+  it("applies the same stack-name validation as composeUp", async () => {
+    const result = await handlerOf(composePull)({ stacks: ["a.yml;reboot"] });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/Invalid stack file/);
+    expect(mockExecSSH).not.toHaveBeenCalled();
+  });
+
+  it("pulls the whole project when no stacks are given", async () => {
+    mockExecSSH.mockResolvedValueOnce("pulled");
+    await handlerOf(composePull)({});
+    expect(cmd().endsWith("docker compose $files pull 2>&1")).toBe(true);
   });
 });
 
