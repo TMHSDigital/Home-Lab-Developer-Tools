@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `homelab_speedtestResults` now uses Speedtest Tracker's paginated results API so `count` controls the number of recent results, newest first. Set `HOMELAB_SPEEDTEST_TOKEN` to an API token with `results:read` permission; per-node token overrides are supported.
+
 ## [0.28.0] - 2026-11-26
 
 ### Added
