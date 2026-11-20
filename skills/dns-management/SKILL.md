@@ -6,6 +6,8 @@ tools:
   - homelab_adguardFilters
   - homelab_adguardQueryLog
   - homelab_adguardFilterToggle
+  - homelab_adguardRewrites
+  - homelab_adguardRewriteSet
 standards-version: 1.10.0
 ---
 
@@ -50,7 +52,10 @@ Optional:
    - Check if the domain is being blocked by a filter list
    - Guide the user to add an exception if needed
 6. **For local DNS records:**
-   - Guide configuration of DNS rewrites via the AdGuard API or config file
+   - Call `homelab_adguardRewrites` to list the current domain/answer pairs
+   - Use `homelab_adguardRewriteSet` with `action: "add"` or `"delete"`, `domain`, `answer`, and `confirm: false` to preview the change
+   - After the user approves, repeat with `confirm: true`; deletion removes the exact domain/answer pair shown in the list
+   - Domains accept ASCII hostnames and leading wildcards such as `*.home.lab`; answers accept IPv4, IPv6, or a CNAME hostname (use punycode for internationalized names)
    - Common use case: `service.home.lab` pointing to the Pi's IP
 7. **For upstream DNS configuration:**
    - Guide setup of upstream DNS servers (e.g. Cloudflare 1.1.1.1, Quad9 9.9.9.9)
@@ -76,7 +81,9 @@ Common API endpoints:
 - `GET /control/filtering/status` -- filter lists
 - `GET /control/querylog?search=DOMAIN&limit=N` -- query log search
 - `POST /control/filtering/add_url` -- add a blocklist
+- `GET /control/rewrite/list` -- list DNS rewrites
 - `POST /control/rewrite/add` -- add a DNS rewrite
+- `POST /control/rewrite/delete` -- delete an exact domain/answer pair
 - `GET /control/dns_info` -- upstream DNS config
 
 Popular blocklists:
@@ -104,6 +111,13 @@ Popular blocklists:
 1. Call `homelab_adguardStats`
 2. Format the response
 
+**User:** "Point service.home.lab at 192.0.2.1"
+
+**Assistant actions:**
+1. Call `homelab_adguardRewrites` to check existing records
+2. Preview with `homelab_adguardRewriteSet({action: "add", domain: "service.home.lab", answer: "192.0.2.1", confirm: false})`
+3. After approval, call again with `confirm: true`
+
 ## MCP Usage
 
 | Tool                          | Purpose                                        |
@@ -113,6 +127,8 @@ Popular blocklists:
 | `homelab_adguardFilters`      | List filter/blocklists and their status         |
 | `homelab_adguardFilterToggle` | Enable or disable a filter list (confirm=true)  |
 | `homelab_adguardQueryLog`     | Search DNS queries for troubleshooting          |
+| `homelab_adguardRewrites`     | List local DNS rewrite records                 |
+| `homelab_adguardRewriteSet`   | Add or delete an exact rewrite (confirm=true)   |
 | `homelab_serviceHealth`       | Check AdGuard container health                  |
 | `homelab_serviceLogs`         | Debug AdGuard startup or config issues          |
 | `homelab_serviceRestart`      | Restart AdGuard after config changes            |

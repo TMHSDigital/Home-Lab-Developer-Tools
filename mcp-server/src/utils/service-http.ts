@@ -80,7 +80,7 @@ export function servicePort(service: ServiceDef, node?: string): number {
 export function adguardAuth(node?: string): string {
   const user = setting(node, "HOMELAB_ADGUARD_USER", "admin");
   const password = setting(node, "HOMELAB_ADGUARD_PASSWORD", "admin");
-  return `-u '${user}:${password}'`;
+  return `-u ${shellQuote(`${user}:${password}`)}`;
 }
 
 /** Bearer token (preferred) or basic-auth flag for Grafana. */
@@ -97,7 +97,7 @@ export function grafanaAuth(node?: string): string {
   return `-u 'admin:admin'`;
 }
 
-function shellQuote(value: string): string {
+export function shellQuote(value: string): string {
   return `'${value.replace(/'/g, "'\\''")}'`;
 }
 
