@@ -26,6 +26,49 @@ function schemaOf(tool: string) {
   return z.object(shape);
 }
 describe("input validation schemas", () => {
+  describe("adguardRewrites", () => {
+    const schema = schemaOf("adguardRewrites");
+    it("accepts the default or a named node", () => {
+      expect(schema.parse({})).toEqual({});
+      expect(schema.parse({ node: "nas" }).node).toBe("nas");
+    });
+  });
+
+  describe("adguardRewriteSet", () => {
+    const schema = schemaOf("adguardRewriteSet");
+    const base = { action: "add", domain: "service.home.lab", answer: "192.0.2.1", confirm: true };
+
+    it.each(["192.0.2.1", "2001:db8::1", "nas.home.lab", "nas.home.lab.", "localhost", "xn--bcher-kva.example"])(
+      "accepts IP or hostname answer %j", (answer) => {
+        expect(schema.parse({ ...base, answer }).answer).toBe(answer);
+      },
+    );
+    it.each(["service.home.lab", "*.home.lab", "localhost", "home.lab."])("accepts domain %j", (domain) => {
+      expect(schema.parse({ ...base, action: "delete", domain }).domain).toBe(domain);
+    });
+    it.each(["", "*", "a.*.lab", ".home.lab", "a..lab", "-bad.lab", "bad-.lab", "a".repeat(64) + ".lab", "x;id", "x'", "a\nlab"])(
+      "rejects invalid domain %j", (domain) => {
+        expect(schema.safeParse({ ...base, domain }).success).toBe(false);
+      },
+    );
+    it.each(["", "999.0.0.1", "192.168.1", "fe80::1%eth0", "https://nas.lab", "*.home.lab", "bad..lab", "x'", "$(id)", "a".repeat(254)])(
+      "rejects invalid answer %j", (answer) => {
+        expect(schema.safeParse({ ...base, answer }).success).toBe(false);
+      },
+    );
+    it("requires an add/delete action, both record fields, and boolean confirmation", () => {
+      for (const key of ["action", "domain", "answer", "confirm"]) {
+        const args: Record<string, unknown> = { ...base };
+        delete args[key];
+        expect(schema.safeParse(args).success).toBe(false);
+      }
+      expect(schema.safeParse({ ...base, action: "update" }).success).toBe(false);
+      expect(schema.safeParse({ ...base, confirm: "yes" }).success).toBe(false);
+      expect(schema.parse({ ...base, confirm: false }).confirm).toBe(false);
+    });
+  });
+
+
   describe("composePull", () => {
     const schema = schemaOf("composePull");
 

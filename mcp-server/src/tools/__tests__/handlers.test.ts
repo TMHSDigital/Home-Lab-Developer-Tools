@@ -17,6 +17,8 @@ import { CommandFailedError } from "../../utils/errors.js";
 import { register as prometheusQuery } from "../prometheusQuery.js";
 import { register as grafanaSnapshot } from "../grafanaSnapshot.js";
 import { register as uptimeKumaStatus } from "../uptimeKumaStatus.js";
+import { register as adguardRewrites } from "../adguardRewrites.js";
+import { register as adguardRewriteSet } from "../adguardRewriteSet.js";
 import { register as adguardStats } from "../adguardStats.js";
 import { register as adguardQueryLog } from "../adguardQueryLog.js";
 import { register as npmProxyHosts } from "../npmProxyHosts.js";
@@ -895,5 +897,76 @@ describe("composePs", () => {
     const result = await handlerOf(composePs)({});
     expect(result.content[0].text).toContain("NAME");
     expect(cmd()).toContain("docker compose -f compose.base.yml -f compose.apps.yml ps");
+  });
+});
+
+describe("AdGuard DNS rewrites", () => {
+  it.each(["add", "delete"])("previews %s without sending a request or exposing credentials", async (action) => {
+    vi.stubEnv("HOMELAB_ADGUARD_PASSWORD", "it's-a-secret");
+    for (const confirm of [false, undefined]) {
+      const result = await handlerOf(adguardRewriteSet)({ action, domain: "service.home.lab", answer: "192.0.2.1", confirm });
+      expect(result.content[0].text).toContain("Preview (nothing was run)");
+      expect(result.content[0].text).toContain(`/control/rewrite/${action}`);
+      expect(result.content[0].text).toContain("-u '****'");
+      expect(result.content[0].text).not.toContain("s-a-secret");
+    }
+    expect(mockExecSSH).not.toHaveBeenCalled();
+  });
+
+  beforeEach(() => mockExecSSH.mockReset());
+  afterEach(() => vi.unstubAllEnvs());
+
+  it.each(["[]", '[{"domain":"service.home.lab","answer":"192.0.2.1","enabled":true}]'])(
+    "lists rewrite entries, including empty lists", async (body) => {
+      mockExecSSH.mockResolvedValueOnce(body);
+      const result = await handlerOf(adguardRewrites)({});
+      expect(cmd()).toContain("/control/rewrite/list'");
+      expect(result.content[0].text).toBe(body);
+      expect(result.isError).toBeUndefined();
+    },
+  );
+
+  it.each(["<html>login</html>", "{}", '[{"domain":"missing-answer.lab"}]', "[output truncated: kept last 10 of 100 bytes]\n[]"])(
+    "reports malformed or truncated lists", async (body) => {
+      mockExecSSH.mockResolvedValueOnce(body);
+      expect((await handlerOf(adguardRewrites)({})).isError).toBe(true);
+    },
+  );
+
+  it.each(["add", "delete"])("posts only the exact domain/answer pair for %s", async (action) => {
+    mockExecSSH.mockResolvedValueOnce("");
+    const result = await handlerOf(adguardRewriteSet)({ action, domain: "*.home.lab", answer: "2001:db8::1", confirm: true });
+    expect(cmd()).toContain("-X POST -H 'Content-Type: application/json'");
+    expect(cmd()).toContain(`-d '{"domain":"*.home.lab","answer":"2001:db8::1"}'`);
+    expect(cmd()).toContain(`/control/rewrite/${action}'`);
+    expect(mockExecSSH).toHaveBeenCalledTimes(1);
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain(action === "add" ? "added" : "deleted");
+  });
+
+  it("uses node-specific credentials and port for both tools", async () => {
+    vi.mocked(nodeSetting).mockImplementation((node, key) => node === "nas" ? ({
+      HOMELAB_ADGUARD_PORT: "8081", HOMELAB_ADGUARD_USER: "dns", HOMELAB_ADGUARD_PASSWORD: "node-password",
+    } as Record<string, string>)[key] : undefined);
+    try {
+      mockExecSSH.mockResolvedValueOnce("[]").mockResolvedValueOnce("");
+      await handlerOf(adguardRewrites)({ node: "nas" });
+      await handlerOf(adguardRewriteSet)({ node: "nas", action: "delete", domain: "service.home.lab", answer: "192.0.2.1", confirm: true });
+      for (const [command, node] of mockExecSSH.mock.calls) {
+        expect(node).toBe("nas");
+        expect(command).toContain("http://localhost:8081/control/rewrite/");
+        expect(command).toContain("-u 'dns:node-password'");
+      }
+    } finally {
+      vi.mocked(nodeSetting).mockReset();
+    }
+  });
+
+  it.each([adguardRewrites, adguardRewriteSet])("reports HTTP authentication failures without success", async (register) => {
+    mockExecSSH.mockRejectedValueOnce(failed(22));
+    const result = await handlerOf(register)({ action: "add", domain: "service.home.lab", answer: "192.0.2.1", confirm: true });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("HOMELAB_ADGUARD_PASSWORD");
+    expect(result.content[0].text).not.toContain(" added.");
   });
 });

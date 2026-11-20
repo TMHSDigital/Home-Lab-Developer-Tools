@@ -19,7 +19,7 @@ export interface ConfirmPreview {
 /** Hide credentials that commands carry inline (basic auth, bearer tokens, JSON passwords). */
 export function maskCredentials(text: string): string {
   return text
-    .replace(/(-u\s+')[^']*'/g, "$1****'")
+    .replace(/(-u\s+')(?:[^']|'\\'')*'/g, "$1****'")
     .replace(/(Authorization:\s*Bearer\s+)[^'"\s]+/gi, "$1****")
     .replace(/("(?:password|secret|token)"\s*:\s*")[^"]*"/gi, '$1****"');
 }

@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 55 MCP tools</strong>
+  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 57 MCP tools</strong>
 </p>
 
 ---
@@ -43,7 +43,7 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
 | **22 Skills** (SKILL.md) | Yes | Yes | Yes | - |
 | **11 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **55 MCP tools** | Yes | Yes | Yes | Yes |
+| **57 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -131,7 +131,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-55-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-57-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2022.12-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -156,7 +156,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>55 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>57 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -198,7 +198,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_alertSilence` | Create a silence for matching alerts or expire one by ID (requires confirm=true) |
 | `homelab_speedtestResults` | Get recent Speedtest Tracker results |
 
-**DNS / Proxy** (6)
+**DNS / Proxy** (8)
 
 | Tool | What It Does |
 |---|---|
@@ -206,6 +206,8 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_adguardFilters` | List AdGuard filter/blocklists and status |
 | `homelab_adguardQueryLog` | Search the AdGuard DNS query log |
 | `homelab_adguardFilterToggle` | Enable or disable an AdGuard filter list by URL (requires confirm=true) |
+| `homelab_adguardRewrites` | List local DNS rewrite records |
+| `homelab_adguardRewriteSet` | Add or delete a DNS rewrite (requires confirm=true) |
 | `homelab_npmProxyHosts` | List NPM proxy host configurations |
 | `homelab_npmCerts` | List SSL certificates and expiry dates |
 

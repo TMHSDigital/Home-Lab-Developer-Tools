@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { spawnSync } from "node:child_process";
-import { SERVICES, servicePort, curlErrorResponse, setting, npmGetCommand } from "../service-http.js";
+import { SERVICES, servicePort, curlErrorResponse, setting, npmGetCommand, adguardAuth } from "../service-http.js";
 import { CommandFailedError } from "../errors.js";
 
 const KEYS = ["HOMELAB_NPM_PORT", "HOMELAB_NODES", "HOMELAB_ADGUARD_USER", "HOMELAB_NPM_PASSWORD"];
@@ -100,5 +100,25 @@ describe("npmGetCommand", () => {
     const r = run(stub("<html>login</html>") + npmGetCommand("/nginx/certificates", 81));
     expect(r.status).toBe(65);
     expect(r.stderr).toContain("login returned no token");
+  });
+});
+
+describe("adguardAuth", () => {
+  it.skipIf(!!spawnSync("sh", ["-c", "true"]).error)("passes quoted credentials as one literal curl argument", () => {
+    const savedUser = process.env.HOMELAB_ADGUARD_USER;
+    const savedPassword = process.env.HOMELAB_ADGUARD_PASSWORD;
+    process.env.HOMELAB_ADGUARD_USER = "dns";
+    process.env.HOMELAB_ADGUARD_PASSWORD = "it's-$(printf expanded)-a-secret";
+    try {
+      const script = `curl() { printf '%s\\n' "$@"; }; curl ${adguardAuth()}`;
+      const result = spawnSync("sh", ["-c", script], { encoding: "utf8" });
+      expect(result.status).toBe(0);
+      expect(result.stdout.trim().split("\n")).toEqual(["-u", "dns:it's-$(printf expanded)-a-secret"]);
+    } finally {
+      if (savedUser === undefined) delete process.env.HOMELAB_ADGUARD_USER;
+      else process.env.HOMELAB_ADGUARD_USER = savedUser;
+      if (savedPassword === undefined) delete process.env.HOMELAB_ADGUARD_PASSWORD;
+      else process.env.HOMELAB_ADGUARD_PASSWORD = savedPassword;
+    }
   });
 });
