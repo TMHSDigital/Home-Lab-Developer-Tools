@@ -933,9 +933,10 @@ describe("AdGuard DNS rewrites", () => {
     },
   );
 
-  it.each(["add", "delete"])("posts only the exact domain/answer pair for %s", async (action) => {
-    mockExecSSH.mockResolvedValueOnce("");
+  it.each([["add", "200"], ["delete", "204"]])("posts only the exact domain/answer pair for %s", async (action, status) => {
+    mockExecSSH.mockResolvedValueOnce(status);
     const result = await handlerOf(adguardRewriteSet)({ action, domain: "*.home.lab", answer: "2001:db8::1", confirm: true });
+    expect(cmd()).toContain("curl -q -sf -o /dev/null -w '%{http_code}'");
     expect(cmd()).toContain("-X POST -H 'Content-Type: application/json'");
     expect(cmd()).toContain(`-d '{"domain":"*.home.lab","answer":"2001:db8::1"}'`);
     expect(cmd()).toContain(`/control/rewrite/${action}'`);
@@ -944,12 +945,29 @@ describe("AdGuard DNS rewrites", () => {
     expect(result.content[0].text).toContain(action === "add" ? "added" : "deleted");
   });
 
+  it("reports HTTP redirects without claiming a rewrite was added", async () => {
+    mockExecSSH.mockResolvedValueOnce("307");
+    const result = await handlerOf(adguardRewriteSet)({ action: "add", domain: "service.home.lab", answer: "192.0.2.1", confirm: true });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("HTTP 307");
+    expect(result.content[0].text).toContain("HTTPS");
+    expect(result.content[0].text).not.toContain(" added.");
+  });
+
+  it("reports an error when the command returns no HTTP status", async () => {
+    mockExecSSH.mockResolvedValueOnce("");
+    const result = await handlerOf(adguardRewriteSet)({ action: "delete", domain: "service.home.lab", answer: "192.0.2.1", confirm: true });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("successful HTTP status");
+    expect(result.content[0].text).not.toContain(" deleted.");
+  });
+
   it("uses node-specific credentials and port for both tools", async () => {
     vi.mocked(nodeSetting).mockImplementation((node, key) => node === "nas" ? ({
       HOMELAB_ADGUARD_PORT: "8081", HOMELAB_ADGUARD_USER: "dns", HOMELAB_ADGUARD_PASSWORD: "node-password",
     } as Record<string, string>)[key] : undefined);
     try {
-      mockExecSSH.mockResolvedValueOnce("[]").mockResolvedValueOnce("");
+      mockExecSSH.mockResolvedValueOnce("[]").mockResolvedValueOnce("200");
       await handlerOf(adguardRewrites)({ node: "nas" });
       await handlerOf(adguardRewriteSet)({ node: "nas", action: "delete", domain: "service.home.lab", answer: "192.0.2.1", confirm: true });
       for (const [command, node] of mockExecSSH.mock.calls) {
