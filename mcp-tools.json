@@ -43,6 +43,7 @@
   {"name": "homelab_npmProxyHosts", "description": "List Nginx Proxy Manager proxy host configs", "category": "TLS & Reverse Proxy"},
   {"name": "homelab_prometheusQuery", "description": "Run a PromQL query against Prometheus", "category": "Monitoring"},
   {"name": "homelab_grafanaSnapshot", "description": "Export a Grafana dashboard configuration", "category": "Monitoring"},
+  {"name": "homelab_grafanaImport", "description": "Import Grafana dashboard JSON (requires confirm=true)", "category": "Monitoring"},
   {"name": "homelab_uptimeKumaStatus", "description": "Get status of all Uptime Kuma monitors", "category": "Monitoring"},
   {"name": "homelab_alertList", "description": "List alerts from Alertmanager", "category": "Monitoring"},
   {"name": "homelab_alertSilences", "description": "List Alertmanager silences, optionally by state", "category": "Monitoring"},
