@@ -42,7 +42,8 @@ export function register(server: McpServer): void {
     },
     async (args) => {
       const command = () =>
-        `curl -sf ${adguardAuth(args.node)} -X POST -H 'Content-Type: application/json' ` +
+        // Ignore curlrc so redirects are not followed and stdout contains only the status.
+        `curl -q -sf -o /dev/null -w '%{http_code}' ${adguardAuth(args.node)} -X POST -H 'Content-Type: application/json' ` +
         `-d ${shellQuote(JSON.stringify({ domain: args.domain, answer: args.answer }))} ` +
         `'http://localhost:${servicePort(SERVICE, args.node)}/control/rewrite/${args.action}'`;
       if (!args.confirm) {
@@ -51,7 +52,13 @@ export function register(server: McpServer): void {
       let port = SERVICE.defaultPort;
       try {
         port = servicePort(SERVICE, args.node);
-        await execSSH(command(), args.node);
+        const status = await execSSH(command(), args.node);
+        if (/^3\d{2}$/.test(status)) {
+          throw new Error(`${SERVICE.name} on port ${port} redirected the rewrite request (HTTP ${status}). Check whether the endpoint requires HTTPS.`);
+        }
+        if (!/^2\d{2}$/.test(status)) {
+          throw new Error(`${SERVICE.name} on port ${port} did not return a successful HTTP status for the rewrite request.`);
+        }
         return {
           content: [{ type: "text" as const, text: `DNS rewrite ${args.domain} -> ${args.answer} ${args.action === "add" ? "added" : "deleted"}.` }],
         };
