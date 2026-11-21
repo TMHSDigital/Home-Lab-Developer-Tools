@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { register as grafanaImport } from "../grafanaImport.js";
 import { register as npmCerts } from "../npmCerts.js";
 import { register as adguardFilterToggle } from "../adguardFilterToggle.js";
 import { register as sshTest } from "../sshTest.js";
@@ -35,11 +36,13 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   for (const k of ENV) delete process.env[k];
 });
 
 describe("dry-run mode", () => {
   it.each([
+    ["grafanaImport", grafanaImport, { dashboardJson: '{"title":"Pi"}', confirm: true }, "/api/dashboards/db"],
     ["npmCerts", npmCerts, {}, "/api/tokens"],
     ["adguardFilterToggle", adguardFilterToggle, { url: "https://l.example/a.txt", enabled: false, confirm: true }, "/control/filtering/status"],
     ["sshTest", sshTest, {}, "echo ok"],
@@ -55,6 +58,15 @@ describe("dry-run mode", () => {
     expect(text).toContain(fragment);
     expect(text).toContain("Nothing was run (HOMELAB_DRY_RUN)");
     expect(text).not.toMatch(/: OK|Reboot command sent|Check authentication|non-JSON|\[FAIL\]/);
+  });
+
+  it.each(["token", "password"])("Grafana imports redact %s credentials and keep JSON out of dry-run output", async (kind) => {
+    vi.stubEnv("HOMELAB_GRAFANA_TOKEN", kind === "token" ? "secret' tail" : "");
+    vi.stubEnv("HOMELAB_GRAFANA_PASSWORD", "password' tail");
+    const result = await handlerOf(grafanaImport)({ dashboardJson: '{"title":"Pi","description":"private-json"}', confirm: true });
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("Nothing was run");
+    expect(result.content[0].text).not.toMatch(/secret|password|tail|private-json|Dashboard imported/);
   });
 
   it("nodeList does not report nodes as online or offline", async () => {

@@ -45,6 +45,8 @@ export const TIMEOUTS = {
 export interface ExecOptions {
   /** Overall timeout (connect + command) in milliseconds. */
   timeoutMs?: number;
+  /** Optional UTF-8 input, followed by EOF; never included in the command. */
+  stdin?: string;
 }
 
 /**
@@ -381,6 +383,7 @@ export async function execSSH(
             .stderr.on("data", (data: Buffer) => {
               stderr.push(data);
             });
+          if (options.stdin !== undefined) stream.end(options.stdin);
         });
       })
       .on("error", (err: Error & { level?: string }) => {

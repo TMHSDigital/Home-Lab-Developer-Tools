@@ -6,7 +6,7 @@ Project documentation for Claude Code and AI assistants working on this reposito
 
 ## Project Overview
 
-Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 55 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
+Home Lab Developer Tools integrates home lab and Raspberry Pi workflows into AI-assisted development. It includes 22 skills, 11 rules, and a companion MCP server with 56 tools for managing Docker Compose stacks, monitoring, DNS, reverse proxy, networking, backups, disaster recovery, security auditing, logs, notifications, OS management, certificates, multi-node, diagnostics, and system administration via SSH.
 
 **Works with:** Cursor (plugin), Claude Code (terminal and in-editor), and any MCP-compatible client.
 
@@ -83,7 +83,7 @@ Home-Lab-Developer-Tools/
 | resource-limits | compose*.yml | Flag containers without memory or CPU limits |
 | inventory-consistency | hosts, inventory*, .env* | Flag nodes in config missing from HOMELAB_NODES registry |
 
-## MCP Tools (55)
+## MCP Tools (56)
 
 All tools connect to the Pi (or any registered node) via SSH. All tools except `homelab_nodeList` accept a `node` parameter to target a specific node from the `HOMELAB_NODES` registry (optional everywhere except `homelab_nodeExec` and `homelab_nodeStatus`, where it is required). The read-only `homelab_nodeStatus`, `homelab_piStatus`, `homelab_serviceHealth`, `homelab_backupStatus`, `homelab_aptUpgradable`, `homelab_certList`, `homelab_diskUsage`, `homelab_ufwStatus`, `homelab_kernelInfo` and `homelab_healthCheck` also accept `node: "all"` to query every node in parallel (`forNodes`/`fanOut` in `utils/fan-out.ts`); state-changing tools stay single-node.
 
@@ -102,6 +102,7 @@ All tools connect to the Pi (or any registered node) via SSH. All tools except `
 | `homelab_composePs` | List running compose containers |
 | `homelab_prometheusQuery` | Run a PromQL query against Prometheus |
 | `homelab_grafanaSnapshot` | Export a Grafana dashboard configuration by UID |
+| `homelab_grafanaImport` | Import dashboard JSON and return its UID and URL (requires confirm=true) |
 | `homelab_uptimeKumaStatus` | Get the status of all Uptime Kuma monitors |
 | `homelab_alertList` | List alerts from Alertmanager by state |
 | `homelab_alertSilences` | List Alertmanager silences, optionally by state |
@@ -190,7 +191,7 @@ npm install -g @tmhs/homelab-mcp
 
 ## Security
 
-- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, `homelab_adguardFilterToggle`, `homelab_alertSilence`, `homelab_systemdControl`, and `homelab_aptUpdate` when `upgrade=true`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`; pass `confirmCancelled` a preview (`node` plus a lazy `commands` builder) so a call with `confirm: false` shows the target node and the masked command it would run, and runs nothing. `confirm` is a required boolean, so a call that omits it fails input validation (aptUpdate is the exception: there `confirm` is optional).
+- Tools that change running state require `confirm=true`: `homelab_piReboot`, `homelab_backupRun`, `homelab_backupRestore`, `homelab_volumeBackup`, `homelab_certRenew`, `homelab_nodeExec`, `homelab_serviceRestart`, `homelab_composeUp`, `homelab_composeDown`, `homelab_adguardFilterToggle`, `homelab_alertSilence`, `homelab_systemdControl`, `homelab_grafanaImport`, and `homelab_aptUpdate` when `upgrade=true`. Use the shared `confirmParam` and `confirmCancelled` helpers from `utils/confirm-param.ts`; pass `confirmCancelled` a preview (`node` plus a lazy `commands` builder) so a call with `confirm: false` shows the target node and the masked command it would run, and runs nothing. `confirm` is a required boolean, so a call that omits it fails input validation (aptUpdate is the exception: there `confirm` is optional).
 - `execSSH()` runs `assertCommandSafe()` before opening any SSH connection. This blocks catastrophic patterns (`rm -rf /`, `mkfs` on block devices, fork bombs, `poweroff`, etc.). Override with `HOMELAB_ALLOW_DANGEROUS_COMMANDS=true`.
 - `HOMELAB_DRY_RUN=true` makes `execSSH` throw a `DryRunError` (from `utils/errors.ts`) describing the command instead of connecting; `errorResponse` turns it into a normal result, so tools never parse the plan as output. Multi-step tools stop at their first command. The command guard still runs in dry-run mode.
 - No personal SSH usernames, hostnames, or key names in code or docs. Use `pi` / `raspberrypi.local` / `~/.ssh/id_ed25519` as generic defaults.

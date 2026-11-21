@@ -27,6 +27,7 @@ import { register as diagnostics } from "./tools/diagnostics.js";
 import { register as diskUsage } from "./tools/diskUsage.js";
 import { register as fail2banStatus } from "./tools/fail2banStatus.js";
 import { register as grafanaSnapshot } from "./tools/grafanaSnapshot.js";
+import { register as grafanaImport } from "./tools/grafanaImport.js";
 import { register as healthCheck } from "./tools/healthCheck.js";
 import { register as inventorySync } from "./tools/inventorySync.js";
 import { register as journalLogs } from "./tools/journalLogs.js";
@@ -89,6 +90,7 @@ export const TOOLS: Record<string, (server: McpServer) => void> = {
   diskUsage,
   fail2banStatus,
   grafanaSnapshot,
+  grafanaImport,
   healthCheck,
   inventorySync,
   journalLogs,
