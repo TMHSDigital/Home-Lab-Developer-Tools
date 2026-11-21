@@ -40,6 +40,7 @@ const GATED: Array<[tool: string, file: string, args: Record<string, unknown>, e
   ["homelab_composeDown", "composeDown", {}, "down"],
   ["homelab_aptUpdate", "aptUpdate", { upgrade: true }, "apt-get upgrade -y"],
   ["homelab_adguardFilterToggle", "adguardFilterToggle", { url: "https://l.example/a.txt", enabled: false }, "/control/filtering/status"],
+  ["homelab_adguardRewriteSet", "adguardRewriteSet", { action: "add", domain: "service.home.lab", answer: "192.0.2.1" }, "/control/rewrite/add"],
   ["homelab_alertSilence", "alertSilence", { action: "expire", id: "8e6c1b9a-6d1f-4c1e-9a43-0f5d2b7a9c10" }, "-X DELETE"],
   ["homelab_systemdControl", "systemdControl", { unit: "smbd", action: "restart" }, "sudo systemctl restart 'smbd'"],
 ];
@@ -87,13 +88,14 @@ describe("confirm gate", () => {
     expect(mockExecSSH).not.toHaveBeenCalled();
   });
 
-  it("masks credentials in previews", async () => {
-    process.env.HOMELAB_ADGUARD_PASSWORD = "hunter2";
+  it.each(["hunter2", "it's-a-secret"])("masks credentials %j in previews", async (password) => {
+    process.env.HOMELAB_ADGUARD_PASSWORD = password;
     try {
       const handler = await load("adguardFilterToggle");
       const text = (await handler({ url: "https://l.example/a.txt", enabled: false, confirm: false })).content[0].text;
       expect(text).toContain("curl -sf -u '****'");
-      expect(text).not.toContain("hunter2");
+      expect(text).not.toContain(password);
+      expect(text).not.toContain("s-a-secret");
     } finally {
       delete process.env.HOMELAB_ADGUARD_PASSWORD;
     }

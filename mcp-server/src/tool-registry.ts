@@ -2,6 +2,8 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { register as adguardFilterToggle } from "./tools/adguardFilterToggle.js";
 import { register as adguardFilters } from "./tools/adguardFilters.js";
 import { register as adguardQueryLog } from "./tools/adguardQueryLog.js";
+import { register as adguardRewrites } from "./tools/adguardRewrites.js";
+import { register as adguardRewriteSet } from "./tools/adguardRewriteSet.js";
 import { register as adguardStats } from "./tools/adguardStats.js";
 import { register as alertList } from "./tools/alertList.js";
 import { register as alertSilence } from "./tools/alertSilence.js";
@@ -64,6 +66,8 @@ export const TOOLS: Record<string, (server: McpServer) => void> = {
   adguardFilterToggle,
   adguardFilters,
   adguardQueryLog,
+  adguardRewrites,
+  adguardRewriteSet,
   adguardStats,
   alertList,
   alertSilence,

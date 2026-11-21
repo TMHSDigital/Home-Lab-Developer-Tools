@@ -6,6 +6,8 @@ import { register as piReboot } from "../piReboot.js";
 import { register as backupStatus } from "../backupStatus.js";
 import { register as serviceHealth } from "../serviceHealth.js";
 import { register as healthCheck } from "../healthCheck.js";
+import { register as adguardRewrites } from "../adguardRewrites.js";
+import { register as adguardRewriteSet } from "../adguardRewriteSet.js";
 import { register as nodeList } from "../nodeList.js";
 
 /**
@@ -39,7 +41,25 @@ afterEach(() => {
 });
 
 describe("dry-run mode", () => {
+  it.each([adguardRewrites, adguardRewriteSet])("masks AdGuard credentials in dry-run output", async (register) => {
+    const saved = process.env.HOMELAB_ADGUARD_PASSWORD;
+    process.env.HOMELAB_ADGUARD_PASSWORD = "it's-a-secret";
+    try {
+      const result = await handlerOf(register)({ action: "delete", domain: "service.home.lab", answer: "192.0.2.1", confirm: true });
+      expect(result.isError).toBeUndefined();
+      expect(result.content[0].text).toContain("-u '****'");
+      expect(result.content[0].text).not.toContain("s-a-secret");
+      expect(result.content[0].text).toContain("Nothing was run (HOMELAB_DRY_RUN)");
+      expect(result.content[0].text).not.toContain(" deleted.");
+    } finally {
+      if (saved === undefined) delete process.env.HOMELAB_ADGUARD_PASSWORD;
+      else process.env.HOMELAB_ADGUARD_PASSWORD = saved;
+    }
+  });
+
   it.each([
+    ["adguardRewrites", adguardRewrites, {}, "/control/rewrite/list"],
+    ["adguardRewriteSet", adguardRewriteSet, { action: "add", domain: "service.home.lab", answer: "192.0.2.1", confirm: true }, "/control/rewrite/add"],
     ["npmCerts", npmCerts, {}, "/api/tokens"],
     ["adguardFilterToggle", adguardFilterToggle, { url: "https://l.example/a.txt", enabled: false, confirm: true }, "/control/filtering/status"],
     ["sshTest", sshTest, {}, "echo ok"],
