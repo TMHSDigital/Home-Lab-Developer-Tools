@@ -43,6 +43,7 @@ const toolsDir = join(here, "..");
 const repoRoot = join(here, "../../../..");
 
 const GATED_REQUIRED = [
+  "homelab_grafanaImport",
   "homelab_piReboot",
   "homelab_backupRun",
   "homelab_backupRestore",
@@ -169,6 +170,7 @@ describe("tool input schemas", () => {
         .map(([key, s]) => {
           const options = (s as { options?: unknown[] }).options;
           if (Array.isArray(options)) return [key, options[0]];
+          if (key === "dashboardJson") return [key, '{"title":"Pi"}'];
           return [key, (s as z.ZodType).safeParse("x").success ? "x" : true];
         }),
     );

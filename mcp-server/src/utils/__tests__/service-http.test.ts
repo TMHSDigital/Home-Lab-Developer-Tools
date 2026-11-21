@@ -1,12 +1,28 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { spawnSync } from "node:child_process";
-import { SERVICES, servicePort, curlErrorResponse, setting, npmGetCommand } from "../service-http.js";
+import { SERVICES, servicePort, curlErrorResponse, setting, npmGetCommand, grafanaAuth } from "../service-http.js";
 import { CommandFailedError } from "../errors.js";
 
 const KEYS = ["HOMELAB_NPM_PORT", "HOMELAB_NODES", "HOMELAB_ADGUARD_USER", "HOMELAB_NPM_PASSWORD"];
 
 afterEach(() => {
+  vi.unstubAllEnvs();
   for (const k of KEYS) delete process.env[k];
+});
+
+describe("grafanaAuth", () => {
+  const hasSh = !spawnSync("sh", ["-c", "true"]).error;
+  it.skipIf(!hasSh).each(["token", "password"])("quotes a %s with shell metacharacters intact", (kind) => {
+    const secret = "secret'$(printf INJECTED); tail";
+    vi.stubEnv("HOMELAB_GRAFANA_TOKEN", kind === "token" ? secret : "");
+    vi.stubEnv("HOMELAB_GRAFANA_USER", "pi'user");
+    vi.stubEnv("HOMELAB_GRAFANA_PASSWORD", secret);
+    const result = spawnSync("sh", ["-c", `printf '%s\\n' ${grafanaAuth()}`], { encoding: "utf8" });
+    expect(result.status).toBe(0);
+    expect(result.stdout.trim().split("\n")).toEqual(kind === "token"
+      ? ["-H", `Authorization: Bearer ${secret}`]
+      : ["-u", `pi'user:${secret}`]);
+  });
 });
 
 describe("servicePort", () => {
