@@ -1,15 +1,54 @@
 ---
-name: E2E Tests (Live Pi)
+name: E2E Tests (SSH and Live Pi)
 
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: "0 6 * * 0" # Weekly, Sunday 6am UTC
 
+permissions:
+  contents: read
+
 jobs:
-  e2e:
+  ssh-fixture:
+    name: OpenSSH fixture
     runs-on: ubuntu-latest
-    if: github.repository == 'TMHSDigital/Home-Lab-Developer-Tools' && vars.PI_CONFIGURED == 'true'
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mcp-server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: mcp-server
+
+      - name: Test against an isolated OpenSSH container
+        run: bash scripts/test-ssh-e2e.sh
+        working-directory: mcp-server
+
+  configuration:
+    name: Check live Pi configuration
+    if: github.event_name == 'workflow_dispatch' && vars.PI_CONFIGURED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain missing configuration
+        run: |
+          echo '::error::Live Pi tests require PI_CONFIGURED=true and the PI_HOST, PI_USER and base64-encoded PI_KEY secrets. The independent OpenSSH fixture needs no Pi configuration.'
+          exit 1
+
+  e2e:
+    name: Live Pi (optional)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name != 'pull_request' && github.repository == 'TMHSDigital/Home-Lab-Developer-Tools' && vars.PI_CONFIGURED == 'true'
     steps:
       - uses: actions/checkout@v6
 
@@ -29,14 +68,17 @@ jobs:
         working-directory: mcp-server
 
       - name: Write SSH key
+        env:
+          PI_KEY: ${{ secrets.PI_KEY }}
+          PI_HOST: ${{ secrets.PI_HOST }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.PI_KEY }}" | base64 -d > ~/.ssh/pi_key
+          printf '%s' "$PI_KEY" | base64 -d > ~/.ssh/pi_key
           chmod 600 ~/.ssh/pi_key
-          ssh-keyscan -H ${{ secrets.PI_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -H "$PI_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Run E2E tests
-        run: npm test
+        run: npm test -- src/tools/__tests__/e2e.test.ts
         working-directory: mcp-server
         env:
           HOMELAB_TEST_PI: "true"

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Run read-only SSH end-to-end tests against an isolated OpenSSH container on every pull request. Give live-Pi tests explicit 60-second timeouts, limit their disk probe to `/var/log`, and report missing Pi configuration on manual workflow dispatch.
+
 ## [0.28.0] - 2026-11-26
 
 ### Added
