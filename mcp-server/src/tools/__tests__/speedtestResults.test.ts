@@ -55,6 +55,23 @@ describe("speedtestResults", () => {
     expect((await invoke()).content[0].text).toBe('{"data":[],"meta":{"total":0}}');
   });
 
+  it("rejects a result page truncated by the SSH output limit", async () => {
+    mockExecSSH.mockResolvedValueOnce('[output truncated: showing last 1024 of 2048 bytes]\n{"id":1}]}');
+    const result = await invoke();
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("HOMELAB_MAX_OUTPUT_BYTES");
+  });
+
+  it.each(['{"data":[', '{"data":null}', '{"error":"unavailable"}', '[]'])(
+    "rejects a response without a complete data array: %s",
+    async (output) => {
+      mockExecSSH.mockResolvedValueOnce(output);
+      const result = await invoke();
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain("expected JSON with a data array");
+    },
+  );
+
   it("uses the target node's token and port overrides", async () => {
     vi.stubEnv("HOMELAB_NODES", JSON.stringify({
       nas: { host: "nas.local", env: { HOMELAB_SPEEDTEST_PORT: "9876", HOMELAB_SPEEDTEST_TOKEN: "2|nas-token" } },
