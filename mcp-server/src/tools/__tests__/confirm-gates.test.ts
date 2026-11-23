@@ -3,24 +3,18 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-vi.mock("../../utils/ssh-api.js", async (importOriginal) => ({
-  assertCommandSafe: (await importOriginal<typeof import("../../utils/ssh-api.js")>()).assertCommandSafe,
-  execSSH: vi.fn(),
-  errorResponse: vi.fn((error: unknown) => ({
-    content: [{ type: "text" as const, text: error instanceof Error ? error.message : "Unknown error" }],
-    isError: true,
-  })),
-  nodeSetting: vi.fn((_node: string | undefined, key: string) => process.env[key] || undefined),
-  getNodeConfig: vi.fn(() => ({ host: "raspberrypi.local", username: "pi", keyPath: "", port: 22, env: {} })),
-  listNodes: vi.fn(() => [{ name: "default", host: "raspberrypi.local" }]),
-  TIMEOUTS: { long: 1_800_000, backup: 3_600_000, medium: 300_000 },
-}));
+vi.mock("../../utils/ssh-api.js", async (importOriginal) => {
+  const { mockSSHModule } = await import("./helpers/mock-ssh.js");
+  return mockSSHModule(await importOriginal<typeof import("../../utils/ssh-api.js")>());
+});
+import { useSSHMock } from "./helpers/mock-ssh.js";
 
 import { execSSH } from "../../utils/ssh-api.js";
 import { TOOLS } from "../../tool-registry.js";
 
 
 const mockExecSSH = vi.mocked(execSSH);
+useSSHMock(mockExecSSH, { nas: { host: "nas.local" } });
 
 type Register = (server: unknown) => void;
 
@@ -66,7 +60,6 @@ async function load(file: string) {
 
 describe("confirm gate", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     mockExecSSH.mockResolvedValue("installed");
   });
 
@@ -83,7 +76,7 @@ describe("confirm gate", () => {
     const handler = await load(file);
     const text = (await handler({ ...args, confirm: false })).content[0].text;
     expect(text).toContain("Preview (nothing was run):");
-    expect(text).toMatch(/Node: \w+ \(pi@raspberrypi\.local\)/);
+    expect(text).toContain(args.node ? "Node: nas (pi@nas.local)" : "Node: default (pi@raspberrypi.local)");
     expect(text).toContain(expected);
     expect(mockExecSSH).not.toHaveBeenCalled();
   });

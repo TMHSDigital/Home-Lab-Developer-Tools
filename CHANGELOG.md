@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Handler tests share an SSH mock that preserves real node configuration, timeouts and error formatting, resets replies between tests, and covers every registered tool. Removed the unused `checkSSHAvailable` wrapper.
+
 ## [0.28.0] - 2026-11-26
 
 ### Added
