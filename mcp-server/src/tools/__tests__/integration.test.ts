@@ -30,12 +30,33 @@ vi.mock("../../utils/ssh-api.js", () => ({
 import { execSSH, listNodes } from "../../utils/ssh-api.js";
 import { CommandFailedError } from "../../utils/errors.js";
 
+import { register as healthCheck, buildHealthCheckScript, parseHealthCheckOutput } from "../healthCheck.js";
+import { register as diagnostics, buildDiagnosticsScript } from "../diagnostics.js";
+import { register as backupRun } from "../backupRun.js";
+import { register as backupStatus } from "../backupStatus.js";
+import { register as backupList } from "../backupList.js";
+import { register as sshTest } from "../sshTest.js";
+import { register as backupRestore } from "../backupRestore.js";
+import { register as certRenew } from "../certRenew.js";
+import { register as nodeExec } from "../nodeExec.js";
+import { register as serviceRestart } from "../serviceRestart.js";
+import { register as composeUp } from "../composeUp.js";
+import { register as aptUpdate } from "../aptUpdate.js";
+import { register as composeDown } from "../composeDown.js";
+import { register as nodeList } from "../nodeList.js";
+import { register as piStatus } from "../piStatus.js";
+
+// Load the real guard during collection, outside individual test timeouts.
+const { assertCommandSafe } = await vi.importActual<typeof import("../../utils/ssh-api.js")>(
+  "../../utils/ssh-api.js",
+);
+
 const mockExecSSH = vi.mocked(execSSH);
 const mockListNodes = vi.mocked(listNodes);
 
 describe("integration tests (mocked SSH)", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   describe("healthCheck", () => {
@@ -51,8 +72,7 @@ describe("integration tests (mocked SSH)", () => {
         ].join("\n"),
       );
 
-      const { register } = await import("../healthCheck.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(healthCheck);
       const result = await handler({});
 
       const text = result.content[0].text;
@@ -66,8 +86,7 @@ describe("integration tests (mocked SSH)", () => {
     it("passes node parameter to execSSH", async () => {
       mockExecSSH.mockResolvedValue("@@CHECK|pass|Docker|x");
 
-      const { register } = await import("../healthCheck.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(healthCheck);
       await handler({ node: "nas" });
 
       expect(mockExecSSH).toHaveBeenCalled();
@@ -77,10 +96,6 @@ describe("integration tests (mocked SSH)", () => {
     });
 
     it("builds a script that passes the command guard and covers every check", async () => {
-      const { buildHealthCheckScript, parseHealthCheckOutput } = await import("../healthCheck.js");
-      const { assertCommandSafe } = await vi.importActual<typeof import("../../utils/ssh-api.js")>(
-        "../../utils/ssh-api.js",
-      );
       const script = buildHealthCheckScript();
       expect(() => assertCommandSafe(script)).not.toThrow();
       for (const name of ["Docker", "Docker Compose", "curl", "restic", "certbot", "systemd"]) {
@@ -96,8 +111,7 @@ describe("integration tests (mocked SSH)", () => {
     it("returns the bundle from a single round trip", async () => {
       mockExecSSH.mockResolvedValueOnce("=== OS ===\nDebian GNU/Linux 12\n\n=== Kernel ===\nLinux");
 
-      const { register } = await import("../diagnostics.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(diagnostics);
       const result = await handler({ node: "nas" });
 
       const text = result.content[0].text;
@@ -108,10 +122,6 @@ describe("integration tests (mocked SSH)", () => {
     });
 
     it("builds a script with every section that passes the command guard", async () => {
-      const { buildDiagnosticsScript } = await import("../diagnostics.js");
-      const { assertCommandSafe } = await vi.importActual<typeof import("../../utils/ssh-api.js")>(
-        "../../utils/ssh-api.js",
-      );
       const script = buildDiagnosticsScript();
       expect(() => assertCommandSafe(script)).not.toThrow();
       for (const label of ["OS", "Kernel", "Docker", "Containers", "Memory", "Disk", "Uptime", "Node.js", "Network"]) {
@@ -123,8 +133,7 @@ describe("integration tests (mocked SSH)", () => {
     it("returns an error with the cause when the node is unreachable", async () => {
       mockExecSSH.mockRejectedValueOnce(new Error('Unknown node "typo"'));
 
-      const { register } = await import("../diagnostics.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(diagnostics);
       const result = await handler({ node: "typo" });
 
       expect(result.isError).toBe(true);
@@ -139,8 +148,7 @@ describe("integration tests (mocked SSH)", () => {
         new CommandFailedError("backup", 1, "Fatal: unable to create lock in backend"),
       );
 
-      const { register } = await import("../backupRun.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(backupRun);
       const result = await handler({ confirm: true });
 
       expect(result.isError).toBe(true);
@@ -159,8 +167,7 @@ describe("integration tests (mocked SSH)", () => {
         ),
       );
 
-      const { register } = await import("../backupStatus.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(backupStatus);
       const result = await handler({ count: 5 });
 
       expect(result.isError).toBe(true);
@@ -172,8 +179,7 @@ describe("integration tests (mocked SSH)", () => {
         new CommandFailedError("restic", 1, "Fatal: wrong password or no key found"),
       );
 
-      const { register } = await import("../backupList.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(backupList);
       const result = await handler({});
 
       expect(result.isError).toBe(true);
@@ -186,8 +192,7 @@ describe("integration tests (mocked SSH)", () => {
     it("sshTest reports the targeted node's user and host", async () => {
       mockExecSSH.mockResolvedValueOnce("ok\nnas\nup 3 days");
 
-      const { register } = await import("../sshTest.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(sshTest);
       const result = await handler({ node: "nas" });
 
       expect(result.content[0].text).toContain("SSH connection to admin@nas.local:2222: OK");
@@ -197,8 +202,7 @@ describe("integration tests (mocked SSH)", () => {
     it("backup tools use the node's HOMELAB_BACKUP_REPO override", async () => {
       mockExecSSH.mockResolvedValue("[]");
 
-      const { register } = await import("../backupList.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(backupList);
       await handler({ node: "nas" });
       await handler({});
 
@@ -211,8 +215,7 @@ describe("integration tests (mocked SSH)", () => {
     it("stops and reports the cause when SSH connectivity fails", async () => {
       mockExecSSH.mockRejectedValueOnce(new Error("SSH authentication failed."));
 
-      const { register } = await import("../healthCheck.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(healthCheck);
       const result = await handler({});
 
       expect(result.isError).toBe(true);
@@ -223,8 +226,7 @@ describe("integration tests (mocked SSH)", () => {
 
   describe("confirm gate tools", () => {
     it("backupRestore blocks when confirm=false", async () => {
-      const { register } = await import("../backupRestore.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(backupRestore);
       const result = await handler({
         snapshot: "abc123",
         target: "/tmp/restore",
@@ -236,8 +238,7 @@ describe("integration tests (mocked SSH)", () => {
     });
 
     it("certRenew blocks when confirm=false", async () => {
-      const { register } = await import("../certRenew.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(certRenew);
       const result = await handler({ confirm: false });
 
       expect(result.content[0].text).toContain("cancelled");
@@ -245,8 +246,7 @@ describe("integration tests (mocked SSH)", () => {
     });
 
     it("nodeExec blocks when confirm=false", async () => {
-      const { register } = await import("../nodeExec.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(nodeExec);
       const result = await handler({
         node: "pi5",
         command: "ls",
@@ -258,8 +258,7 @@ describe("integration tests (mocked SSH)", () => {
     });
 
     it("serviceRestart blocks when confirm=false", async () => {
-      const { register } = await import("../serviceRestart.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(serviceRestart);
       const result = await handler({ service: "grafana", confirm: false });
 
       expect(result.content[0].text).toContain("cancelled");
@@ -267,8 +266,7 @@ describe("integration tests (mocked SSH)", () => {
     });
 
     it("composeUp blocks when confirm=false", async () => {
-      const { register } = await import("../composeUp.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(composeUp);
       const result = await handler({ confirm: false });
 
       expect(result.content[0].text).toContain("cancelled");
@@ -276,8 +274,7 @@ describe("integration tests (mocked SSH)", () => {
     });
 
     it("aptUpdate upgrade blocks without confirm=true", async () => {
-      const { register } = await import("../aptUpdate.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(aptUpdate);
       for (const args of [{ upgrade: true }, { upgrade: true, confirm: false }]) {
         const result = await handler(args);
         expect(result.content[0].text).toContain("cancelled");
@@ -287,8 +284,7 @@ describe("integration tests (mocked SSH)", () => {
 
     it("aptUpdate runs upgrade with confirm=true and lists without it", async () => {
       mockExecSSH.mockResolvedValue("ok");
-      const { register } = await import("../aptUpdate.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(aptUpdate);
 
       await handler({ upgrade: false });
       expect(mockExecSSH.mock.calls[0][0]).not.toContain("apt-get upgrade");
@@ -298,8 +294,7 @@ describe("integration tests (mocked SSH)", () => {
     });
 
     it("composeDown blocks when confirm=false", async () => {
-      const { register } = await import("../composeDown.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(composeDown);
       const result = await handler({ confirm: false });
 
       expect(result.content[0].text).toContain("cancelled");
@@ -313,8 +308,7 @@ describe("integration tests (mocked SSH)", () => {
         .mockResolvedValueOnce("ok")
         .mockRejectedValueOnce(new Error("connection refused"));
 
-      const { register } = await import("../nodeList.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(nodeList);
       const result = await handler({});
 
       const text = result.content[0].text;
@@ -327,8 +321,7 @@ describe("integration tests (mocked SSH)", () => {
         throw new Error("HOMELAB_NODES is not valid JSON");
       });
 
-      const { register } = await import("../nodeList.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(nodeList);
       const result = await handler({});
 
       expect(result.isError).toBe(true);
@@ -340,8 +333,7 @@ describe("integration tests (mocked SSH)", () => {
     it("piStatus returns error on SSH failure", async () => {
       mockExecSSH.mockRejectedValueOnce(new Error("Connection refused"));
 
-      const { register } = await import("../piStatus.js");
-      const handler = captureHandler(register);
+      const handler = captureHandler(piStatus);
       const result = await handler({});
 
       expect(result.isError).toBe(true);
