@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-11-26
+
 ### Added
 
 - `homelab_adguardRewrites` lists local DNS records and `homelab_adguardRewriteSet` adds or deletes a validated domain/answer pair with a confirmation preview. Both use per-node AdGuard credentials and port settings; the DNS management skill now uses these tools.
