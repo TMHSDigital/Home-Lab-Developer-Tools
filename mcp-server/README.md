@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 55 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. Every tool except `homelab_nodeList` takes a `node` parameter to target a node from `HOMELAB_NODES` (optional, except for `homelab_nodeExec` and `homelab_nodeStatus` where it is required). Read-only status tools such as `homelab_piStatus`, `homelab_serviceHealth`, `homelab_backupStatus` and `homelab_diskUsage` also accept `node: "all"` to query every node in parallel. State-changing tools require `confirm: true` and return a preview with `confirm: false`.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 57 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. Every tool except `homelab_nodeList` takes a `node` parameter to target a node from `HOMELAB_NODES` (optional, except for `homelab_nodeExec` and `homelab_nodeStatus` where it is required). Read-only status tools such as `homelab_piStatus`, `homelab_serviceHealth`, `homelab_backupStatus` and `homelab_diskUsage` also accept `node: "all"` to query every node in parallel. State-changing tools require `confirm: true` and return a preview with `confirm: false`.
 
 ## Tools
 
@@ -36,6 +36,8 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | DNS/Proxy | `homelab_adguardFilters` | List AdGuard filter lists and status |
 | DNS/Proxy | `homelab_adguardQueryLog` | Search AdGuard DNS query log |
 | DNS/Proxy | `homelab_adguardFilterToggle` | Enable or disable an AdGuard filter list (requires confirm=true) |
+| DNS/Proxy | `homelab_adguardRewrites` | List local DNS rewrite records |
+| DNS/Proxy | `homelab_adguardRewriteSet` | Add or delete a DNS rewrite (requires confirm=true) |
 | DNS/Proxy | `homelab_npmProxyHosts` | List NPM proxy host configs |
 | DNS/Proxy | `homelab_npmCerts` | List SSL certificates and expiry |
 | Security | `homelab_ufwStatus` | List UFW firewall rules and status |
