@@ -1,6 +1,6 @@
 # Home Lab MCP Server
 
-MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 57 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. Every tool except `homelab_nodeList` takes a `node` parameter to target a node from `HOMELAB_NODES` (optional, except for `homelab_nodeExec` and `homelab_nodeStatus` where it is required). Read-only status tools such as `homelab_piStatus`, `homelab_serviceHealth`, `homelab_backupStatus` and `homelab_diskUsage` also accept `node: "all"` to query every node in parallel. State-changing tools require `confirm: true` and return a preview with `confirm: false`.
+MCP (Model Context Protocol) server for home lab operations. Connects to a Raspberry Pi (or multiple nodes) via SSH and provides 58 tools for system management, Docker Compose stacks, service monitoring, networking, backups, disaster recovery, security auditing, log analysis, notifications, OS management, certificate lifecycle, multi-node management, and diagnostics. Every tool except `homelab_nodeList` takes a `node` parameter to target a node from `HOMELAB_NODES` (optional, except for `homelab_nodeExec` and `homelab_nodeStatus` where it is required). Read-only status tools such as `homelab_piStatus`, `homelab_serviceHealth`, `homelab_backupStatus` and `homelab_diskUsage` also accept `node: "all"` to query every node in parallel. State-changing tools require `confirm: true` and return a preview with `confirm: false`.
 
 ## Tools
 
@@ -27,6 +27,7 @@ MCP (Model Context Protocol) server for home lab operations. Connects to a Raspb
 | Backup | `homelab_volumeBackup` | Back up a Docker volume to restic (requires confirm=true) |
 | Monitoring | `homelab_prometheusQuery` | Run PromQL queries against Prometheus |
 | Monitoring | `homelab_grafanaSnapshot` | Export Grafana dashboard config by UID |
+| Monitoring | `homelab_grafanaImport` | Import dashboard JSON and return its UID and URL (requires confirm=true) |
 | Monitoring | `homelab_uptimeKumaStatus` | Get Uptime Kuma monitor statuses |
 | Monitoring | `homelab_alertList` | List Alertmanager alerts by state |
 | Monitoring | `homelab_alertSilences` | List Alertmanager silences, optionally by state |

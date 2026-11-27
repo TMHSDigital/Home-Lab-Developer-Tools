@@ -29,6 +29,7 @@ type Register = (server: unknown) => void;
  * `confirm`) and a fragment of the command it must run once confirmed.
  */
 const GATED: Array<[tool: string, file: string, args: Record<string, unknown>, expected: string]> = [
+  ["homelab_grafanaImport", "grafanaImport", { dashboardJson: '{"title":"Pi"}' }, "/api/dashboards/db"],
   ["homelab_piReboot", "piReboot", {}, "sudo shutdown -r +0"],
   ["homelab_backupRun", "backupRun", {}, "/opt/backup/backup.sh"],
   ["homelab_backupRestore", "backupRestore", { snapshot: "abc123", target: "/tmp/restore" }, "restore"],

@@ -3,6 +3,7 @@ name: grafana-dashboards
 description: Create, import, export, and manage Grafana dashboards for home lab observability.
 tools:
   - homelab_grafanaSnapshot
+  - homelab_grafanaImport
   - homelab_prometheusQuery
 standards-version: 1.10.0
 ---
@@ -42,11 +43,11 @@ Optional:
 4. **For creating a new dashboard:**
    - Determine the target metrics using `homelab_prometheusQuery` to verify data availability
    - Build the dashboard JSON with appropriate panels (graph, stat, gauge, table)
-   - Guide the user through provisioning or API import
+   - Preview with `homelab_grafanaImport` (`dashboardJson`, `confirm: false`), then import with `confirm: true` after approval
 5. **For modifying an existing dashboard:**
    - Export the current config via `homelab_grafanaSnapshot`
    - Apply changes to the JSON structure
-   - Re-import via the Grafana API or provisioning directory
+   - Preview and re-import with `homelab_grafanaImport`, using `overwrite: true` and `confirm: true` after approval
 6. **For data source setup:**
    - Guide configuration of Prometheus as the primary data source at `http://prometheus:9090`
    - Verify connectivity from Grafana to the data source
@@ -90,15 +91,14 @@ Useful PromQL for dashboards:
 **Response:**
 > Here is the full JSON export for dashboard `rYdddlPWk` (Node Exporter Full).
 > It contains 24 panels across 6 rows covering CPU, memory, disk, network, and
-> system load. You can re-import this via the Grafana UI at Settings > JSON Model
-> or place it in the provisioning directory.
+> system load. Pass the export to `homelab_grafanaImport` to restore or migrate it.
 
 **User:** "Create a dashboard showing my Pi's temperature over time"
 
 **Assistant actions:**
 1. Verify data exists: call `homelab_prometheusQuery` with `node_thermal_zone_temp`
 2. Build a dashboard JSON with a time-series panel
-3. Guide the user through import
+3. Preview with `homelab_grafanaImport`, then import after approval
 
 ## MCP Usage
 
@@ -106,10 +106,20 @@ Useful PromQL for dashboards:
 |-------------------------------|-----------------------------------------------|
 | `homelab_sshTest`             | Validate connectivity before operations       |
 | `homelab_grafanaSnapshot`     | Export dashboard JSON by UID                  |
+| `homelab_grafanaImport`       | Import dashboard JSON after confirmation      |
 | `homelab_prometheusQuery`     | Verify metric availability for panels         |
 | `homelab_serviceHealth`       | Check Grafana container health                |
 | `homelab_serviceLogs`         | Debug Grafana issues                          |
 | `homelab_serviceRestart`      | Restart Grafana after provisioning changes    |
+
+### Import options
+
+Pass raw dashboard JSON or the complete snapshot export as the `dashboardJson` string (up to 1 MiB in UTF-8). The tool sends it via SSH stdin to `POST /api/dashboards/db`; the preview omits the JSON contents and masks authentication.
+
+- `confirm: false` previews the target, title, UID, folder and overwrite choice. `confirm: true` submits the import.
+- `overwrite` defaults to `false`. Set it to `true` only when replacing an existing dashboard is intended. The tool retains the UID but resets database-local `id` and `version` so a saved export cannot bypass this choice. Omit or clear the dashboard UID to let Grafana generate one.
+- `folderUid` overrides the exported `meta.folderUid`; an empty string selects root. Without either value, the destination is root. The folder must already exist and be writable.
+- The result includes the UID and Grafana URL (which can be relative to your Grafana base URL). Authentication and port settings match `homelab_grafanaSnapshot` and support per-node overrides.
 
 ## Common Pitfalls
 

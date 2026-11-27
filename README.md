@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 57 MCP tools</strong>
+  <strong>22 skills &nbsp;&bull;&nbsp; 11 rules &nbsp;&bull;&nbsp; 58 MCP tools</strong>
 </p>
 
 ---
@@ -43,7 +43,7 @@ This project works with any AI coding tool that supports skills, rules, or MCP:
 | **CLAUDE.md** context | Yes | Yes | Yes | - |
 | **22 Skills** (SKILL.md) | Yes | Yes | Yes | - |
 | **11 Rules** (.mdc) | Yes | Via CLAUDE.md | Yes | - |
-| **57 MCP tools** | Yes | Yes | Yes | Yes |
+| **58 MCP tools** | Yes | Yes | Yes | Yes |
 
 > **Claude Code** reads `CLAUDE.md` automatically and can reference skills. The MCP server works with any client that supports the MCP stdio transport.
 
@@ -131,7 +131,7 @@ The MCP server gives your AI assistant live access to your Raspberry Pi via SSH.
 
 <p align="center">
   <img src="https://img.shields.io/badge/transport-stdio-blue" alt="transport">
-  <img src="https://img.shields.io/badge/tools-57-green" alt="tools">
+  <img src="https://img.shields.io/badge/tools-58-green" alt="tools">
   <img src="https://img.shields.io/badge/runtime-Node%20%E2%89%A5%2022.12-yellow" alt="runtime">
   <img src="https://img.shields.io/badge/connection-SSH-orange" alt="connection">
 </p>
@@ -156,7 +156,7 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 ```
 
 <details>
-<summary><strong>57 MCP Tools</strong> - full tool reference</summary>
+<summary><strong>58 MCP Tools</strong> - full tool reference</summary>
 
 &nbsp;
 
@@ -186,12 +186,13 @@ Add to your Cursor MCP config (`.cursor/mcp.json`):
 | `homelab_composePull` | Pull latest images |
 | `homelab_composePs` | List running compose containers |
 
-**Monitoring** (7)
+**Monitoring** (8)
 
 | Tool | What It Does |
 |---|---|
 | `homelab_prometheusQuery` | Run a PromQL query against Prometheus |
 | `homelab_grafanaSnapshot` | Export a Grafana dashboard configuration by UID |
+| `homelab_grafanaImport` | Import dashboard JSON and return its UID and URL (requires confirm=true) |
 | `homelab_uptimeKumaStatus` | Get the status of all Uptime Kuma monitors |
 | `homelab_alertList` | List alerts from Alertmanager by state |
 | `homelab_alertSilences` | List Alertmanager silences, optionally by state |

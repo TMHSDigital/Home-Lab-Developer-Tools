@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `homelab_grafanaImport`: confirm-gated dashboard import from raw JSON or `homelab_grafanaSnapshot` exports, with a 1 MiB UTF-8 input limit, folder selection, opt-in overwrite, SSH stdin transport, and UID/URL results.
+
+### Fixed
+
+- Quote Grafana credentials safely when they contain apostrophes or shell metacharacters.
+
 ## [0.28.0] - 2026-11-26
 
 ### Added

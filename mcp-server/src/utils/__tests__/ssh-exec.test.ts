@@ -17,6 +17,7 @@ interface Behavior {
 const state = vi.hoisted(() => ({
   behavior: {} as Behavior,
   ended: 0,
+  stdin: undefined as string | undefined,
   signals: [] as string[],
   connectConfig: undefined as { port?: number } | undefined,
 }));
@@ -26,6 +27,9 @@ vi.mock("ssh2", async () => {
 
   class FakeStream extends EventEmitter {
     stderr = new EventEmitter();
+    end(input: string) {
+      state.stdin = input;
+    }
     signal(name: string) {
       state.signals.push(name);
     }
@@ -76,6 +80,7 @@ import {
 beforeEach(() => {
   state.behavior = {};
   state.ended = 0;
+  state.stdin = undefined;
   state.signals.length = 0;
   delete process.env.HOMELAB_DRY_RUN;
   delete process.env.HOMELAB_PI_KEY_PATH;
@@ -88,6 +93,21 @@ afterEach(() => {
 });
 
 describe("execSSH with a mocked SSH client", () => {
+  it("writes optional stdin, including empty input, and leaves other channels open", async () => {
+    await execSSH("cat");
+    expect(state.stdin).toBeUndefined();
+    await execSSH("cat", undefined, { stdin: "" });
+    expect(state.stdin).toBe("");
+    await execSSH("cat", undefined, { stdin: "台北\n'$(literal)'" });
+    expect(state.stdin).toBe("台北\n'$(literal)'");
+  });
+
+  it("does not send stdin in dry-run mode", async () => {
+    vi.stubEnv("HOMELAB_DRY_RUN", "true");
+    await expect(execSSH("cat", undefined, { stdin: "private payload" })).rejects.toThrow(/dry-run/);
+    expect(state.stdin).toBeUndefined();
+  });
+
   it("resolves trimmed stdout on exit 0", async () => {
     state.behavior = { stdout: ["hello ", "world\n"], exitCode: 0 };
     await expect(execSSH("echo hi")).resolves.toBe("hello world");

@@ -69,6 +69,36 @@ describe("input validation schemas", () => {
   });
 
 
+  describe("grafanaImport", () => {
+    const schema = schemaOf("grafanaImport");
+    const valid = { dashboardJson: '{"title":"Pi"}', confirm: true };
+
+    it("accepts a raw dashboard or snapshot export and defaults overwrite to false", () => {
+      expect(schema.parse(valid).overwrite).toBe(false);
+      expect(schema.parse({ ...valid, dashboardJson: '{"dashboard":{"title":"Pi","uid":null},"meta":{"folderUid":"lab"}}', folderUid: "", overwrite: true }).folderUid).toBe("");
+    });
+
+    it.each(["", "not json", "null", "[]", "42", "{}", '{"title":" "}', '{"title":42}', '{"title":"Pi","uid":5}', '{"dashboard":[]}', '{"dashboard":{"title":"Pi"},"meta":{"folderUid":5}}'])
+      ("rejects an invalid dashboard: %s", (dashboardJson) => {
+        expect(schema.safeParse({ ...valid, dashboardJson }).success).toBe(false);
+      });
+
+    it("measures the size cap in UTF-8 bytes and accepts the exact limit", () => {
+      expect(schema.safeParse({ ...valid, dashboardJson: valid.dashboardJson.padEnd(1024 * 1024, " ") }).success).toBe(true);
+      expect(schema.safeParse({ ...valid, dashboardJson: valid.dashboardJson.padEnd(1024 * 1024 + 1, " ") }).success).toBe(false);
+      const dashboardJson = JSON.stringify({ title: "Pi", description: "台".repeat(350000) });
+      expect(dashboardJson.length).toBeLessThan(1024 * 1024);
+      expect(schema.safeParse({ ...valid, dashboardJson }).success).toBe(false);
+    });
+
+    it("requires confirm and rejects invalid overwrite or folder values", () => {
+      expect(schema.safeParse({ dashboardJson: valid.dashboardJson }).success).toBe(false);
+      expect(schema.safeParse({ ...valid, confirm: "yes" }).success).toBe(false);
+      expect(schema.safeParse({ ...valid, overwrite: "yes" }).success).toBe(false);
+      expect(schema.safeParse({ ...valid, folderUid: "x".repeat(41) }).success).toBe(false);
+    });
+  });
+
   describe("composePull", () => {
     const schema = schemaOf("composePull");
 

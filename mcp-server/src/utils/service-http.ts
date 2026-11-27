@@ -87,12 +87,12 @@ export function adguardAuth(node?: string): string {
 export function grafanaAuth(node?: string): string {
   const token = setting(node, "HOMELAB_GRAFANA_TOKEN");
   if (token) {
-    return `-H 'Authorization: Bearer ${token}'`;
+    return `-H ${shellQuote(`Authorization: Bearer ${token}`)}`;
   }
   const user = setting(node, "HOMELAB_GRAFANA_USER", "admin");
   const password = setting(node, "HOMELAB_GRAFANA_PASSWORD");
   if (password) {
-    return `-u '${user}:${password}'`;
+    return `-u ${shellQuote(`${user}:${password}`)}`;
   }
   return `-u 'admin:admin'`;
 }

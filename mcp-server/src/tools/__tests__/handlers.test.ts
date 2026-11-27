@@ -16,6 +16,7 @@ import { execSSH, nodeSetting, listNodes } from "../../utils/ssh-api.js";
 import { CommandFailedError } from "../../utils/errors.js";
 import { register as prometheusQuery } from "../prometheusQuery.js";
 import { register as grafanaSnapshot } from "../grafanaSnapshot.js";
+import { register as grafanaImport } from "../grafanaImport.js";
 import { register as uptimeKumaStatus } from "../uptimeKumaStatus.js";
 import { register as adguardRewrites } from "../adguardRewrites.js";
 import { register as adguardRewriteSet } from "../adguardRewriteSet.js";
@@ -544,6 +545,101 @@ describe("grafanaSnapshot", () => {
     const result = await handlerOf(grafanaSnapshot)({ dashboard: "missing-uid" });
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('dashboard UID "missing-uid"');
+  });
+});
+
+describe("grafanaImport", () => {
+  const args = { dashboardJson: '{"title":"Pi"}', confirm: true };
+  const success = JSON.stringify({ status: "success", uid: "pi", url: "/d/pi/pi" });
+  const payload = () => JSON.parse(mockExecSSH.mock.calls[0][2]!.stdin!);
+  const defaultSetting = vi.mocked(nodeSetting).getMockImplementation()!;
+
+  beforeEach(() => { mockExecSSH.mockReset(); });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.mocked(nodeSetting).mockImplementation(defaultSetting);
+  });
+
+  it("imports a raw dashboard via stdin and returns its UID and URL", async () => {
+    const dashboard = { title: "台北's Pi", panels: [{ description: "private-json; $(touch /tmp/never)" }] };
+    mockExecSSH.mockResolvedValueOnce(success);
+    const result = await handlerOf(grafanaImport)({ ...args, dashboardJson: JSON.stringify(dashboard) });
+    expect(cmd()).toContain("-X POST");
+    expect(cmd()).toContain("--data-binary @-");
+    expect(cmd()).toContain("http://localhost:3000/api/dashboards/db");
+    expect(cmd()).not.toContain("private-json");
+    expect(cmd()).not.toContain("touch");
+    expect(payload()).toEqual({ dashboard: { ...dashboard, id: null, version: 0 }, folderUid: "", overwrite: false });
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("UID: pi\nURL: /d/pi/pi");
+  });
+
+  it.each([undefined, "another-folder", ""])("imports snapshot envelopes with folder override %j", async (folderUid) => {
+    mockExecSSH.mockResolvedValueOnce(success);
+    await handlerOf(grafanaImport)({
+      ...args, folderUid, overwrite: true,
+      dashboardJson: JSON.stringify({ dashboard: { title: "Pi", uid: "pi", id: 42, version: 10, panels: [] }, meta: { folderUid: "lab", folderId: 7 } }),
+    });
+    expect(payload()).toEqual({ dashboard: { title: "Pi", uid: "pi", id: null, version: 0, panels: [] }, folderUid: folderUid ?? "lab", overwrite: true });
+  });
+
+  it("does not let a saved ID or version bypass overwrite=false", async () => {
+    mockExecSSH.mockResolvedValueOnce(success);
+    await handlerOf(grafanaImport)({ ...args, dashboardJson: '{"title":"Pi","uid":"pi","id":42,"version":10}' });
+    expect(payload()).toMatchObject({ dashboard: { id: null, version: 0, uid: "pi" }, overwrite: false });
+  });
+
+  it("uses the selected node's auth and port", async () => {
+    vi.mocked(nodeSetting).mockImplementation((node, key) => node === "nas"
+      ? ({ HOMELAB_GRAFANA_TOKEN: "node-token", HOMELAB_GRAFANA_PORT: "3300" } as Record<string, string>)[key]
+      : undefined);
+    mockExecSSH.mockResolvedValueOnce(success);
+    await handlerOf(grafanaImport)({ ...args, node: "nas" });
+    expect(cmd()).toContain("Authorization: Bearer node-token");
+    expect(cmd()).toContain("localhost:3300/");
+    expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+  });
+
+  it.each([undefined, false])("previews without confirm=%j and hides credentials and dashboard content", async (confirm) => {
+    vi.stubEnv("HOMELAB_GRAFANA_TOKEN", "secret' token-tail");
+    const result = await handlerOf(grafanaImport)({ ...args, confirm, folderUid: "lab", overwrite: true,
+      dashboardJson: '{"title":"Pi","panels":[{"description":"private-json"}]}' });
+    const text = result.content[0].text;
+    expect(mockExecSSH).not.toHaveBeenCalled();
+    expect(text).toContain("folder: lab; overwrite: true");
+    expect(text).toContain("/api/dashboards/db");
+    expect(text).not.toMatch(/secret|token-tail|private-json/);
+  });
+
+  it.each(["not-json", "null", "[]", '{"title":""}', " ".repeat(1024 * 1024 + 1)])
+    ("rejects invalid or oversized input before connecting (case %#)", async (dashboardJson) => {
+      const result = await handlerOf(grafanaImport)({ ...args, dashboardJson });
+      expect(result.isError).toBe(true);
+      expect(mockExecSSH).not.toHaveBeenCalled();
+    });
+
+  it.each(["{}", "[]", "null", '{"uid":"pi","url":"/d/pi","status":"error"}', '{"uid":"pi","status":"success"}', "<html>login</html>", "[output truncated: showing last 5 of 100 bytes]\nhello"])
+    ("does not report success for an invalid response: %s", async (output) => {
+      mockExecSSH.mockResolvedValueOnce(output);
+      const result = await handlerOf(grafanaImport)(args);
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).not.toContain("Dashboard imported.");
+    });
+
+  it("explains auth, folders and overwrite conflicts on an HTTP failure", async () => {
+    mockExecSSH.mockRejectedValueOnce(failed(22));
+    const result = await handlerOf(grafanaImport)(args);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toMatch(/HOMELAB_GRAFANA_TOKEN.*destination folder.*overwrite=true/);
+  });
+
+  it("masks the auth flag even when an error includes the command", async () => {
+    vi.stubEnv("HOMELAB_GRAFANA_TOKEN", "secret' token-tail");
+    mockExecSSH.mockImplementationOnce(async (command) => { throw new Error(command); });
+    const result = await handlerOf(grafanaImport)(args);
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).not.toMatch(/secret|token-tail/);
+    expect(result.content[0].text).toContain("Bearer ****");
   });
 });
 
