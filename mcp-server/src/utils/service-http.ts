@@ -54,7 +54,12 @@ export const SERVICES = {
   prometheus: { name: "Prometheus", portEnv: "HOMELAB_PROMETHEUS_PORT", defaultPort: 9090 },
   alertmanager: { name: "Alertmanager", portEnv: "HOMELAB_ALERTMANAGER_PORT", defaultPort: 9093 },
   uptimeKuma: { name: "Uptime Kuma", portEnv: "HOMELAB_UPTIME_KUMA_PORT", defaultPort: 3001 },
-  speedtest: { name: "Speedtest Tracker", portEnv: "HOMELAB_SPEEDTEST_PORT", defaultPort: 8765 },
+  speedtest: {
+    name: "Speedtest Tracker",
+    portEnv: "HOMELAB_SPEEDTEST_PORT",
+    defaultPort: 8765,
+    authHint: "Check HOMELAB_SPEEDTEST_TOKEN and its results:read permission.",
+  },
   ntfy: { name: "Ntfy", portEnv: "HOMELAB_NTFY_PORT", defaultPort: 8080 },
 } satisfies Record<string, ServiceDef>;
 

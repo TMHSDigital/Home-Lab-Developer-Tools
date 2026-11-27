@@ -95,6 +95,7 @@ Set environment variables:
 | `HOMELAB_GRAFANA_PORT` | `3000` | Grafana port override |
 | `HOMELAB_ALERTMANAGER_PORT` | `9093` | Alertmanager port override |
 | `HOMELAB_UPTIME_KUMA_PORT` | `3001` | Uptime Kuma port override |
+| `HOMELAB_SPEEDTEST_TOKEN` | (empty) | Required for speedtest results: create an API token with `results:read` permission at `/admin/api-tokens` in Speedtest Tracker |
 | `HOMELAB_SPEEDTEST_PORT` | `8765` | Speedtest Tracker port override |
 | `HOMELAB_ADGUARD_USER` | `admin` | AdGuard Home username |
 | `HOMELAB_ADGUARD_PASSWORD` | `admin` | AdGuard Home password |
@@ -111,6 +112,8 @@ Set environment variables:
 | `HOMELAB_UPTIME_KUMA_SLUG` | `default` | Status page slug used by `homelab_uptimeKumaStatus` when no `slug` is passed |
 | `HOMELAB_NTFY_TOPICS` | (unset) | Default topic list (comma-separated) for `homelab_ntfyTopics` when no `topic` is passed |
 | `HOMELAB_SSH_TIMEOUT_MS` | `30000` | Default timeout (connect + command) for tools without their own budget. Long-running tools (apt upgrade, compose pull, restic backup/restore, image scans) use longer built-in timeouts |
+
+`homelab_speedtestResults` requests up to `count` results (default 5, maximum 100), newest first, from Speedtest Tracker's `/api/v1/results` endpoint. The response contains a `data` array and pagination metadata. Set `HOMELAB_SPEEDTEST_TOKEN` in your MCP client's environment, or in the target node's `env` override in `HOMELAB_NODES`.
 
 ## Resources and Prompts
 
