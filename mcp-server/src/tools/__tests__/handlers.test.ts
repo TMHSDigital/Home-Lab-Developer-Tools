@@ -1,18 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+import { z } from "zod";
+import { TOOLS } from "../../tool-registry.js";
 
-vi.mock("../../utils/ssh-api.js", () => ({
-  execSSH: vi.fn(),
-  errorResponse: vi.fn((error: unknown) => ({
-    content: [{ type: "text" as const, text: error instanceof Error ? error.message : "Unknown error" }],
-    isError: true,
-  })),
-  nodeSetting: vi.fn((_node: string | undefined, key: string) => process.env[key] || undefined),
-  getNodeConfig: vi.fn(() => ({ host: "raspberrypi.local", username: "pi", keyPath: "", env: {} })),
-  listNodes: vi.fn(() => [{ name: "default", host: "raspberrypi.local" }]),
-  TIMEOUTS: { long: 1_800_000, backup: 3_600_000, medium: 300_000 },
-}));
+vi.mock("../../utils/ssh-api.js", async (importOriginal) => {
+  const { mockSSHModule } = await import("./helpers/mock-ssh.js");
+  return mockSSHModule(await importOriginal<typeof import("../../utils/ssh-api.js")>());
+});
+import { useSSHMock } from "./helpers/mock-ssh.js";
 
-import { execSSH, nodeSetting, listNodes } from "../../utils/ssh-api.js";
+import { execSSH, TIMEOUTS } from "../../utils/ssh-api.js";
 import { CommandFailedError } from "../../utils/errors.js";
 import { register as prometheusQuery } from "../prometheusQuery.js";
 import { register as grafanaSnapshot } from "../grafanaSnapshot.js";
@@ -52,7 +48,7 @@ import {
 } from "../adguardFilterToggle.js";
 
 const mockExecSSH = vi.mocked(execSSH);
-const ENV_KEYS = ["HOMELAB_GRAFANA_TOKEN", "HOMELAB_ADGUARD_PORT", "HOMELAB_COMPOSE_FILES", "HOMELAB_RESTIC_PASSWORD_FILE"];
+useSSHMock(mockExecSSH, { nas: { host: "nas.local" } });
 
 type Handler = (args: Record<string, unknown>) => Promise<{ content: { text: string }[]; isError?: boolean }>;
 
@@ -67,16 +63,22 @@ function handlerOf(register: (server: never) => void): Handler {
   return handler;
 }
 
+/** Exercise registered defaults as well as the handler for valid MCP calls. */
+async function invoke(tool: string, args: Record<string, unknown> = {}) {
+  let handler: Handler | undefined;
+  let shape: z.ZodRawShape = {};
+  TOOLS[tool]({
+    registerTool: (_name: string, config: { inputSchema: z.ZodRawShape }, h: Handler) => {
+      shape = config.inputSchema;
+      handler = h;
+    },
+  } as never);
+  if (!handler) throw new Error(`handler not captured: ${tool}`);
+  return handler(z.object(shape).parse(args));
+}
+
 const cmd = (i = 0) => String(mockExecSSH.mock.calls[i][0]);
 const failed = (code: number) => new CommandFailedError("http", code, "");
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
-
-afterEach(() => {
-  for (const k of ENV_KEYS) delete process.env[k];
-});
 
 describe("alert silences", () => {
   const silence = (id: string, state: string, endsAt: string) => ({
@@ -304,14 +306,17 @@ describe("bounded JSON output", () => {
 });
 
 describe('node: "all" fan-out', () => {
-  const fleet = [
-    { name: "default", host: "raspberrypi.local", port: 22 },
-    { name: "nas", host: "nas.local", port: 22 },
-    { name: "zero", host: "zero.local", port: 22 },
-  ];
-
+  it("piStatus annotates each node's hardware output and preserves offline errors", async () => {
+    mockExecSSH.mockResolvedValueOnce("throttled=0x1").mockRejectedValueOnce(new Error("nas unavailable"));
+    const result = await invoke("piStatus", { node: "all" });
+    expect(mockExecSSH.mock.calls.map((call) => call[1])).toEqual([undefined, "nas"]);
+    expect(result.isError).toBeUndefined();
+    expect(result.content[0].text).toContain("1 of 2 nodes responded.");
+    expect(result.content[0].text).toContain("Under-voltage: now YES, since boot no");
+    expect(result.content[0].text).toContain("=== nas (nas.local) ===\nError: nas unavailable");
+  });
   it("nodeStatus reports every node, with per-node errors for offline ones", async () => {
-    vi.mocked(listNodes).mockReturnValueOnce(fleet);
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local" }, zero: { host: "zero.local" } });
     mockExecSSH.mockImplementation(async (_cmd, node) => {
       if (node === "zero") throw new Error("Cannot connect to zero.local\nmore detail");
       return `up on ${node ?? "default"}`;
@@ -325,12 +330,10 @@ describe('node: "all" fan-out', () => {
         "=== nas (nas.local) ===\nup on nas\n\n" +
         "=== zero (zero.local) ===\nError: Cannot connect to zero.local",
     );
-    mockExecSSH.mockReset();
   });
 
   it("serviceHealth fans out and is an error only when every node fails", async () => {
     const row = JSON.stringify({ Names: "web", State: "exited", Status: "Exited (1)", Ports: "" });
-    vi.mocked(listNodes).mockReturnValueOnce(fleet.slice(0, 2));
     mockExecSSH.mockResolvedValueOnce(row).mockRejectedValueOnce(new Error("timeout"));
     const mixed = await handlerOf(serviceHealth)({ node: "all" });
     expect(mixed.isError).toBeUndefined();
@@ -338,7 +341,6 @@ describe('node: "all" fan-out', () => {
     expect(mixed.content[0].text).toContain("Containers needing attention: web");
     expect(mixed.content[0].text).toContain("=== nas (nas.local) ===\nError: timeout");
 
-    vi.mocked(listNodes).mockReturnValueOnce(fleet.slice(0, 2));
     mockExecSSH.mockRejectedValueOnce(new Error("down")).mockRejectedValueOnce(new Error("down"));
     const allDown = await handlerOf(serviceHealth)({ node: "all" });
     expect(allDown.isError).toBe(true);
@@ -346,7 +348,6 @@ describe('node: "all" fan-out', () => {
   });
 
   it("fanOut tools keep each node's own error text and fail only when every node fails", async () => {
-    vi.mocked(listNodes).mockReturnValueOnce(fleet.slice(0, 2));
     mockExecSSH
       .mockResolvedValueOnce("Status: active")
       .mockRejectedValueOnce(new CommandFailedError("ufw", 1, "sudo: a password is required"));
@@ -355,9 +356,8 @@ describe('node: "all" fan-out', () => {
     expect(mockExecSSH.mock.calls.map((c) => c[1])).toEqual([undefined, "nas"]);
     expect(result.content[0].text).toContain("1 of 2 nodes responded.");
     expect(result.content[0].text).toContain("=== default (raspberrypi.local) ===\nStatus: active");
-    expect(result.content[0].text).toContain("=== nas (nas.local) ===\nError: sudo: a password is required");
+    expect(result.content[0].text).toContain("=== nas (nas.local) ===\nError: [CommandFailedError] sudo: a password is required");
 
-    vi.mocked(listNodes).mockReturnValueOnce(fleet.slice(0, 2));
     mockExecSSH.mockRejectedValueOnce(new Error("down")).mockRejectedValueOnce(new Error("down"));
     expect((await handlerOf(ufwStatus)({ node: "all" })).isError).toBe(true);
   });
@@ -522,6 +522,16 @@ describe("prometheusQuery", () => {
 });
 
 describe("adguardQueryLog", () => {
+  it("applies the default count and the real node registry's port and credentials", async () => {
+    process.env.HOMELAB_ADGUARD_PORT = "3000";
+    process.env.HOMELAB_NODES = JSON.stringify({
+      nas: { host: "nas.local", env: { HOMELAB_ADGUARD_PORT: "3001", HOMELAB_ADGUARD_USER: "dns", HOMELAB_ADGUARD_PASSWORD: "test-password" } },
+    });
+    mockExecSSH.mockResolvedValueOnce('{"data":[]}');
+    const result = await invoke("adguardQueryLog", { node: "nas" });
+    expect(mockExecSSH).toHaveBeenCalledWith("curl -sf -u 'dns:test-password' 'http://localhost:3001/control/querylog?limit=25'", "nas");
+    expect(result.content[0].text).toBe('{"data":[]}');
+  });
   it("encodes the search term, including single quotes", async () => {
     mockExecSSH.mockResolvedValueOnce('{"data":[]}');
     await handlerOf(adguardQueryLog)({ count: 25, search: "o'reilly (x)" });
@@ -643,6 +653,30 @@ describe("npmProxyHosts", () => {
 });
 
 describe("npmCerts and certList", () => {
+  it.each(["npmCerts", "certList"])("%s logs in and uses its token in the certificate request", async (tool) => {
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local", env: {
+      HOMELAB_NPM_PORT: "8181", HOMELAB_NPM_EMAIL: "admin@example.com", HOMELAB_NPM_PASSWORD: "test-password",
+    } } });
+    if (tool === "certList") mockExecSSH.mockResolvedValueOnce("__CERTBOT_NOT_INSTALLED__");
+    mockExecSSH.mockResolvedValueOnce("[]");
+    const result = await invoke(tool, { node: "nas" });
+    const command = cmd(tool === "certList" ? 1 : 0);
+    expect(command).toContain('"identity":"admin@example.com","secret":"test-password"');
+    expect(command).toContain("http://localhost:8181/api/tokens");
+    expect(command).toContain('-H "Authorization: Bearer $token"');
+    expect(command).toContain("http://localhost:8181/api/nginx/certificates");
+    expect(result.content[0].text).toContain("[]");
+  });
+
+  it.each(["npmCerts", "certList"])("%s reports a login response without a token", async (tool) => {
+    if (tool === "certList") mockExecSSH.mockResolvedValueOnce("__CERTBOT_NOT_INSTALLED__");
+    mockExecSSH.mockRejectedValueOnce(new CommandFailedError("npm login", 65, "Nginx Proxy Manager login returned no token."));
+    const result = await invoke(tool);
+    expect(cmd(tool === "certList" ? 1 : 0)).toContain("exit 65");
+    expect(result.content[0].text).toContain("login returned no token");
+    if (tool === "npmCerts") expect(result.isError).toBe(true);
+    else expect(result.content[0].text).toContain("Could not query NPM certificates");
+  });
   it("npmCerts uses one SSH round trip", async () => {
     mockExecSSH.mockResolvedValueOnce('[{"id":2}]');
     const result = await handlerOf(npmCerts)({});
@@ -722,9 +756,9 @@ describe("inventorySync", () => {
   });
 
   it("uses the node's HOMELAB_ANSIBLE_INVENTORY override", async () => {
-    vi.mocked(nodeSetting).mockImplementationOnce((node, key) =>
-      node === "lab" && key === "HOMELAB_ANSIBLE_INVENTORY" ? "/srv/ansible/hosts" : undefined,
-    );
+    process.env.HOMELAB_NODES = JSON.stringify({
+      lab: { host: "lab.local", env: { HOMELAB_ANSIBLE_INVENTORY: "/srv/ansible/hosts" } },
+    });
     mockExecSSH.mockResolvedValueOnce("[pis]");
     const text = (await handlerOf(inventorySync)({ source: "ansible", node: "lab" })).content[0].text;
     expect(cmd()).toContain("cat '/srv/ansible/hosts'");
@@ -759,18 +793,14 @@ describe("logSearch", () => {
 
 describe("backupRun", () => {
   it("runs the node's HOMELAB_BACKUP_SCRIPT", async () => {
-    vi.mocked(nodeSetting).mockImplementation((node, key) =>
-      node === "nas" && key === "HOMELAB_BACKUP_SCRIPT" ? "/srv/scripts/restic-backup.sh" : undefined,
-    );
-    try {
-      mockExecSSH.mockResolvedValueOnce("done");
-      await handlerOf(backupRun)({ node: "nas", confirm: true });
-      expect(cmd()).toContain("sudo test -x '/srv/scripts/restic-backup.sh'");
-      expect(cmd()).toContain("out=$(sudo '/srv/scripts/restic-backup.sh' 2>&1)");
-      expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
-    } finally {
-      vi.mocked(nodeSetting).mockImplementation((_n, key) => process.env[key] || undefined);
-    }
+    process.env.HOMELAB_NODES = JSON.stringify({
+      nas: { host: "nas.local", env: { HOMELAB_BACKUP_SCRIPT: "/srv/scripts/restic-backup.sh" } },
+    });
+    mockExecSSH.mockResolvedValueOnce("done");
+    await handlerOf(backupRun)({ node: "nas", confirm: true });
+    expect(cmd()).toContain("sudo test -x '/srv/scripts/restic-backup.sh'");
+    expect(cmd()).toContain("out=$(sudo '/srv/scripts/restic-backup.sh' 2>&1)");
+    expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
   });
 
   it("rejects a relative or unusual script path without running anything", async () => {
@@ -858,6 +888,15 @@ describe("adguardFilterToggle", () => {
 });
 
 describe("composePull", () => {
+  it("discovers compose files and uses the shared long timeout on the target node", async () => {
+    mockExecSSH.mockResolvedValueOnce("pulled");
+    const result = await invoke("composePull", { node: "nas" });
+    expect(cmd()).toContain("for f in compose.");
+    expect(cmd()).toContain("for f in compose.*.yml;");
+    expect(cmd()).toContain("docker compose $files pull 2>&1");
+    expect(mockExecSSH.mock.calls[0].slice(1)).toEqual(["nas", { timeoutMs: TIMEOUTS.long }]);
+    expect(result.content[0].text).toContain("pulled");
+  });
   it("pulls a stack's services without requiring compose.base.yml", async () => {
     mockExecSSH.mockResolvedValueOnce("pulled");
     await handlerOf(composePull)({ stacks: ["compose.apps.yml"] });
@@ -913,9 +952,6 @@ describe("AdGuard DNS rewrites", () => {
     expect(mockExecSSH).not.toHaveBeenCalled();
   });
 
-  beforeEach(() => mockExecSSH.mockReset());
-  afterEach(() => vi.unstubAllEnvs());
-
   it.each(["[]", '[{"domain":"service.home.lab","answer":"192.0.2.1","enabled":true}]'])(
     "lists rewrite entries, including empty lists", async (body) => {
       mockExecSSH.mockResolvedValueOnce(body);
@@ -963,20 +999,16 @@ describe("AdGuard DNS rewrites", () => {
   });
 
   it("uses node-specific credentials and port for both tools", async () => {
-    vi.mocked(nodeSetting).mockImplementation((node, key) => node === "nas" ? ({
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local", env: {
       HOMELAB_ADGUARD_PORT: "8081", HOMELAB_ADGUARD_USER: "dns", HOMELAB_ADGUARD_PASSWORD: "node-password",
-    } as Record<string, string>)[key] : undefined);
-    try {
-      mockExecSSH.mockResolvedValueOnce("[]").mockResolvedValueOnce("200");
-      await handlerOf(adguardRewrites)({ node: "nas" });
-      await handlerOf(adguardRewriteSet)({ node: "nas", action: "delete", domain: "service.home.lab", answer: "192.0.2.1", confirm: true });
-      for (const [command, node] of mockExecSSH.mock.calls) {
-        expect(node).toBe("nas");
-        expect(command).toContain("http://localhost:8081/control/rewrite/");
-        expect(command).toContain("-u 'dns:node-password'");
-      }
-    } finally {
-      vi.mocked(nodeSetting).mockReset();
+    } } });
+    mockExecSSH.mockResolvedValueOnce("[]").mockResolvedValueOnce("200");
+    await handlerOf(adguardRewrites)({ node: "nas" });
+    await handlerOf(adguardRewriteSet)({ node: "nas", action: "delete", domain: "service.home.lab", answer: "192.0.2.1", confirm: true });
+    for (const [command, node] of mockExecSSH.mock.calls) {
+      expect(node).toBe("nas");
+      expect(command).toContain("http://localhost:8081/control/rewrite/");
+      expect(command).toContain("-u 'dns:node-password'");
     }
   });
 
@@ -986,5 +1018,168 @@ describe("AdGuard DNS rewrites", () => {
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain("HOMELAB_ADGUARD_PASSWORD");
     expect(result.content[0].text).not.toContain(" added.");
+  });
+});
+
+describe("HTTP service handlers", () => {
+  it("adguardFilters returns the authenticated filter list", async () => {
+    mockExecSSH.mockResolvedValueOnce('{"filters":[]}');
+    const result = await invoke("adguardFilters");
+    expect(cmd()).toBe("curl -sf -u 'admin:admin' 'http://localhost:3000/control/filtering/status'");
+    expect(result.content[0].text).toBe('{"filters":[]}');
+  });
+
+  it("alertList sends Alertmanager's suppression flags", async () => {
+    mockExecSSH.mockResolvedValueOnce("[]");
+    const result = await invoke("alertList", { state: "suppressed", node: "nas" });
+    expect(mockExecSSH).toHaveBeenCalledWith("curl -sf 'http://localhost:9093/api/v2/alerts?active=false&silenced=true&inhibited=true&unprocessed=false'", "nas");
+    expect(result.content[0].text).toBe("[]");
+  });
+
+  it("speedtestResults uses the configured node port and explains connection failure", async () => {
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local", env: {
+      HOMELAB_SPEEDTEST_PORT: "18765", HOMELAB_SPEEDTEST_TOKEN: "test-token",
+    } } });
+    mockExecSSH.mockRejectedValueOnce(failed(7));
+    const result = await invoke("speedtestResults", { node: "nas" });
+    expect(cmd()).toContain("http://localhost:18765/");
+    expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Could not connect to Speedtest Tracker on port 18765");
+  });
+
+  it("ntfyTopics uses configured topics, a node-specific port and the default time window", async () => {
+    process.env.HOMELAB_NODES = JSON.stringify({ nas: { host: "nas.local", env: {
+      HOMELAB_NTFY_TOPICS: "alerts, backups", HOMELAB_NTFY_PORT: "8088",
+    } } });
+    mockExecSSH.mockResolvedValueOnce("");
+    const result = await invoke("ntfyTopics", { node: "nas" });
+    expect(mockExecSSH).toHaveBeenCalledWith("curl -sf 'http://localhost:8088/alerts,backups/json?since=1h&poll=1'", "nas");
+    expect(result.content[0].text).toBe("No recent messages found.");
+  });
+});
+
+describe("ntfySend", () => {
+  it("publishes a quoted body with optional headers and reports empty success output", async () => {
+    mockExecSSH.mockResolvedValueOnce("");
+    const result = await invoke("ntfySend", { topic: "alerts", message: "Pi's backup finished", title: "Backup", priority: "high", tags: "white_check_mark", node: "nas" });
+    expect(cmd()).toContain("-d 'Pi'\\''s backup finished'");
+    expect(cmd()).toContain("-H 'Title: Backup' -H 'Priority: high' -H 'Tags: white_check_mark'");
+    expect(cmd()).toContain("'http://localhost:8080/alerts'");
+    expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+    expect(result.content[0].text).toBe("Notification sent to topic 'alerts'.");
+  });
+
+  it("omits optional headers and returns the service response", async () => {
+    mockExecSSH.mockResolvedValueOnce('{"id":"message-id"}');
+    const result = await invoke("ntfySend", { topic: "alerts", message: "ready" });
+    expect(cmd()).not.toContain("-H ");
+    expect(result.content[0].text).toBe('{"id":"message-id"}');
+  });
+
+  it("maps connection failures through the real HTTP error helper", async () => {
+    mockExecSSH.mockRejectedValueOnce(failed(7));
+    const result = await invoke("ntfySend", { topic: "alerts", message: "ready" });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("Could not connect to Ntfy on port 8080");
+    expect(result.content[0].text).toContain("HOMELAB_NTFY_PORT");
+  });
+});
+
+describe("OS and log handlers", () => {
+  it("aptHistory applies its default limit and reports no entries", async () => {
+    mockExecSSH.mockResolvedValueOnce("");
+    const result = await invoke("aptHistory");
+    expect(cmd()).toContain("history.log.*.gz");
+    expect(cmd()).toContain("| tac |");
+    expect(cmd()).toMatch(/\| tail -n 50$/);
+    expect(result.content[0].text).toBe("No apt history entries found.");
+  });
+
+  it.each(["", "curl/stable 8.0 arm64 [upgradable from: 7.0]"])("aptUpgradable handles output %j", async (output) => {
+    mockExecSSH.mockResolvedValueOnce(output);
+    const result = await invoke("aptUpgradable", { node: "nas" });
+    expect(mockExecSSH).toHaveBeenCalledWith("apt list --upgradable 2>/dev/null | grep -v '^Listing'", "nas");
+    expect(result.content[0].text).toBe(output || "All packages are up to date.");
+  });
+
+  it.each([undefined, "sshd"])("fail2banStatus selects jail %j", async (jail) => {
+    mockExecSSH.mockResolvedValueOnce("Currently banned: 0");
+    const result = await invoke("fail2banStatus", { jail, node: "nas" });
+    expect(mockExecSSH).toHaveBeenCalledWith(`sudo fail2ban-client status${jail ? " 'sshd'" : ""} 2>&1`, "nas");
+    expect(result.content[0].text).toBe("Currently banned: 0");
+  });
+
+  it("openPorts returns the listening sockets and retains command-failure diagnostics", async () => {
+    mockExecSSH.mockResolvedValueOnce("LISTEN 0 128 *:22").mockRejectedValueOnce(new CommandFailedError("ss", 1, "sudo: a password is required"));
+    expect((await invoke("openPorts", { node: "nas" })).content[0].text).toBe("LISTEN 0 128 *:22");
+    expect(mockExecSSH).toHaveBeenCalledWith("sudo ss -tlnp 2>&1", "nas");
+    const result = await invoke("openPorts");
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain("sudo: a password is required");
+    expect(result.content[0].text).toContain("Suggestion: The command failed");
+  });
+
+  it("serviceLogs converts days and applies the default line limit", async () => {
+    mockExecSSH.mockResolvedValueOnce("");
+    const result = await invoke("serviceLogs", { service: "grafana", since: "7d", node: "nas" });
+    expect(mockExecSSH).toHaveBeenCalledWith("docker logs --tail 50 --since 168h grafana 2>&1", "nas");
+    expect(result.content[0].text).toBe("No logs found for grafana.");
+  });
+
+  it.each([["30m", "-30m"], ["2026-11-23T00:00:00Z", "2026-11-23 00:00:00 UTC"]])("journalLogs converts %s and preserves priority zero", async (since, expected) => {
+    mockExecSSH.mockResolvedValueOnce("");
+    const result = await invoke("journalLogs", { unit: "sshd", priority: 0, since, node: "nas" });
+    expect(mockExecSSH).toHaveBeenCalledWith(`journalctl --no-pager -n 50 --unit 'sshd' --priority 0 --since '${expected}'`, "nas");
+    expect(result.content[0].text).toBe("No journal entries matched the filters.");
+  });
+
+  it("kernelInfo preserves labelled kernel output", async () => {
+    const output = "=== Kernel ===\nLinux\n=== Boot Parameters ===\nquiet";
+    mockExecSSH.mockResolvedValueOnce(output);
+    const result = await invoke("kernelInfo", { node: "nas" });
+    expect(cmd()).toContain("uname -a");
+    expect(cmd()).toContain("cat /proc/cmdline");
+    expect(cmd()).toContain("lsmod | head -31");
+    expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+    expect(result.content[0].text).toBe(output);
+  });
+
+  it("networkInfo probes interfaces, routing, DNS and optional Tailscale", async () => {
+    mockExecSSH.mockResolvedValueOnce("=== Default Gateway ===\nNo default route");
+    const result = await invoke("networkInfo", { node: "nas" });
+    expect(cmd()).toContain("ip -4 addr show");
+    expect(cmd()).toContain("ip route show default");
+    expect(cmd()).toContain("/etc/resolv.conf");
+    expect(cmd()).toContain("command -v tailscale");
+    expect(mockExecSSH.mock.calls[0][1]).toBe("nas");
+    expect(result.content[0].text).toContain("No default route");
+  });
+
+  it("diskUsage applies the path and depth with the shared timeout", async () => {
+    mockExecSSH.mockResolvedValueOnce("=== Filesystem ===\n/dev/root 10G");
+    const result = await invoke("diskUsage", { path: "/srv", depth: 2, node: "nas" });
+    expect(cmd()).toContain("df -h");
+    expect(cmd()).toContain("sudo du -x -h --max-depth=2 /srv");
+    expect(cmd()).toContain("docker system df");
+    expect(mockExecSSH.mock.calls[0].slice(1)).toEqual(["nas", { timeoutMs: TIMEOUTS.medium }]);
+    expect(result.content[0].text).toContain("/dev/root 10G");
+  });
+});
+
+describe("containerScan", () => {
+  it("does not scan when Trivy is missing", async () => {
+    mockExecSSH.mockResolvedValueOnce("missing");
+    const result = await invoke("containerScan");
+    expect(mockExecSSH).toHaveBeenCalledTimes(1);
+    expect(cmd()).toContain("command -v trivy");
+    expect(result.content[0].text).toContain("Trivy is not installed");
+  });
+
+  it("scans the selected image with distinct severities and the long timeout", async () => {
+    mockExecSSH.mockResolvedValueOnce("installed").mockResolvedValueOnce("No vulnerabilities found");
+    const result = await invoke("containerScan", { image: "nginx:latest", severity: ["LOW", "HIGH", "LOW"], node: "nas" });
+    expect(mockExecSSH.mock.calls[1]).toEqual(["trivy image --quiet --severity LOW,HIGH --format table 'nginx:latest' 2>&1", "nas", { timeoutMs: TIMEOUTS.long }]);
+    expect(result.content[0].text).toBe("No vulnerabilities found");
   });
 });

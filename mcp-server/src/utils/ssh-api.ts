@@ -414,14 +414,6 @@ export async function execSSH(
   });
 }
 
-export async function checkSSHAvailable(): Promise<void> {
-  try {
-    await execSSH("echo ok");
-  } catch (error) {
-    throw error;
-  }
-}
-
 /** Text for a dry-run result; later steps of multi-step tools depend on real output. */
 export const DRY_RUN_NOTE = "Nothing was run (HOMELAB_DRY_RUN). Tools that run several commands stop at the first one.";
 

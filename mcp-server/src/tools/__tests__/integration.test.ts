@@ -1,33 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
-vi.mock("../../utils/ssh-api.js", () => ({
-  execSSH: vi.fn(),
-  errorResponse: vi.fn((error: unknown) => ({
-    content: [
-      {
-        type: "text" as const,
-        text: error instanceof Error ? error.message : "Unknown error",
-      },
-    ],
-    isError: true,
-  })),
-  checkSSHAvailable: vi.fn(),
-  TIMEOUTS: { long: 1_800_000, backup: 3_600_000, medium: 300_000 },
-  listNodes: vi.fn(() => [
-    { name: "default", host: "raspberrypi.local", port: 22 },
-    { name: "nas", host: "nas.local", port: 2222 },
-  ]),
-  getNodeConfig: vi.fn((node?: string) =>
-    node === "nas"
-      ? { host: "nas.local", username: "admin", keyPath: "", port: 2222, env: { HOMELAB_BACKUP_REPO: "/srv/restic" } }
-      : { host: "raspberrypi.local", username: "pi", keyPath: "", port: 22, env: {} },
-  ),
-  nodeSetting: vi.fn((node: string | undefined, key: string) =>
-    node === "nas" && key === "HOMELAB_BACKUP_REPO" ? "/srv/restic" : process.env[key] || undefined,
-  ),
-}));
+vi.mock("../../utils/ssh-api.js", async (importOriginal) => {
+  const { mockSSHModule } = await import("./helpers/mock-ssh.js");
+  return mockSSHModule(await importOriginal<typeof import("../../utils/ssh-api.js")>());
+});
+import { useSSHMock } from "./helpers/mock-ssh.js";
 
-import { execSSH, listNodes } from "../../utils/ssh-api.js";
+import { execSSH } from "../../utils/ssh-api.js";
 import { CommandFailedError } from "../../utils/errors.js";
 
 import { register as healthCheck, buildHealthCheckScript, parseHealthCheckOutput } from "../healthCheck.js";
@@ -52,13 +31,11 @@ const { assertCommandSafe } = await vi.importActual<typeof import("../../utils/s
 );
 
 const mockExecSSH = vi.mocked(execSSH);
-const mockListNodes = vi.mocked(listNodes);
+useSSHMock(mockExecSSH, {
+  nas: { host: "nas.local", user: "admin", port: 2222, env: { HOMELAB_BACKUP_REPO: "/srv/restic" } },
+});
 
 describe("integration tests (mocked SSH)", () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-  });
-
   describe("healthCheck", () => {
     it("returns pass/fail checklist from a single round trip", async () => {
       mockExecSSH.mockResolvedValueOnce(
@@ -317,9 +294,7 @@ describe("integration tests (mocked SSH)", () => {
     });
 
     it("returns an error when the node registry is invalid", async () => {
-      mockListNodes.mockImplementationOnce(() => {
-        throw new Error("HOMELAB_NODES is not valid JSON");
-      });
+      process.env.HOMELAB_NODES = "not JSON";
 
       const handler = captureHandler(nodeList);
       const result = await handler({});
