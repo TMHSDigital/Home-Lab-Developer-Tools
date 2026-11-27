@@ -42,6 +42,22 @@ pip install -r requirements-test.txt
 pytest tests/ -v --tb=short
 ```
 
+### SSH end-to-end tests
+
+Every pull request runs a separate OpenSSH fixture job on Ubuntu. It builds a small Debian container, generates a temporary client key, and exercises real SSH authentication, read-only tool commands, and exit-code/stderr handling. No Pi or repository secrets are required.
+
+To run the same tests locally, install Docker, Bash and the OpenSSH client, then run:
+
+```bash
+cd mcp-server
+npm ci
+bash scripts/test-ssh-e2e.sh
+```
+
+The script binds SSH to a random loopback port and removes the container and temporary keys on exit. `HOMELAB_TEST_SSH=true` enables only the fixture suite; ordinary `npm test` skips it.
+
+The optional live-Pi suite runs weekly or through `workflow_dispatch` when the upstream repository has `PI_CONFIGURED=true` and the `PI_HOST`, `PI_USER` and base64-encoded `PI_KEY` secrets. It never runs for pull requests. Manual dispatch without `PI_CONFIGURED=true` reports a configuration error instead of silently skipping. Locally, opt in with `HOMELAB_TEST_PI=true` and the usual `HOMELAB_PI_*` settings, then run `npm test -- src/tools/__tests__/e2e.test.ts`. Each remote test has a 60-second timeout; the live disk-usage probe is limited to `/var/log`.
+
 ## Plugin Structure
 
 ```
